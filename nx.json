@@ -1,0 +1,246 @@
+{
+  "installation": {
+    "version": "20.7.0",
+    "plugins": {
+      "@nx/eslint": "20.7.0",
+      "@nx/jest": "20.7.0",
+      "@nx/js": "20.7.0",
+      "@nx/node": "20.7.0"
+    }
+  },
+  "affected": {
+    "defaultBase": "main"
+  },
+  "tasksRunnerOptions": {
+    "default": {
+      "runner": "nx/tasks-runners/default",
+      "options": {
+        "cacheableOperations": [
+          "build",
+          "test",
+          "lint"
+        ]
+      }
+    }
+  },
+  "targetDefaults": {
+    "build": {
+      "dependsOn": [
+        "^build"
+      ],
+      "inputs": [
+        "production",
+        "^production"
+      ],
+      "executor": "@nx/esbuild:esbuild",
+      "outputs": [
+        "{options.outputPath}"
+      ],
+      "options": {
+        "outputPath": "dist/{projectRoot}",
+        "main": "{projectRoot}/app.ts",
+        "tsConfig": "{projectRoot}/tsconfig.json",
+        "platform": "node",
+        "bundle": true,
+        "format": [
+          "cjs"
+        ],
+        "target": "node20",
+        "sourcemap": true,
+        "minify": true,
+        "outputFileName": "app.cjs",
+        "thirdParty": true,
+        "external": [
+          "aws-sdk"
+        ],
+        "skipTypeCheck": false
+      },
+      "configurations": {
+        "application": {
+          "generatePackageJson": true
+        }
+      }
+    },
+    "run-docker": {
+      "executor": "nx:run-commands",
+      "dependsOn": [
+        "docker"
+      ],
+      "options": {
+        "command": "node scripts/invoke-docker-lambda.js {projectName}"
+      }
+    },
+    "docker": {
+      "executor": "nx:run-commands",
+      "dependsOn": [],
+      "options": {
+        "command": "podman build --build-arg FUNCTION_NAME={projectName} -t personalised-lobby/{projectName}:latest -f Dockerfile ."
+      },
+      "configurations": {
+        "production": {
+          "command": "docker build --build-arg FUNCTION_NAME={projectName} -t gamesys-native-docker-build.artifactory.gamesys.co.uk/personalised-lobby/{projectName}:${TAG:-latest} -f Dockerfile ."
+        },
+        "production-local": {
+          "command": "podman build --build-arg FUNCTION_NAME={projectName} -t gamesys-native-docker-build.artifactory.gamesys.co.uk/personalised-lobby/{projectName}:${TAG:-latest} -f Dockerfile ."
+        }
+      }
+    },
+    "docker-push": {
+      "dependsOn": [],
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "docker push gamesys-native-docker-build.artifactory.gamesys.co.uk/personalised-lobby/{projectName}:${TAG:-latest}"
+      }
+    },
+    "test": {
+      "inputs": [
+        "default",
+        "^production"
+      ],
+      "executor": "@nx/jest:jest",
+      "options": {
+        "jestConfig": "{projectRoot}/jest.config.ts"
+      }
+    },
+    "lint": {
+      "inputs": [
+        "default"
+      ],
+      "executor": "@nx/eslint:lint",
+      "options": {
+        "lintFilePatterns": [
+          "{projectRoot}/**/*.{ts,tsx,js,jsx}"
+        ],
+        "maxWarnings": -1,
+        "fix": true,
+        "quiet": false,
+        "format": "stylish"
+      }
+    },
+    "format": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "prettier --write '**/*.{ts,tsx,js,jsx,json,md}' --config ../../.prettierrc.js --ignore-path ../../.prettierignore --ignore-unknown",
+        "cwd": "{projectRoot}"
+      },
+      "inputs": [
+        "default"
+      ]
+    },
+    "clean": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npm run clean",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "version": {
+      "executor": "@jscutlery/semver:version",
+      "options": {
+        "preset": "conventional",
+        "trackDeps": true,
+        "push": true,
+        "commitMessageFormat": "chore(release): version [{projectName}] [skip ci] {version}",
+        "baseBranch": "main",
+        "noVerify": true,
+        "postTargets": [],
+        "syncVersions": false,
+        "files": [
+          "package.json",
+          "project.json"
+        ]
+      }
+    },
+    "changelog": {
+      "executor": "@jscutlery/semver:changelog",
+      "options": {
+        "outputFile": "{projectRoot}/CHANGELOG.md",
+        "preset": "angular"
+      }
+    },
+    "sync-versions": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node scripts/update-dependencies.js"
+      }
+    },
+    "run": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "scripts/run-lambda.sh {projectName}"
+      },
+      "configurations": {
+        "with-event": {
+          "command": "scripts/run-lambda.sh {projectName} functions/{projectName}/events/event.json"
+        }
+      }
+    },
+    "sam-invoke-eu": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "rm -rf test-output/{projectName}.invoke.eu.out; sam local invoke {args.functionName} -e {projectRoot}/events/event.eu.json > test-output/{projectName}.invoke.eu.out 2>&1"
+      }
+    },
+    "sam-invoke-validate-eu": {
+      "dependsOn": [
+        "sam-invoke-eu"
+      ],
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node scripts/validate-sam-invoke-output.js test-output/{projectName}.invoke.eu.out"
+      }
+    },
+    "sam-invoke-na": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "rm -rf test-output/{projectName}.invoke.na.out; sam local invoke {args.functionName} -e {projectRoot}/events/event.na.json --config-env na > test-output/{projectName}.invoke.na.out 2>&1"
+      }
+    }
+  },
+  "namedInputs": {
+    "default": [
+      "{projectRoot}/**/*",
+      "sharedGlobals"
+    ],
+    "production": [
+      "default",
+      "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
+      "!{projectRoot}/tsconfig.spec.json",
+      "!{projectRoot}/.eslintrc.json",
+      "!{projectRoot}/jest.config.[jt]s"
+    ],
+    "sharedGlobals": [
+      "{workspaceRoot}/package.json"
+    ]
+  },
+  "release": {
+    "version": {
+      "generatorOptions": {
+        "currentVersion": "0.0.0",
+        "commitMessageFormat": "chore(release): publish [skip ci] {version}"
+      }
+    },
+    "changelog": {
+      "workspaceChangelog": {
+        "createRelease": false
+      },
+      "projectChangelogs": {
+        "createRelease": false
+      }
+    },
+    "groups": {
+      "functions": {
+        "projects": [
+          "tag:type:app"
+        ],
+        "projectsRelationship": "independent"
+      },
+      "libraries": {
+        "projects": [
+          "tag:type:lib"
+        ],
+        "projectsRelationship": "independent"
+      }
+    }
+  }
+}

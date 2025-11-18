@@ -1,0 +1,16 @@
+{
+  "name": "get-navigation",
+  "version": "0.10.7",
+  "description": "Get the navigation for the lobby.",
+  "main": "app.js",
+  "repository": "https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3",
+  "relComponent": "igaming_lobby_navigation_v3",
+  "author": "Nightwatch",
+  "scripts": {
+    "unit": "jest",
+    "clean": "rm -rf node_modules coverage",
+    "clean:lock": "rimraf package-lock.json yarn.lock",
+    "format:check": "prettier --check '**/*.{ts,tsx,js,jsx,json,md}'"
+  },
+  "dependencies": {}
+}

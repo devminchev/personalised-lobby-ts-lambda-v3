@@ -1,0 +1,49 @@
+{
+  "$schema": "https://nx.dev/reference/project-configuration",
+  "name": "get-all-games-search",
+  "sourceRoot": "functions/get-all-games-search",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "options": {
+        "outputPath": "dist/functions/GetAllGamesSearchFunction"
+      },
+      "configurations": {
+        "production": {
+          "configuration": "application"
+        }
+      }
+    },
+    "test": {},
+    "lint": {},
+    "format": {},
+    "version": {},
+    "changelog": {},
+    "docker": {},
+    "docker-push": {},
+    "run-docker": {},
+    "sam-invoke-eu": {
+      "options": {
+        "args": [
+          "--functionName=GetAllGamesSearchFunction"
+        ]
+      }
+    },
+    "sam-invoke-validate-eu": {},
+    "sam-invoke-na": {
+      "options": {
+        "args": [
+          "--functionName=GetAllGamesSearchFunction"
+        ]
+      }
+    }
+  },
+  "tags": [
+    "type:app",
+    "scope:pl"
+  ],
+  "dependencies": [
+    "os-client"
+  ],
+  "version": "0.21.7"
+}

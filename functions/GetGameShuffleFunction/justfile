@@ -1,0 +1,16 @@
+clean:
+  yarn clean
+
+clean-lock:
+  yarn clean:lock
+
+clean-all: clean clean-lock
+
+deps:
+  yarn
+
+test:
+  yarn test
+
+lint:
+  yarn lint

@@ -1,0 +1,17 @@
+{
+  "name": "get-gameconfig",
+  "version": "0.13.7",
+  "description": "A GET endpoint that provides game configuration data.",
+  "main": "app.js",
+  "repository": "https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda",
+  "relComponent": "igaming_lobby_game_config_v3",
+  "scripts": {
+    "unit": "jest",
+    "clean": "rm -rf node_modules coverage",
+    "clean:lock": "rimraf package-lock.json yarn.lock",
+    "lint": "eslint '**/*.{ts,tsx,js,jsx}' --fix",
+    "format:check": "prettier --check '**/*.{ts,tsx,js,jsx,json,md}'",
+    "lint:fix": "yarn lint && yarn format"
+  },
+  "dependencies": {}
+}

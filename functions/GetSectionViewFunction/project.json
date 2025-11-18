@@ -1,0 +1,35 @@
+{
+  "$schema": "https://nx.dev/reference/project-configuration",
+  "name": "get-section-view",
+  "sourceRoot": "functions/get-section-view",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "options": {
+        "outputPath": "dist/functions/GetSectionViewFunction"
+      },
+      "configurations": {
+        "production": {
+          "configuration": "application"
+        }
+      }
+    },
+    "test": {},
+    "lint": {},
+    "format": {},
+    "version": {},
+    "changelog": {},
+    "docker": {},
+    "docker-push": {},
+    "run-docker": {},
+    "sync-project-versions": {}
+  },
+  "tags": [
+    "type:app",
+    "scope:pl"
+  ],
+  "dependencies": [
+    "os-client"
+  ],
+  "version": "0.10.3"
+}

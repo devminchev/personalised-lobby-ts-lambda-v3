@@ -1,0 +1,15 @@
+{
+  "name": "get-historical-game-titles",
+  "version": "0.11.7",
+  "description": "format list of game titles and server it back to client via Lambda",
+  "main": "app.js",
+  "repository": "https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda",
+  "relComponent": "igaming_lobby_historical_game_titles_v3",
+  "scripts": {
+    "unit": "jest",
+    "clean": "rm -rf node_modules coverage",
+    "clean:lock": "rimraf package-lock.json yarn.lock",
+    "format:check": "prettier --check '**/*.{ts,tsx,js,jsx,json,md}'"
+  },
+  "dependencies": {}
+}

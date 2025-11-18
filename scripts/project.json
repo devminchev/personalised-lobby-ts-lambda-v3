@@ -1,0 +1,166 @@
+{
+  "name": "scripts",
+  "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "scripts",
+  "projectType": "library",
+  "targets": {
+    "update-version-dashboard-eu-stg": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cat versions.json | ./scripts/push-version-dashboard.js --environment=aws-stg-eu00",
+        "cwd": "."
+      }
+    },
+    "update-version-dashboard-eu-prod": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cat versions.json | ./scripts/push-version-dashboard.js --environment=aws-prod-eu00",
+        "cwd": "."
+      }
+    },
+    "update-version-dashboard-na-stg": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cat versions.json | ./scripts/push-version-dashboard.js --environment=aws-stg-na03",
+        "cwd": "."
+      }
+    },
+    "update-version-dashboard-na-prod": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cat versions.json | ./scripts/push-version-dashboard.js --environment=aws-prod-na03",
+        "cwd": "."
+      }
+    },
+    "create-jira-tickets-eu": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cat versions.json | ./scripts/create-jira-tickets.js --environment=eu",
+        "cwd": "."
+      }
+    },
+    "create-jira-tickets-na": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cat versions.json | ./scripts/create-jira-tickets.js --environment=na",
+        "cwd": "."
+      }
+    },
+    "transition-jira-tickets-deploy-pp-eu": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cat versions.json | ./scripts/transition-jira-tickets.js --state=deploy-pp",
+        "cwd": "."
+      }
+    },
+    "transition-jira-tickets-deploy-pp-na": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cat versions.json | ./scripts/transition-jira-tickets.js --state=deploy-pp",
+        "cwd": "."
+      }
+    },
+    "transition-jira-tickets-pp-testing-eu": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cat versions.json | ./scripts/transition-jira-tickets.js --state=pp-testing",
+        "cwd": "."
+      }
+    },
+    "transition-jira-tickets-pp-testing-na": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cat versions.json | ./scripts/transition-jira-tickets.js --state=pp-testing",
+        "cwd": "."
+      }
+    },
+    "transition-jira-tickets-deploying-eu": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cat versions.json | ./scripts/transition-jira-tickets.js --state=deploying",
+        "cwd": "."
+      }
+    },
+    "transition-jira-tickets-deploying-na": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cat versions.json | ./scripts/transition-jira-tickets.js --state=deploying",
+        "cwd": "."
+      }
+    },
+    "transition-jira-tickets-resolved-eu": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cat versions.json | ./scripts/transition-jira-tickets.js --state=resolved",
+        "cwd": "."
+      }
+    },
+    "transition-jira-tickets-resolved-na": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cat versions.json | ./scripts/transition-jira-tickets.js --state=resolved",
+        "cwd": "."
+      }
+    },
+    "transition-jira-tickets-closed-eu": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cat versions.json | ./scripts/transition-jira-tickets.js --state=closed",
+        "cwd": "."
+      }
+    },
+    "transition-jira-tickets-closed-na": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cat versions.json | ./scripts/transition-jira-tickets.js --state=closed",
+        "cwd": "."
+      }
+    },
+    "comment-jira-tickets-staging-eu": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cat versions.json | ./scripts/comment-jira-tickets.js --environment=stg_eu00",
+        "cwd": "."
+      }
+    },
+    "comment-jira-tickets-staging-na": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cat versions.json | ./scripts/comment-jira-tickets.js --environment=stg_na03",
+        "cwd": "."
+      }
+    },
+    "comment-jira-tickets-production-eu": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cat versions.json | ./scripts/comment-jira-tickets.js --environment=prod_eu00",
+        "cwd": "."
+      }
+    },
+    "comment-jira-tickets-production-na": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cat versions.json | ./scripts/comment-jira-tickets.js --environment=prod_na03",
+        "cwd": "."
+      }
+    },
+    "update-jira-instructions-eu": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cat versions.json | ./scripts/update-jira-instructions.js --environment=stg_eu00",
+        "cwd": "."
+      }
+    },
+    "update-jira-instructions-na": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cat versions.json | ./scripts/update-jira-instructions.js --environment=stg_na03",
+        "cwd": "."
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    }
+  },
+  "tags": []
+}

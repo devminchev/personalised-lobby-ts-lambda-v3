@@ -1,0 +1,15 @@
+{
+  "name": "get-because-you-played",
+  "version": "0.12.11",
+  "description": "Returns games for Because You Played section",
+  "main": "app.js",
+  "repository": "https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda",
+  "relComponent": "igaming_lobby_because_you_played_games_v3",
+  "scripts": {
+    "unit": "jest",
+    "clean": "rm -rf node_modules coverage",
+    "clean:lock": "rimraf package-lock.json yarn.lock",
+    "format:check": "prettier --check '**/*.{ts,tsx,js,jsx,json,md}'"
+  },
+  "dependencies": {}
+}

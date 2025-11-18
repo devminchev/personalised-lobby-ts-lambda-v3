@@ -1,0 +1,15 @@
+{
+    "name": "get-section-view",
+    "version": "0.10.3",
+    "description": "section view that displays games and jackpots",
+    "main": "app.js",
+    "repository": "https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3",
+    "relComponent": "igaming_lobby_section_view_v3",
+    "scripts": {
+        "unit": "jest",
+        "test": "jest --config jest.config.ts",
+        "clean": "rm -rf node_modules coverage",
+        "clean:lock": "rimraf package-lock.json yarn.lock"
+    },
+    "devDependencies": {}
+}

@@ -1,0 +1,15 @@
+{
+  "name": "get-bulk-game-data",
+  "version": "0.12.15",
+  "description": "Lambda to get fresh game data for ML ",
+  "main": "app.js",
+  "repository": "https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda",
+  "relComponent": "igaming_lobby_bulk_game_data_v3",
+  "scripts": {
+    "unit": "jest",
+    "clean": "rm -rf node_modules coverage",
+    "clean:lock": "rimraf package-lock.json yarn.lock",
+    "format:check": "prettier --check '**/*.{ts,tsx,js,jsx,json,md}'"
+  },
+  "dependencies": {}
+}

@@ -1,0 +1,415 @@
+[
+  {
+    "title": "Gum Bubbles",
+    "gameSkin": "PP_GUM_BUBBLES",
+    "name": "play-gum-bubbles",
+    "gameType": {
+      "winLineType": "L2R",
+      "features": [
+        "Free Spins",
+        "Expanding Wilds",
+        "Other Wilds",
+        "Respins",
+        "Multipliers (With or without wilds)",
+        "Bonus Game",
+        "Cash Collect"
+      ],
+      "themes": ["Fantasy", "Sweets", "Bubble"],
+      "waysToWin": "N/A",
+      "symbolCount": "1",
+      "winLines": 20,
+      "isJackpot": false,
+      "symbolType": [],
+      "reel": "5-4"
+    },
+    "id": "37X17es1Zn7VP1XqB5F9pu",
+    "contentType": "gameV2",
+    "entryTitle": "PP_GUM_BUBBLES",
+    "vendor": "infinity",
+    "platform": ["Desktop", "Phone", "Tablet"]
+  },
+  {
+    "title": "The Dog House Multihold",
+    "gameSkin": "PP_THE_DOG_HOUSE_MULTIHOLD",
+    "name": "play-pp-the-dog-house-multihold",
+    "gameType": {
+      "winLineType": "L2R",
+      "features": [
+        "Free Spins",
+        "Sticky Wilds",
+        "Scatter Wilds/Symbols",
+        "Buy a bonus",
+        "Multipliers (With or without wilds)"
+      ],
+      "themes": ["Nature"],
+      "waysToWin": "Other",
+      "symbolCount": "1",
+      "winLines": 20,
+      "isJackpot": false,
+      "symbolType": ["Other"],
+      "reel": "5-3"
+    },
+    "id": "6DRu8HBOeuDgITymVnveyV",
+    "contentType": "gameV2",
+    "entryTitle": "PP_THE_DOG_HOUSE_MULTIHOLD",
+    "vendor": "infinity",
+    "platform": ["Desktop", "Phone", "Tablet"]
+  },
+  {
+    "title": "Candy Blitz",
+    "gameSkin": "PP_CANDY_BLITZ",
+    "name": "play-candy-blitz",
+    "gameType": {
+      "winLineType": "All ways",
+      "themes": ["Sweets"],
+      "features": [
+        "Free Spins",
+        "Scatter Wilds/Symbols",
+        "Buy a bonus",
+        "Multipliers (With or without wilds)",
+        "Cascading Reels"
+      ],
+      "waysToWin": "Other",
+      "symbolCount": "1",
+      "winLines": "Other",
+      "isJackpot": false,
+      "symbolType": ["Other"],
+      "reel": "6-5"
+    },
+    "id": "2GurvTAM64OCEuXZeH7k0h",
+    "contentType": "gameV2",
+    "entryTitle": "PP_CANDY_BLITZ",
+    "vendor": "infinity",
+    "platform": ["Desktop", "Phone", "Tablet"]
+  },
+  {
+    "title": "Buffalo King Megaways",
+    "gameSkin": "PP_BUFFALO_KING_MEGAWAYS",
+    "name": "play-buffalo-king-megaways",
+    "gameType": {
+      "winLineType": "Megaways",
+      "themes": ["Nature"],
+      "features": [
+        "Free Spins",
+        "Scatter Wilds/Symbols",
+        "Buy a bonus",
+        "Multipliers (With or without wilds)",
+        "Bonus Game",
+        "Cascading Reels"
+      ],
+      "waysToWin": "Other",
+      "symbolCount": "1",
+      "winLines": "Other",
+      "isJackpot": false,
+      "symbolType": ["Other"],
+      "reel": "Megaways"
+    },
+    "id": "5zbpEDNYL43CKtnHRS8Ipp",
+    "contentType": "gameV2",
+    "entryTitle": "PP_BUFFALO_KING_MEGAWAYS",
+    "vendor": "infinity",
+    "platform": ["Desktop", "Phone", "Tablet"]
+  },
+  {
+    "title": "Big Bass Day At The Races",
+    "gameSkin": "PP_BIG_BASS_DAY_AT_THE_RACES",
+    "name": "play-big-bass-day-at-races",
+    "gameType": {
+      "winLineType": "L2R",
+      "features": ["Free Spins", "Scatter Wilds/Symbols", "Multipliers (With or without wilds)"],
+      "themes": ["Sports"],
+      "waysToWin": "Other",
+      "symbolCount": "1",
+      "winLines": 10,
+      "isJackpot": false,
+      "symbolType": ["Royals", "Other"],
+      "reel": "5-3"
+    },
+    "id": "103iAz3PviAWnqNtKuFUrM",
+    "contentType": "gameV2",
+    "entryTitle": "PP_BIG_BASS_DAY_AT_THE_RACES",
+    "vendor": "infinity",
+    "platform": ["Desktop", "Tablet", "Phone"]
+  },
+  {
+    "title": "Big Bass 3 Reeler",
+    "gameSkin": "PP_BIG_BASS_3_WHEELER",
+    "name": "play-big-bass-3-reeler",
+    "gameType": {
+      "winLineType": "L2R",
+      "themes": ["Fishing", "Water", "Other"],
+      "features": ["Free Spins", "Cash Collect"],
+      "waysToWin": "Other",
+      "symbolCount": "12",
+      "winLines": "5",
+      "isJackpot": false,
+      "symbolType": ["Royals", "Other"],
+      "reel": "3-3"
+    },
+    "id": "1KjrlISBh0c9VHL3LnxWJ2",
+    "contentType": "gameV2",
+    "entryTitle": "PP_BIG_BASS_3_WHEELER",
+    "vendor": "infinity",
+    "platform": ["Desktop", "Tablet", "Phone"]
+  },
+  {
+    "title": "Jokers Jewels Hot",
+    "gameSkin": "PP_JOKERS_JEWELS_HOT",
+    "name": "play-jokers-jewels-hot",
+    "gameType": {
+      "winLineType": "L2R",
+      "features": ["Free Spins", "Other Wilds", "Bonus Game", "Pick Me", "Cash Collect"],
+      "themes": ["Gems", "Irish", "Mining"],
+      "waysToWin": "N/A",
+      "symbolCount": 15,
+      "winLines": "N/A",
+      "isJackpot": false,
+      "symbolType": ["Royals", "Other", "Gems"],
+      "reel": "5-3"
+    },
+    "id": "3qC5iprfUFAbFHqzRJYhid",
+    "contentType": "gameV2",
+    "entryTitle": "PP_JOKERS_JEWELS_HOT",
+    "vendor": "infinity",
+    "platform": ["Desktop"]
+  },
+  {
+    "title": "Gates of Olympus Xmas 1000",
+    "gameSkin": "PP_GATES_OF_OLYMPUS_XMAS_1000",
+    "name": "play-gates-of-olympus-xmas-1000",
+    "gameType": {
+      "winLineType": "L2R",
+      "themes": ["Christmas", "Gods", "Greece", "Other"],
+      "features": ["Free Spins", "Multipliers (With or without wilds)"],
+      "waysToWin": "Other",
+      "symbolCount": "10",
+      "winLines": "other",
+      "isJackpot": false,
+      "symbolType": ["Other", "Gems"],
+      "reel": "6-5"
+    },
+    "id": "6UbbUbgQUxdgiv5GbYtXeC",
+    "contentType": "gameV2",
+    "entryTitle": "PP_GATES_OF_OLYMPUS_XMAS_1000",
+    "vendor": "infinity",
+    "platform": ["Desktop", "Phone", "Tablet"]
+  },
+  {
+    "title": "Big Bass Halloween 2",
+    "gameSkin": "PP_BIG_BASS_HALLOWEEN_2",
+    "name": "play-big-bass-halloween-2",
+    "gameType": {
+      "winLineType": "L2R",
+      "features": [
+        "Free Spins",
+        "Expanding Wilds",
+        "Other Wilds",
+        "Respins",
+        "Multipliers (With or without wilds)",
+        "Bonus Game"
+      ],
+      "themes": ["Wild West", "Horror"],
+      "waysToWin": "NA",
+      "symbolCount": "1",
+      "winLines": 10,
+      "isJackpot": false,
+      "symbolType": [],
+      "reel": "5-3"
+    },
+    "id": "5AzUwefFqatYQHWbX7c0k5",
+    "contentType": "gameV2",
+    "entryTitle": "PP_BIG_BASS_HALLOWEEN_2",
+    "vendor": "infinity",
+    "platform": ["Desktop", "Tablet", "Phone"]
+  },
+  {
+    "title": "Big Bass Bonanza Megaways",
+    "gameSkin": "PP_BIG_BASS_BONANZA_MEGAWAYS",
+    "name": "play-big-bass-bonanza-megaways",
+    "gameType": {
+      "winLineType": "Megaways",
+      "features": [
+        "Free Spins",
+        "Scatter Wilds/Symbols",
+        "Multipliers (With or without wilds)",
+        "Cascading Reels",
+        "Cash Collect"
+      ],
+      "themes": ["Fishing"],
+      "waysToWin": "Other",
+      "symbolCount": "1",
+      "winLines": "Other",
+      "isJackpot": false,
+      "symbolType": ["Other"],
+      "reel": "Megaways"
+    },
+    "id": "5uW652nabyky4ENoXc8IR5",
+    "contentType": "gameV2",
+    "entryTitle": "PP_BIG_BASS_BONANZA_MEGAWAYS",
+    "vendor": "infinity",
+    "platform": ["Desktop", "Phone", "Tablet"]
+  },
+  {
+    "title": "The Dog House - Muttley Crew",
+    "gameSkin": "PP_THE_DOG_HOUSE_MUTTLEY_CREW",
+    "name": "play-the-dog-house-muttley-crew",
+    "gameType": {
+      "winLineType": "L2R",
+      "features": ["Free Spins", "Sticky Wilds", "Scatter Wilds/Symbols", "Respins"],
+      "themes": ["Pirate"],
+      "waysToWin": "N/A",
+      "symbolCount": 12,
+      "winLines": 45432,
+      "isJackpot": false,
+      "symbolType": ["Royals", "Suits", "Other"],
+      "reel": "5-5"
+    },
+    "id": "4ROXY5G7O9zMLeZ4WGtQgv",
+    "contentType": "gameV2",
+    "entryTitle": "PP_THE_DOG_HOUSE_MUTTLEY_CREW",
+    "vendor": "infinity",
+    "platform": ["Desktop", "Phone", "Tablet"]
+  },
+  {
+    "title": "Sweet Bonanza 1000",
+    "gameSkin": "PP_SWEET_BONANZA_1000",
+    "name": "play-sweet-bonanza-1000",
+    "gameType": {
+      "winLineType": "Cluster",
+      "features": ["Free Spins", "Multipliers (With or without wilds)"],
+      "themes": ["Fruit", "Sweets"],
+      "waysToWin": "Cluster",
+      "symbolCount": 10,
+      "winLines": "N/A",
+      "isJackpot": false,
+      "symbolType": ["Other", "Fruits"],
+      "reel": "6-5"
+    },
+    "id": "47XtVRjWhUzMZEl7lW3PXc",
+    "contentType": "gameV2",
+    "entryTitle": "PP_SWEET_BONANZA_1000",
+    "vendor": "infinity",
+    "platform": ["Desktop", "Phone", "Tablet"]
+  },
+  {
+    "title": "Big Bass Secrets Of The Golden Lake",
+    "gameSkin": "PP_BIG_BASS_SECRETS_OF_THE_GOLDEN_LAKE",
+    "name": "play-big-bass-secrets-of-the-golden-lake",
+    "gameType": {
+      "winLineType": "L2R",
+      "features": ["Free Spins", "Other Wilds", "Scatter Wilds/Symbols"],
+      "themes": ["Nature", "Fishing", "Medieval"],
+      "waysToWin": "N/A",
+      "symbolCount": 12,
+      "winLines": 10,
+      "isJackpot": false,
+      "symbolType": ["Royals", "Other"],
+      "reel": "5-3"
+    },
+    "id": "1g3valNfa2qZkkpJMYkKFi",
+    "contentType": "gameV2",
+    "entryTitle": "PP_BIG_BASS_SECRETS_OF_THE_GOLDEN_LAKE",
+    "vendor": "infinity",
+    "platform": ["Desktop", "Phone", "Tablet"]
+  },
+  {
+    "title": "Release the Kraken Megaways",
+    "gameSkin": "PP_RELEASE_THE_KRAKEN_MEGAWAYS",
+    "name": "play-release-the-kraken-megaways",
+    "gameType": {
+      "winLineType": "L2R",
+      "features": [
+        "Free Spins",
+        "Expanding Wilds",
+        "Other Wilds",
+        "Respins",
+        "Multipliers (With or without wilds)",
+        "Bonus Game",
+        "Cash Collect"
+      ],
+      "themes": ["Fishing", "Wild West", "Pirate", "Island"],
+      "waysToWin": 117649,
+      "symbolCount": 7,
+      "winLines": 20,
+      "isJackpot": false,
+      "symbolType": [],
+      "reel": "Megaways"
+    },
+    "id": "v2TCnwmMZrlmS6AAKiHKt",
+    "contentType": "gameV2",
+    "entryTitle": "PP_RELEASE_THE_KRAKEN_MEGAWAYS",
+    "vendor": "infinity",
+    "platform": ["Phone", "Desktop", "Tablet"]
+  },
+  {
+    "title": "Ultimate Wolf Gold",
+    "gameSkin": "PP_ULTIMATE_WOLF_GOLD",
+    "name": "play-ultimate-wolf-gold",
+    "gameType": {
+      "winLineType": "L2R",
+      "themes": ["Wild West", "Jungle"],
+      "features": ["Free Spins", "Other Wilds", "Scatter Wilds/Symbols", "Bonus Game"],
+      "waysToWin": "Other",
+      "symbolCount": "5",
+      "winLines": "25",
+      "isJackpot": false,
+      "symbolType": ["Other"],
+      "reel": "5-3"
+    },
+    "id": "3uhinz2DwKizFPO2sMgs78",
+    "contentType": "gameV2",
+    "entryTitle": "PP_ULTIMATE_WOLF_GOLD",
+    "vendor": "infinity",
+    "platform": ["Desktop", "Phone", "Tablet"]
+  },
+  {
+    "title": "Jokers Jewels Wild",
+    "gameSkin": "PP_JOKERS_JEWELS_WILD",
+    "name": "play-jokers-jewels-wild",
+    "gameType": {
+      "winLineType": "L2R",
+      "features": ["Scatter Wilds/Symbols"],
+      "themes": ["Gems", "Other"],
+      "waysToWin": "N/A",
+      "symbolCount": 11,
+      "winLines": 5,
+      "isJackpot": false,
+      "symbolType": ["Other", "Gems"],
+      "reel": "5-3"
+    },
+    "id": "2TMePJ4ex1qSOyVGtiGzjv",
+    "contentType": "gameV2",
+    "entryTitle": "PP_JOKERS_JEWELS_WILD",
+    "vendor": "infinity",
+    "platform": ["Desktop", "Phone", "Tablet"]
+  },
+  {
+    "title": "Big Bass Vegas Double Down Deluxe",
+    "gameSkin": "PP_BIG_BASS_VEGAS_DOUBLE_DOWN_DELUXE",
+    "name": "play-big-bass-vegas-double-down-deluxe",
+    "gameType": {
+      "winLineType": "L2R",
+      "features": [
+        "Free Spins",
+        "Expanding Wilds",
+        "Other Wilds",
+        "Respins",
+        "Multipliers (With or without wilds)",
+        "Bonus Game",
+        "Cash Collect"
+      ],
+      "themes": ["Fishing", "Money", "Sweets"],
+      "waysToWin": "N/A",
+      "symbolCount": "1",
+      "winLines": 20,
+      "isJackpot": false,
+      "symbolType": [],
+      "reel": "5-3"
+    },
+    "id": "1y4wFQUG5o52Sey3lbs7q7",
+    "contentType": "gameV2",
+    "entryTitle": "PP_BIG_BASS_VEGAS_DOUBLE_DOWN_DELUXE",
+    "vendor": "infinity",
+    "platform": ["Desktop"]
+  }
+]

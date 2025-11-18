@@ -1,0 +1,49 @@
+{
+  "$schema": "https://nx.dev/reference/project-configuration",
+  "name": "get-game-info",
+  "sourceRoot": "functions/GetGameInfoFunction",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "options": {
+        "outputPath": "dist/functions/GetGameInfoFunction"
+      },
+      "configurations": {
+        "production": {
+          "configuration": "application"
+        }
+      }
+    },
+    "test": {},
+    "lint": {},
+    "format": {},
+    "version": {},
+    "changelog": {},
+    "docker": {},
+    "docker-push": {},
+    "run-docker": {},
+    "sam-invoke-eu": {
+      "options": {
+        "args": [
+          "--functionName=GetGameInfoFunction"
+        ]
+      }
+    },
+    "sam-invoke-validate-eu": {},
+    "sam-invoke-na": {
+      "options": {
+        "args": [
+          "--functionName=GetAllGamesSearchFunction"
+        ]
+      }
+    }
+  },
+  "tags": [
+    "type:app",
+    "scope:pl"
+  ],
+  "dependencies": [
+    "os-client"
+  ],
+  "version": "0.18.7"
+}

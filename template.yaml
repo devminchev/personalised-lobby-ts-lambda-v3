@@ -1,0 +1,694 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+    getNavigation
+    getSections
+    getGameConfig
+
+    Sample SAM Template for Lobby lambdas
+
+Globals:
+    Function:
+        Timeout: 3
+        LoggingConfig:
+            LogFormat: JSON
+
+Parameters:
+    StageName:
+        Type: String
+        Default: v3
+        Description: The name of the deployment stage
+    LambdaArchitecture:
+        Type: String
+        Default: arm64
+        AllowedValues:
+            - x86_64
+            - arm64
+        Description: Lambda architecture (x86_64 or arm64)
+Resources:
+    # API Resource
+    LobbyApi:
+        Type: AWS::Serverless::Api
+        Properties:
+            Name: "lobby-v3"
+            StageName: !Ref StageName
+            OpenApiVersion: "2.0"
+            EndpointConfiguration:
+                Type: REGIONAL
+
+    # Get navigation
+    GetNavigationFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            FunctionName: personalisation-lobby-navigation
+            CodeUri: ./functions/GetNavigationFunction/
+            Handler: app.lambdaHandler  # Adjust the handler path to dist/app.lambdaHandler
+            Runtime: nodejs20.x
+            Environment:
+                Variables:
+                    HOST: !Sub "{{resolve:ssm:/personalised-lobby/dev/HOST:3}}"
+                    OS_USER: !Sub "{{resolve:ssm:/personalised-lobby/dev/OS_USER:3}}"
+                    OS_PASS: !Sub "{{resolve:ssm:/personalised-lobby/dev/OS_PASS:4}}"
+                    CONTENTFUL_SPACE_LOCALE: !Sub "{{resolve:ssm:/personalised-lobby/dev/CONTENTFUL_SPACE_LOCALE:1}}"
+                    EXECUTION_ENVIRONMENT: !Sub "{{resolve:ssm:/personalised-lobby/dev/EXECUTION_ENVIRONMENT:1}}"
+            Architectures:
+                - !Ref LambdaArchitecture
+            Events:
+                GetNavigation:
+                    Type: Api
+                    Properties:
+                        Path: /sites/{sitename}/platform/{platform}/navigation
+                        Method: get
+                        RestApiId: !Ref LobbyApi
+        Metadata:
+            BuildMethod: makefile
+
+    # Get Sections
+    GetViewFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            FunctionName: personalisation-lobby-view
+            CodeUri: ./functions/GetViewFunction/  # Folder of the lambda function
+            Handler: app.lambdaHandler  # Adjust the handler path to dist/app.lambdaHandler
+            Runtime: nodejs20.x
+            Environment:
+                Variables:
+                    HOST: !Sub "{{resolve:ssm:/personalised-lobby/dev/HOST:3}}"
+                    OS_USER: !Sub "{{resolve:ssm:/personalised-lobby/dev/OS_USER:3}}"
+                    OS_PASS: !Sub "{{resolve:ssm:/personalised-lobby/dev/OS_PASS:4}}"
+                    CONTENTFUL_SPACE_LOCALE: !Sub "{{resolve:ssm:/personalised-lobby/dev/CONTENTFUL_SPACE_LOCALE:1}}"
+                    EXECUTION_ENVIRONMENT: !Sub "{{resolve:ssm:/personalised-lobby/dev/EXECUTION_ENVIRONMENT:1}}"
+            Architectures:
+                - !Ref LambdaArchitecture
+            Events:
+                GetSections:
+                    Type: Api
+                    Properties:
+                        Path: /sites/{sitename}/platform/{platform}/view/{viewslug}
+                        Method: get
+                        RestApiId: !Ref LobbyApi
+        Metadata:
+            BuildMethod: makefile
+
+    # Get Games
+    GetGamesFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            FunctionName: personalisation-lobby-section-games
+            CodeUri: ./functions/GetGamesFunction/  # Folder of the lambda function
+            Handler: app.lambdaHandler  # Adjust the handler path to dist/app.lambdaHandler
+            Runtime: nodejs20.x
+            Environment:
+                Variables:
+                    HOST: !Sub "{{resolve:ssm:/personalised-lobby/dev/HOST:3}}"
+                    OS_USER: !Sub "{{resolve:ssm:/personalised-lobby/dev/OS_USER:3}}"
+                    OS_PASS: !Sub "{{resolve:ssm:/personalised-lobby/dev/OS_PASS:4}}"
+                    CONTENTFUL_SPACE_LOCALE: !Sub "{{resolve:ssm:/personalised-lobby/dev/CONTENTFUL_SPACE_LOCALE:1}}"
+                    EXECUTION_ENVIRONMENT: !Sub "{{resolve:ssm:/personalised-lobby/dev/EXECUTION_ENVIRONMENT:1}}"
+            Architectures:
+                - !Ref LambdaArchitecture
+            Events:
+                GetGames:
+                    Type: Api
+                    Properties:
+                        Path: /sites/{sitename}/platform/{platform}/view/{viewslug}/sections/{sectionid}/sitegames
+                        Method: get
+                        RestApiId: !Ref LobbyApi
+        Metadata:
+            BuildMethod: makefile
+
+    # Get Suggested Games
+    GetSuggestedForYouFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            FunctionName: personalisation-lobby-suggested-for-you
+            CodeUri: ./functions/GetSuggestedForYouFunction/  # Folder of the lambda function
+            Handler: app.lambdaHandler  # Adjust the handler path to dist/app.lambdaHandler
+            Runtime: nodejs20.x
+            Environment:
+                Variables:
+                    HOST: !Sub "{{resolve:ssm:/personalised-lobby/dev/HOST:3}}"
+                    OS_USER: !Sub "{{resolve:ssm:/personalised-lobby/dev/OS_USER:3}}"
+                    OS_PASS: !Sub "{{resolve:ssm:/personalised-lobby/dev/OS_PASS:4}}"
+                    CONTENTFUL_SPACE_LOCALE: !Sub "{{resolve:ssm:/personalised-lobby/dev/CONTENTFUL_SPACE_LOCALE:1}}"
+
+                    EXECUTION_ENVIRONMENT: !Sub "{{resolve:ssm:/personalised-lobby/dev/EXECUTION_ENVIRONMENT:1}}"
+            Architectures:
+                - !Ref LambdaArchitecture
+            Events:
+                GetGames:
+                    Type: Api
+                    Properties:
+                        Path: /sites/{sitename}/platform/{platform}/suggested-for-you
+                        Method: get
+                        RestApiId: !Ref LobbyApi
+        Metadata:
+            BuildMethod: makefile
+
+    # Get Recently Played Games
+    GetRecentlyPlayedFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            FunctionName: personalisation-lobby-recently-played
+            CodeUri: ./functions/GetRecentlyPlayedFunction/  # Folder of the lambda function
+            Handler: app.lambdaHandler  # Adjust the handler path to dist/app.lambdaHandler
+            Runtime: nodejs20.x
+            Environment:
+                Variables:
+                    HOST: !Sub "{{resolve:ssm:/personalised-lobby/dev/HOST:3}}"
+                    OS_USER: !Sub "{{resolve:ssm:/personalised-lobby/dev/OS_USER:3}}"
+                    OS_PASS: !Sub "{{resolve:ssm:/personalised-lobby/dev/OS_PASS:4}}"
+                    CONTENTFUL_SPACE_LOCALE: !Sub "{{resolve:ssm:/personalised-lobby/dev/CONTENTFUL_SPACE_LOCALE:1}}"
+
+                    EXECUTION_ENVIRONMENT: !Sub "{{resolve:ssm:/personalised-lobby/dev/EXECUTION_ENVIRONMENT:1}}"
+            Architectures:
+                - !Ref LambdaArchitecture
+            Events:
+                GetGames:
+                    Type: Api
+                    Properties:
+                        Path: /sites/{sitename}/platform/{platform}/recently-played
+                        Method: get
+                        RestApiId: !Ref LobbyApi
+        Metadata:
+            BuildMethod: makefile
+
+
+    # GetGameConfigAPI
+    GetGameConfigFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            FunctionName: personalisation-lobby-game-config
+            CodeUri: ./functions/GetGameConfigFunction/  # Folder of the lambda function
+            Handler: app.lambdaHandler  # Adjust the handler path to dist/app.lambdaHandler
+            Runtime: nodejs20.x
+            Environment:
+                Variables:
+                    HOST: !Sub "{{resolve:ssm:/personalised-lobby/dev/HOST:3}}"
+                    OS_USER: !Sub "{{resolve:ssm:/personalised-lobby/dev/OS_USER:3}}"
+                    OS_PASS: !Sub "{{resolve:ssm:/personalised-lobby/dev/OS_PASS:4}}"
+                    CONTENTFUL_SPACE_LOCALE: !Sub "{{resolve:ssm:/personalised-lobby/dev/CONTENTFUL_SPACE_LOCALE:1}}"
+                    EXECUTION_ENVIRONMENT: !Sub "{{resolve:ssm:/personalised-lobby/dev/EXECUTION_ENVIRONMENT:1}}"
+            Architectures:
+                - !Ref LambdaArchitecture
+            Events:
+                GetGameConfig:
+                    Type: Api
+                    Properties:
+                        Path: /sites/{sitename}/platform/{platform}/game-config/{gamename}
+                        Method: get
+                        RestApiId: !Ref LobbyApi
+        Metadata:
+            BuildMethod: makefile
+
+    # Get GameInfo
+    GetGameInfoFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            FunctionName: personalisation-lobby-game-info
+            CodeUri: ./functions/GetGameInfoFunction/  # Folder of the lambda function
+            Handler: app.lambdaHandler  # Adjust the handler path to dist/app.lambdaHandler
+            Runtime: nodejs20.x
+            Environment:
+                Variables:
+                    HOST: !Sub "{{resolve:ssm:/personalised-lobby/dev/HOST:3}}"
+                    OS_USER: !Sub "{{resolve:ssm:/personalised-lobby/dev/OS_USER:3}}"
+                    OS_PASS: !Sub "{{resolve:ssm:/personalised-lobby/dev/OS_PASS:4}}"
+                    CONTENTFUL_SPACE_LOCALE: !Sub "{{resolve:ssm:/personalised-lobby/dev/CONTENTFUL_SPACE_LOCALE:1}}"
+                    EXECUTION_ENVIRONMENT: !Sub "{{resolve:ssm:/personalised-lobby/dev/EXECUTION_ENVIRONMENT:1}}"
+            Architectures:
+                - !Ref LambdaArchitecture
+            Events:
+                GetNavigation:
+                    Type: Api
+                    Properties:
+                        Path: /sites/{sitename}/platform/{platform}/games/{gamename}
+                        Method: get
+                        RestApiId: !Ref LobbyApi
+        Metadata:
+            BuildMethod: makefile
+
+    # Get All Games Search
+    GetAllGamesSearchFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            FunctionName: personalisation-lobby-get-all-games-search
+            CodeUri: ./functions/GetAllGamesSearchFunction/
+            Handler: app.lambdaHandler
+            Runtime: nodejs20.x
+            Timeout: 60
+            Environment:
+                Variables:
+                    HOST: !Sub "{{resolve:ssm:/personalised-lobby/dev/HOST:3}}"
+                    OS_USER: !Sub "{{resolve:ssm:/personalised-lobby/dev/OS_USER:3}}"
+                    OS_PASS: !Sub "{{resolve:ssm:/personalised-lobby/dev/OS_PASS:4}}"
+                    CONTENTFUL_SPACE_LOCALE: !Sub "{{resolve:ssm:/personalised-lobby/dev/CONTENTFUL_SPACE_LOCALE:1}}"
+                    EXECUTION_ENVIRONMENT: !Sub "{{resolve:ssm:/personalised-lobby/dev/EXECUTION_ENVIRONMENT:1}}"
+            Architectures:
+                - !Ref LambdaArchitecture
+            Events:
+                GetAllGamesSearch:
+                    Type: Api
+                    Properties:
+                        Path: /content/sites/{sitename}/platform/{platform}/search
+                        Method: get
+                        RestApiId: !Ref LobbyApi
+        Metadata:
+            BuildMethod: makefile
+
+    # get-minigames
+    GetMiniGamesFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            FunctionName: personalisation-lobby-get-mini-games
+            CodeUri: ./functions/GetMiniGamesFunction/  # Folder of the lambda function
+            Handler: app.lambdaHandler  # Adjust the handler path to dist/app.lambdaHandler
+            Runtime: nodejs20.x
+            Environment:
+                Variables:
+                    HOST: !Sub "{{resolve:ssm:/personalised-lobby/dev/HOST:3}}"
+                    OS_USER: !Sub "{{resolve:ssm:/personalised-lobby/dev/OS_USER:3}}"
+                    OS_PASS: !Sub "{{resolve:ssm:/personalised-lobby/dev/OS_PASS:4}}"
+                    CONTENTFUL_SPACE_LOCALE: !Sub "{{resolve:ssm:/personalised-lobby/dev/CONTENTFUL_SPACE_LOCALE:1}}"
+
+                    EXECUTION_ENVIRONMENT: !Sub "{{resolve:ssm:/personalised-lobby/dev/EXECUTION_ENVIRONMENT:1}}"
+            Architectures:
+                - !Ref LambdaArchitecture
+            Events:
+                GetMiniGames:
+                    Type: Api
+                    Properties:
+                        Path: /sites/{sitename}/platform/{platform}/minigames
+                        Method: get
+                        RestApiId: !Ref LobbyApi
+        Metadata:
+            BuildMethod: makefile
+
+    # get-personalised-extra-data
+    GetPersonalisedExtraDataFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            FunctionName: personalisation-lobby-personalised-extra-data
+            CodeUri: ./functions/GetPersonalisedExtraDataFunction/  # Folder of the lambda function
+            Handler: app.lambdaHandler  # Adjust the handler path to dist/app.lambdaHandler
+            Runtime: nodejs20.x
+            Environment:
+                Variables:
+                    HOST: !Sub "{{resolve:ssm:/personalised-lobby/dev/HOST:3}}"
+                    OS_USER: !Sub "{{resolve:ssm:/personalised-lobby/dev/OS_USER:3}}"
+                    OS_PASS: !Sub "{{resolve:ssm:/personalised-lobby/dev/OS_PASS:4}}"
+                    CONTENTFUL_SPACE_LOCALE: !Sub "{{resolve:ssm:/personalised-lobby/dev/CONTENTFUL_SPACE_LOCALE:1}}"
+                    EXECUTION_ENVIRONMENT: !Sub "{{resolve:ssm:/personalised-lobby/dev/EXECUTION_ENVIRONMENT:1}}"
+            Architectures:
+                - !Ref LambdaArchitecture
+            Events:
+                GetPersonalisedExtraData:
+                    Type: Api
+                    Properties:
+                        Path: /sites/{sitename}/personalised-extra-data
+                        Method: get
+                        RestApiId: !Ref LobbyApi
+        Metadata:
+            BuildMethod: makefile
+
+  # get-recommended-games-on-exit
+    GetRecommendedGamesOnExitFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            FunctionName: personalisation-lobby-recommended-games-on-exit
+            CodeUri: ./functions/GetRecommendedGamesOnExitFunction/  # Folder of the lambda function
+            Handler: app.lambdaHandler  # Adjust the handler path to dist/app.lambdaHandler
+            Runtime: nodejs20.x
+            Environment:
+                Variables:
+                    HOST: !Sub "{{resolve:ssm:/personalised-lobby/dev/HOST:3}}"
+                    OS_USER: !Sub "{{resolve:ssm:/personalised-lobby/dev/OS_USER:3}}"
+                    OS_PASS: !Sub "{{resolve:ssm:/personalised-lobby/dev/OS_PASS:4}}"
+                    CONTENTFUL_SPACE_LOCALE: !Sub "{{resolve:ssm:/personalised-lobby/dev/CONTENTFUL_SPACE_LOCALE:1}}"
+                    EXECUTION_ENVIRONMENT: !Sub "{{resolve:ssm:/personalised-lobby/dev/EXECUTION_ENVIRONMENT:1}}"
+            Architectures:
+                - !Ref LambdaArchitecture
+            Events:
+                GetRecommendedGamesOnExit:
+                    Type: Api
+                    Properties:
+                        Path: /sites/{sitename}/platform/{platform}/gameskin/{gameskin}/recommended-games-on-exit
+                        Method: get
+                        RestApiId: !Ref LobbyApi
+        Metadata:
+            BuildMethod: makefile
+    # get-bulk-game-data
+    GetBulkGameDataFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            FunctionName: personalisation-lobby-get-bulk-game-data
+            CodeUri: ./functions/GetBulkGameDataFunction/  # Folder of the lambda function
+            Handler: app.lambdaHandler  # Adjust the handler path to dist/app.lambdaHandler
+            Runtime: nodejs20.x
+            Timeout: 40
+            Environment:
+                Variables:
+                    HOST: !Sub "{{resolve:ssm:/personalised-lobby/dev/HOST:3}}"
+                    OS_USER: !Sub "{{resolve:ssm:/personalised-lobby/dev/OS_USER:3}}"
+                    OS_PASS: !Sub "{{resolve:ssm:/personalised-lobby/dev/OS_PASS:4}}"
+                    CONTENTFUL_SPACE_LOCALE: !Sub "{{resolve:ssm:/personalised-lobby/dev/CONTENTFUL_SPACE_LOCALE:1}}"
+                    EXECUTION_ENVIRONMENT: !Sub "{{resolve:ssm:/personalised-lobby/dev/EXECUTION_ENVIRONMENT:1}}"
+            Architectures:
+                - !Ref LambdaArchitecture
+            Events:
+                GetBulkGameData:
+                    Type: Api
+                    Properties:
+                        Path: /sites/{sitename}/platform/{platform}/get-bulk-game-data
+                        Method: get
+                        RestApiId: !Ref LobbyApi
+        Metadata:
+            BuildMethod: makefile
+
+    GetHistoricalGameTitlesFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            CodeUri: ./functions/GetHistoricalGameTitlesFunction/  # Folder of the lambda function
+            Handler: app.lambdaHandler  # Adjust the handler path to dist/app.lambdaHandler
+            Runtime: nodejs20.x
+            Environment:
+                Variables:
+                    HOST: !Sub "{{resolve:ssm:/personalised-lobby/dev/HOST:3}}"
+                    OS_USER: !Sub "{{resolve:ssm:/personalised-lobby/dev/OS_USER:3}}"
+                    OS_PASS: !Sub "{{resolve:ssm:/personalised-lobby/dev/OS_PASS:4}}"
+                    CONTENTFUL_SPACE_LOCALE: !Sub "{{resolve:ssm:/personalised-lobby/dev/CONTENTFUL_SPACE_LOCALE:1}}"
+                    EXECUTION_ENVIRONMENT: !Sub "{{resolve:ssm:/personalised-lobby/dev/EXECUTION_ENVIRONMENT:1}}"
+            Architectures:
+                - !Ref LambdaArchitecture
+            Events:
+                GetHistoricalGameTitles:
+                    Type: Api
+                    Properties:
+                        Path: /sites/{sitename}/game-historical-titles
+                        Method: get
+                        RestApiId: !Ref LobbyApi
+        Metadata:
+            BuildMethod: makefile
+
+    # post-historical-game-titles-handler
+    PostHistoricalGameTitlesHandlerFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            CodeUri: ./functions/PostHistoricalGameTitlesHandlerFunction/  # Folder of the lambda function
+            Handler: app.lambdaHandler  # Adjust the handler path to dist/app.lambdaHandler
+            Runtime: nodejs20.x
+            Environment:
+                Variables:
+                    HOST: !Sub "{{resolve:ssm:/personalised-lobby/dev/HOST:3}}"
+                    OS_USER: !Sub '{{resolve:ssm:/personalised-lobby/dev/OS_USER:3}}'
+                    OS_PASS: !Sub '{{resolve:ssm:/personalised-lobby/dev/OS_PASS:4}}'
+                    CONTENTFUL_SPACE_LOCALE: !Sub '{{resolve:ssm:/personalised-lobby/dev/CONTENTFUL_SPACE_LOCALE:1}}'
+                    CONTENTFUL_ACCESS_TOKEN: !Sub '{{resolve:ssm:/personalised-lobby/dev/CONTENTFUL_ACCESS_TOKEN:2}}'
+                    CONTENTFUL_ENVIRONMENT: !Sub '{{resolve:ssm:/personalised-lobby/dev/CONTENTFUL_ENVIRONMENT:1}}'
+                    CONTENTFUL_SIGNING_SECRET: !Sub '{{resolve:ssm:/personalised-lobby/dev/CONTENTFUL_SIGNING_SECRET:3}}'
+                    SPACE_ID: !Sub '{{resolve:ssm:/personalised-lobby/dev/SPACE_ID:1}}'
+            Architectures:
+                - !Ref LambdaArchitecture
+            Events:
+                PostHistoricGameTitlesHandler:
+                    Type: Api
+                    Properties:
+                        Path: /historical-game-titles-handler
+                        Method: post
+                        RestApiId: !Ref LobbyApi
+        Metadata:
+            BuildMethod: makefile
+
+    ApplicationResourceGroup:
+        Type: AWS::ResourceGroups::Group
+        Properties:
+            Name:
+                Fn::Sub: ApplicationInsights-SAM-${AWS::StackName}
+            ResourceQuery:
+                Type: CLOUDFORMATION_STACK_1_0
+
+    ApplicationInsightsMonitoring:
+        Type: AWS::ApplicationInsights::Application
+        Properties:
+            ResourceGroupName:
+                Ref: ApplicationResourceGroup
+            AutoConfigurationEnabled: "true"
+
+    # get-section-view
+    GetSectionViewFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            FunctionName: personalisation-lobby-section-view
+            CodeUri: ./functions/GetSectionViewFunction/  # Folder of the lambda function
+            Handler: app.lambdaHandler  # Adjust the handler path to dist/app.lambdaHandler
+            Runtime: nodejs20.x
+            Environment:
+                Variables:
+                    HOST: !Sub "{{resolve:ssm:/personalised-lobby/dev/HOST:3}}"
+                    OS_USER: !Sub "{{resolve:ssm:/personalised-lobby/dev/OS_USER:3}}"
+                    OS_PASS: !Sub "{{resolve:ssm:/personalised-lobby/dev/OS_PASS:4}}"
+                    CONTENTFUL_SPACE_LOCALE: !Sub "{{resolve:ssm:/personalised-lobby/dev/CONTENTFUL_SPACE_LOCALE:1}}"
+
+                    EXECUTION_ENVIRONMENT: !Sub "{{resolve:ssm:/personalised-lobby/dev/EXECUTION_ENVIRONMENT:1}}"
+            Architectures:
+                - !Ref LambdaArchitecture
+            Events:
+                GetSectionView:
+                    Type: Api
+                    Properties:
+                        Path: /sites/{sitename}/platform/{platform}/section/{sectionslug}
+                        Method: get
+                        RestApiId: !Ref LobbyApi
+        Metadata:
+            BuildMethod: makefile
+
+    # get-game-shuffle
+    GetGameShuffleFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            FunctionName: personalisation-lobby-game-shuffle
+            CodeUri: ./functions/GetGameShuffleFunction/  # Folder of the lambda function
+            Handler: app.lambdaHandler  # Adjust the handler path to dist/app.lambdaHandler
+            Runtime: nodejs20.x
+            Timeout: 10
+            Environment:
+                Variables:
+                    HOST: !Sub "{{resolve:ssm:/personalised-lobby/dev/HOST:3}}"
+                    OS_USER: !Sub "{{resolve:ssm:/personalised-lobby/dev/OS_USER:3}}"
+                    OS_PASS: !Sub "{{resolve:ssm:/personalised-lobby/dev/OS_PASS:4}}"
+                    CONTENTFUL_SPACE_LOCALE: !Sub '{{resolve:ssm:/personalised-lobby/dev/CONTENTFUL_SPACE_LOCALE:1}}'
+
+                    EXECUTION_ENVIRONMENT: !Sub "{{resolve:ssm:/personalised-lobby/dev/EXECUTION_ENVIRONMENT:1}}"
+            Architectures:
+                - !Ref LambdaArchitecture
+            Events:
+                GetGameShuffle:
+                    Type: Api
+                    Properties:
+                        Path: /sites/{sitename}/platform/{platform}/game-shuffle
+                        Method: get
+                        RestApiId: !Ref LobbyApi
+        Metadata:
+            BuildMethod: makefile
+
+Outputs:
+    LobbyApiUrl:
+        Description: "API Gateway endpoint URL for the unified lobby-v1 API"
+        Value: !Sub "https://${LobbyApi}.execute-api.${AWS::Region}.amazonaws.com/${StageName}"
+
+    # GetHistoricalGameTitlesFunction
+    GetHistoricalGameTitlesFunction:
+        Description: GetHistoricalGameTitlesFunction Lambda Function ARN
+        Value: !GetAtt GetHistoricalGameTitlesFunction.Arn
+
+    # PostHistoricalGameTitlesHandlerFunction
+    PostHistoricalGameTitlesHandlerFunction:
+        Description: PostHistoricalGameTitlesHandlerFunction Lambda Function ARN
+        Value: !GetAtt PostHistoricalGameTitlesHandlerFunction.Arn
+
+    PostHistoricalGameTitlesHandlerFunctionIamRole:
+        Description: Implicit IAM Role created for PostHistoricalGameTitlesHandlerFunction function
+        Value: !GetAtt PostHistoricalGameTitlesHandlerFunctionRole.Arn
+
+    # Get Navigation
+    GetNavigationFunction:
+        Description: Get Navigation Lambda Function ARN
+        Value: !GetAtt GetNavigationFunction.Arn
+        Export:
+            Name: !Sub "${AWS::StackName}-GetNavigationFunctionArn"
+
+    GetNavigationFunctionIamRole:
+        Description: Implicit IAM Role created for Get Navigation function
+        Value: !GetAtt GetNavigationFunctionRole.Arn
+        Export:
+            Name: !Sub "${AWS::StackName}-GetNavigationFunctionIamRoleArn"
+
+    # Get Sections
+    GetViewFunction:
+        Description: GetViewFunction Lambda Function ARN
+        Value: !GetAtt GetViewFunction.Arn
+        Export:
+            Name: !Sub "${AWS::StackName}-GetViewFunctionArn"
+
+    GetViewFunctionIamRole:
+        Description: Implicit IAM Role created for Get Sections function
+        Value: !GetAtt GetViewFunctionRole.Arn
+        Export:
+            Name: !Sub "${AWS::StackName}-GetViewFunctionIamRoleArn"
+
+    # Get Games
+    GetGamesFunction:
+        Description: GetGamesFunction Lambda Function ARN
+        Value: !GetAtt GetGamesFunction.Arn
+        Export:
+            Name: !Sub "${AWS::StackName}-GetGamesFunctionArn"
+
+    GetGamesFunctionIamRole:
+        Description: Implicit IAM Role created for GetGamesFunction function
+        Value: !GetAtt GetGamesFunctionRole.Arn
+        Export:
+            Name: !Sub "${AWS::StackName}-GetGamesFunctionIamRoleArn"
+
+    # Get Suggested Games
+    GetSuggestedForYouFunction:
+        Description: GetSuggestedForYouFunction Lambda Function ARN
+        Value: !GetAtt GetSuggestedForYouFunction.Arn
+        Export:
+            Name: !Sub "${AWS::StackName}-GetSuggestedForYouFunctionArn"
+
+    GetSuggestedForYouFunctionIamRole:
+        Description: Implicit IAM Role created for GetSuggestedForYouFunction function
+        Value: !GetAtt GetSuggestedForYouFunctionRole.Arn
+        Export:
+            Name: !Sub "${AWS::StackName}-GetSuggestedForYouFunctionIamRoleArn"
+
+    # GetGameConfigAPI
+    GetGameConfigFunction:
+        Description: GetGameConfigAPI Lambda Function ARN
+        Value: !GetAtt GetGameConfigFunction.Arn
+        Export:
+            Name: !Sub "${AWS::StackName}-GetGameConfigFunctionArn"
+
+    GetGameConfigFunctionIamRole:
+        Description: Implicit IAM Role created for GetGameConfigAPI function
+        Value: !GetAtt GetGameConfigFunctionRole.Arn
+        Export:
+            Name: !Sub "${AWS::StackName}-GetGameConfigFunctionIamRoleArn"
+
+    # Get GameInfo
+    GetGameInfoFunction:
+        Description: GetGameInfoFunction Lambda Function ARN
+        Value: !GetAtt GetGameInfoFunction.Arn
+        Export:
+            Name: !Sub "${AWS::StackName}-GetGameInfoFunctionArn"
+
+    GetGameInfoFunctionIamRole:
+        Description: Implicit IAM Role created for GetGameInfoFunction function
+        Value: !GetAtt GetGameInfoFunctionRole.Arn
+        Export:
+            Name: !Sub "${AWS::StackName}-GetGameInfoFunctionIamRoleArn"
+
+    # get-all-games-search
+    GetAllGamesSearchFunction:
+        Description: get-all-games-search Lambda Function ARN
+        Value: !GetAtt GetAllGamesSearchFunction.Arn
+        Export:
+            Name: !Sub "${AWS::StackName}-GetAllGamesSearchFunctionArn"
+
+    GetAllGamesSearchFunctionIamRole:
+        Description: Implicit IAM Role created for get-all-games-search function
+        Value: !GetAtt GetAllGamesSearchFunctionRole.Arn
+        Export:
+            Name: !Sub "${AWS::StackName}-GetAllGamesSearchFunctionIamRoleArn"
+
+    # get-minigames
+    GetMiniGamesFunction:
+        Description: GetMiniGamesFunction Lambda Function ARN
+        Value: !GetAtt GetMiniGamesFunction.Arn
+        Export:
+            Name: !Sub "${AWS::StackName}-GetMiniGamesFunctionArn"
+
+    GetMiniGamesFunctionIamRole:
+        Description: Implicit IAM Role created for GetMiniGamesFunction function
+        Value: !GetAtt GetMiniGamesFunctionRole.Arn
+        Export:
+            Name: !Sub "${AWS::StackName}-GetMiniGamesFunctionIamRoleArn"
+
+    # get-personalised-extra-data
+    GetPersonalisedExtraDataFunction:
+        Description: GetPersonalisedExtraDataFunction Lambda Function ARN
+        Value: !GetAtt GetPersonalisedExtraDataFunction.Arn
+        Export:
+            Name: !Sub "${AWS::StackName}-GetPersonalisedExtraDataFunctionArn"
+
+    GetPersonalisedExtraDataFunctionIamRole:
+        Description: Implicit IAM Role created for GetPersonalisedExtraDataFunction function
+        Value: !GetAtt GetPersonalisedExtraDataFunctionRole.Arn
+        Export:
+            Name: !Sub "${AWS::StackName}-GetPersonalisedExtraDataFunctionIamRoleArn"
+
+    # get-recommended-games-on-exit
+    GetRecommendedGamesOnExitFunction:
+        Description: GetRecommendedGamesOnExitFunction Lambda Function ARN
+        Value: !GetAtt GetRecommendedGamesOnExitFunction.Arn
+        Export:
+            Name: !Sub "${AWS::StackName}-GetRecommendedGamesOnExitFunctionArn"
+
+    GetRecommendedGamesOnExitFunctionIamRole:
+        Description: Implicit IAM Role created for GetRecommendedGamesOnExitFunction function
+        Value: !GetAtt GetRecommendedGamesOnExitFunctionRole.Arn
+        Export:
+            Name: !Sub "${AWS::StackName}-GetRecommendedGamesOnExitFunctionIamRoleArn"
+
+    # get-bulk-game-data
+    GetBulkGameDataFunction:
+        Description: GetBulkGameDataFunction Lambda Function ARN
+        Value: !GetAtt GetBulkGameDataFunction.Arn
+        Export:
+            Name: !Sub "${AWS::StackName}-GetBulkGameDataFunctionArn"
+
+    GetBulkGameDataFunctionIamRole:
+        Description: Implicit IAM Role created for GetBulkGameDataFunction function
+        Value: !GetAtt GetBulkGameDataFunctionRole.Arn
+        Export:
+            Name: !Sub "${AWS::StackName}-GetBulkGameDataFunctionIamRoleArn"
+
+    # get-section-view
+    GetSectionViewFunction:
+        Description: GetSectionViewFunction Lambda Function ARN
+        Value: !GetAtt GetSectionViewFunction.Arn
+        Export:
+            Name: !Sub "${AWS::StackName}-GetSectionViewFunctionArn"
+
+    GetSectionViewFunctionIamRole:
+        Description: Implicit IAM Role created for GetSectionViewFunction function
+        Value: !GetAtt GetSectionViewFunctionRole.Arn
+        Export:
+            Name: !Sub "${AWS::StackName}-GetSectionViewFunctionIamRoleArn"
+
+    # get-game-shuffle
+    GetGameShuffleFunction:
+        Description: GetGameShuffleFunction Lambda Function ARN
+        Value: !GetAtt GetGameShuffleFunction.Arn
+        Export:
+            Name: !Sub "${AWS::StackName}-GetGameShuffleFunctionArn"
+
+    GetGameShuffleFunctionIamRole:
+        Description: Implicit IAM Role created for GetGameShuffleFunction function
+        Value: !GetAtt GetGameShuffleFunctionRole.Arn
+        Export:
+            Name: !Sub "${AWS::StackName}-GetGameShuffleFunctionIamRoleArm"
+
+    # get-recently-played
+    GetRecentlyPlayedFunction:
+        Description: GetRecentlyPlayedFunction Lambda Function ARN
+        Value: !GetAtt GetRecentlyPlayedFunction.Arn
+        Export:
+            Name: !Sub "${AWS::StackName}-GetRecentlyPlayedFunctionArn"
+
+    GetRecentlyPlayedFunctionIamRole:
+        Description: Implicit IAM Role created for GetGameShuffleFunction function
+        Value: !GetAtt GetRecentlyPlayedFunctionRole.Arn
+        Export:
+            Name: !Sub "${AWS::StackName}-GetRecentlyPlayedFunctionIamRoleArm"

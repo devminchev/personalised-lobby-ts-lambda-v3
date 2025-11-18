@@ -1,0 +1,42 @@
+{
+  "$schema": "https://nx.dev/reference/project-configuration",
+  "name": "get-historical-game-titles",
+  "sourceRoot": "functions/GetHistoricalGameTitlesFunction",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "options": {
+        "outputPath": "dist/functions/GetHistoricalGameTitlesFunction"
+      },
+      "configurations": {
+        "production": {
+          "configuration": "application"
+        }
+      }
+    },
+    "test": {},
+    "lint": {},
+    "format": {},
+    "version": {},
+    "changelog": {},
+    "docker": {},
+    "docker-push": {},
+    "run-docker": {},
+    "sam-invoke-eu": {
+      "options": {
+        "args": [
+          "--functionName=GetHistoricalGameTitlesFunction"
+        ]
+      }
+    },
+    "sam-invoke-validate-eu": {}
+  },
+  "tags": [
+    "type:app",
+    "scope:pl"
+  ],
+  "dependencies": [
+    "os-client"
+  ],
+  "version": "0.11.7"
+}

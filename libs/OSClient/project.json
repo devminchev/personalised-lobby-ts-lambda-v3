@@ -1,0 +1,52 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "os-client",
+  "sourceRoot": "libs/OSClient",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nx/esbuild:esbuild",
+      "outputs": [
+        "{options.outputPath}"
+      ],
+      "options": {
+        "outputPath": "dist/libs/OSClient",
+        "main": "libs/OSClient/index.ts",
+        "tsConfig": "libs/OSClient/tsconfig.json",
+        "platform": "node",
+        "bundle": true,
+        "format": [
+          "cjs"
+        ],
+        "target": "node20",
+        "skipTypeCheck": false,
+        "packageManager": "npm"
+      }
+    },
+    "test": {},
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "options": {
+        "lintFilePatterns": [
+          "libs/OSClient/**/*.ts"
+        ]
+      }
+    },
+    "format": {},
+    "version": {
+      "options": {
+        "postTargets": [
+          "sync-versions"
+        ]
+      }
+    },
+    "changelog": {},
+    "sync-versions": {},
+    "sync-project-versions": {}
+  },
+  "tags": [
+    "type:lib",
+    "scope:pl"
+  ],
+  "version": "0.32.0"
+}

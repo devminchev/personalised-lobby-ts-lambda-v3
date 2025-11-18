@@ -1,0 +1,16 @@
+{
+  "name": "os-client",
+  "version": "0.32.0",
+  "description": "Common utilities for personalized lobby",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf node_modules dist coverage; jest --clearCache",
+    "clean:lock": "rimraf package-lock.json yarn.lock",
+    "format:check": "prettier --check '**/*.{ts,tsx,js,jsx,json,md}'"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}
