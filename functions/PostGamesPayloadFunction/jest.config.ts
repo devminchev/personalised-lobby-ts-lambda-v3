@@ -1,0 +1,26 @@
+/*
+ * For a detailed explanation regarding each configuration property and type check, visit:
+ * https://jestjs.io/docs/configuration
+ */
+
+export default {
+    transform: {
+        '^.+\\.ts?$': 'ts-jest',
+    },
+    preset: 'ts-jest',
+    clearMocks: true,
+    collectCoverage: true,
+    coverageDirectory: 'coverage',
+    coverageProvider: 'v8',
+    testEnvironment: 'node',
+    testMatch: ['**/tests/*.test.ts', '**/tests/*.test.js'],
+    modulePathIgnorePatterns: ['/\\.nx\\/cache\\//', '/\\/dist\\//'],
+    haste: {
+        throwOnModuleCollision: false,
+    },
+
+    moduleNameMapper: {
+        '^os-client$': '<rootDir>/../../libs/OSClient',
+        '^/opt/nodejs/node_modules/os-client$': '<rootDir>/../../layers/OSClientLayer',
+    },
+};

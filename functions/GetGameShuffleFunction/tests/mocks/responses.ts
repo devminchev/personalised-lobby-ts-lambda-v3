@@ -126,6 +126,12 @@ export const FIRST_BUCKET_GAME_SITE_GAME_RESPONSE: any = {
                                     _source: {
                                         game: {
                                             id: '556sZbM22DckSZAfVH2mOt',
+                                            entryTitle: 'JLY_BULLSEYE_BIG_BUCKS',
+                                            gameName: 'play-jly-bullseye-big-bucks',
+                                            mobileGameName: '',
+                                            gameSkin: 'JLY_BULLSEYE_BIG_BUCKS',
+                                            mobileGameSkin: '',
+                                            mobileOverride: false,
                                             title: {
                                                 'en-GB': 'Bullseye Big Bucks',
                                             },
@@ -135,13 +141,17 @@ export const FIRST_BUCKET_GAME_SITE_GAME_RESPONSE: any = {
                                                 es: '/api/content/gametiles/tbc/scale-s%s/tbc-tile-r%s-w%s.jpg',
                                             },
                                             gamePlatformConfig: {
-                                                'en-GB': {
-                                                    name: 'play-jly-bullseye-big-bucks',
-                                                    demoUrl: '/service/game/demo/play-jly-bullseye-big-bucks',
-                                                    gameSkin: 'JLY_BULLSEYE_BIG_BUCKS',
-                                                    realUrl: '/service/game/play/play-jly-bullseye-big-bucks',
-                                                },
+                                                demoUrl: '/service/game/demo/play-jly-bullseye-big-bucks',
+                                                realUrl: '/service/game/play/play-jly-bullseye-big-bucks',
+                                                mobileDemoUrl: '',
+                                                mobileRealUrl: '',
                                             },
+                                            vendor: 'infinity',
+                                            progressiveJackpot: false,
+                                            showNetPosition: true,
+                                            operatorBarDisabled: false,
+                                            funPanelEnabled: false,
+                                            rgpEnabled: true,
                                             imgUrlPattern: {
                                                 'en-GB':
                                                     '/api/content/gametiles/bullseye-big-bucks/scale-s%s/bullseye-big-bucks-tile-r%s-w%s.jpg',
@@ -188,17 +198,27 @@ export const FIRST_BUCKET_GAME_SITE_GAME_RESPONSE: any = {
                                     _source: {
                                         game: {
                                             id: '4mjxf5I9oFS57LnTTBx6zs',
+                                            entryTitle: 'EYE_LOVE_LINES',
+                                            gameName: 'play-eye-love-lines',
+                                            mobileGameName: '',
+                                            gameSkin: 'EYE_LOVE_LINES',
+                                            mobileGameSkin: '',
+                                            mobileOverride: false,
                                             title: {
                                                 'en-GB': 'Love Lines',
                                             },
                                             gamePlatformConfig: {
-                                                'en-GB': {
-                                                    name: 'play-eye-love-lines',
-                                                    demoUrl: '/service/game/demo/play-eye-love-lines',
-                                                    gameSkin: 'EYE_LOVE_LINES',
-                                                    realUrl: '/service/game/play/play-eye-love-lines',
-                                                },
+                                                demoUrl: '/service/game/demo/play-eye-love-lines',
+                                                realUrl: '/service/game/play/play-eye-love-lines',
+                                                mobileDemoUrl: '',
+                                                mobileRealUrl: '',
                                             },
+                                            vendor: 'infinity',
+                                            progressiveJackpot: false,
+                                            showNetPosition: true,
+                                            operatorBarDisabled: false,
+                                            funPanelEnabled: false,
+                                            rgpEnabled: true,
                                             imgUrlPattern: {
                                                 'en-GB':
                                                     '/api/content/gametiles/love-lines/scale-s%s/love-lines-tile-r%s-w%s.jpg',
@@ -243,17 +263,27 @@ export const FIRST_BUCKET_GAME_SITE_GAME_RESPONSE: any = {
                                     _source: {
                                         game: {
                                             id: '569oIHcUwyohn91p5VHjmV',
+                                            entryTitle: 'EYE_NOUGHTS_AND_CROSSES',
+                                            gameName: 'play-eye-noughts-and-crosses',
+                                            mobileGameName: '',
+                                            gameSkin: 'EYE_NOUGHTS_AND_CROSSES',
+                                            mobileGameSkin: '',
+                                            mobileOverride: false,
                                             title: {
                                                 'en-GB': 'Noughts And Crosses',
                                             },
                                             gamePlatformConfig: {
-                                                'en-GB': {
-                                                    name: 'play-eye-noughts-and-crosses',
-                                                    demoUrl: '/service/game/demo/play-eye-noughts-and-crosses',
-                                                    gameSkin: 'EYE_NOUGHTS_AND_CROSSES',
-                                                    realUrl: '/service/game/play/play-eye-noughts-and-crosses',
-                                                },
+                                                demoUrl: '/service/game/demo/play-eye-noughts-and-crosses',
+                                                realUrl: '/service/game/play/play-eye-noughts-and-crosses',
+                                                mobileDemoUrl: '',
+                                                mobileRealUrl: '',
                                             },
+                                            vendor: 'infinity',
+                                            progressiveJackpot: false,
+                                            showNetPosition: true,
+                                            operatorBarDisabled: false,
+                                            funPanelEnabled: false,
+                                            rgpEnabled: true,
                                             imgUrlPattern: {
                                                 'en-GB':
                                                     '/api/content/gametiles/noughts-and-crosses/scale-s%s/noughts-and-crosses-tile-r%s-w%s.jpg',
@@ -310,6 +340,12 @@ export const SECOND_THIRD_BUCKET_GAME_SITE_GAME_RESPONSE: any = {
                                     _source: {
                                         game: {
                                             id: 'zydMZNBcWNpQ1Kk1Ss2Cg',
+                                            entryTitle: 'IGT_CLEOPATRA_MINES',
+                                            gameName: 'play-igt-cleopatra-mines',
+                                            mobileGameName: '',
+                                            gameSkin: 'IGT_CLEOPATRA_MINES',
+                                            mobileGameSkin: '',
+                                            mobileOverride: false,
                                             title: {
                                                 'en-GB': 'Cleopatra Mines',
                                             },
@@ -318,13 +354,17 @@ export const SECOND_THIRD_BUCKET_GAME_SITE_GAME_RESPONSE: any = {
                                                     '/api/content/gametiles/cleopatra-mines/scale-s%s/cleopatra-mines-tile-r%s-w%s.jpg',
                                             },
                                             gamePlatformConfig: {
-                                                'en-GB': {
-                                                    name: 'play-igt-cleopatra-mines',
-                                                    demoUrl: '/service/game/demo/play-igt-cleopatra-mines',
-                                                    gameSkin: 'IGT_CLEOPATRA_MINES',
-                                                    realUrl: '/service/game/play/play-igt-cleopatra-mines',
-                                                },
+                                                demoUrl: '/service/game/demo/play-igt-cleopatra-mines',
+                                                realUrl: '/service/game/play/play-igt-cleopatra-mines',
+                                                mobileDemoUrl: '',
+                                                mobileRealUrl: '',
                                             },
+                                            vendor: 'infinity',
+                                            progressiveJackpot: false,
+                                            showNetPosition: true,
+                                            operatorBarDisabled: false,
+                                            funPanelEnabled: false,
+                                            rgpEnabled: true,
                                             imgUrlPattern: {
                                                 'en-GB':
                                                     '/api/content/gametiles/cleopatra-mines/scale-s%s/cleopatra-mines-tile-r%s-w%s.jpg',
@@ -369,17 +409,27 @@ export const SECOND_THIRD_BUCKET_GAME_SITE_GAME_RESPONSE: any = {
                                     _source: {
                                         game: {
                                             id: '7DRU1QW6qER5OwXicGI4i1',
+                                            entryTitle: 'EVO_FIRST_PERSON_DEAL_OR_NO_DEAL',
+                                            gameName: 'play-ev-first-person-deal-or-no-deal',
+                                            mobileGameName: '',
+                                            gameSkin: 'EVO_FIRST_PERSON_DEAL_OR_NO_DEAL',
+                                            mobileGameSkin: '',
+                                            mobileOverride: false,
                                             title: {
                                                 'en-GB': 'First Person Deal Or No Deal',
                                             },
                                             gamePlatformConfig: {
-                                                'en-GB': {
-                                                    name: 'play-ev-first-person-deal-or-no-deal',
-                                                    demoUrl: '',
-                                                    gameSkin: 'EVO_FIRST_PERSON_DEAL_OR_NO_DEAL',
-                                                    realUrl: '/service/game/play/play-ev-first-person-deal-or-no-deal',
-                                                },
+                                                demoUrl: '',
+                                                realUrl: '/service/game/play/play-ev-first-person-deal-or-no-deal',
+                                                mobileDemoUrl: '',
+                                                mobileRealUrl: '',
                                             },
+                                            vendor: 'infinity',
+                                            progressiveJackpot: false,
+                                            showNetPosition: true,
+                                            operatorBarDisabled: false,
+                                            funPanelEnabled: false,
+                                            rgpEnabled: true,
                                             imgUrlPattern: {
                                                 'en-GB':
                                                     '/api/content/gametiles/first-person-dond-uk/scale-s%s/first-person-dond-uk-tile-r%s-w%s.jpg',
@@ -426,17 +476,27 @@ export const SECOND_THIRD_BUCKET_GAME_SITE_GAME_RESPONSE: any = {
                                     _source: {
                                         game: {
                                             id: '68GJ0diqYFXerYE7L5NYTC',
+                                            entryTitle: 'play-dond-scratchcard',
+                                            gameName: 'play-dond-scratchcard',
+                                            mobileGameName: '',
+                                            gameSkin: 'play-dond-scratchcard',
+                                            mobileGameSkin: '',
+                                            mobileOverride: false,
                                             title: {
                                                 'en-GB': 'Deal or No Deal Scratchcard',
                                             },
                                             gamePlatformConfig: {
-                                                'en-GB': {
-                                                    name: 'play-dond-scratchcard',
-                                                    demoUrl: '/service/game/demo/play-dond-scratchcard',
-                                                    gameSkin: 'play-dond-scratchcard',
-                                                    realUrl: '/service/game/play/play-dond-scratchcard',
-                                                },
+                                                demoUrl: '/service/game/demo/play-dond-scratchcard',
+                                                realUrl: '/service/game/play/play-dond-scratchcard',
+                                                mobileDemoUrl: '',
+                                                mobileRealUrl: '',
                                             },
+                                            vendor: 'infinity',
+                                            progressiveJackpot: false,
+                                            showNetPosition: true,
+                                            operatorBarDisabled: false,
+                                            funPanelEnabled: false,
+                                            rgpEnabled: true,
                                             imgUrlPattern: {
                                                 'en-GB':
                                                     '/api/content/gametiles/deal-or-no-deal-scratchcard/scale-s%s/dond-scratchcard-tile-r%s-w%s.jpg',
@@ -538,42 +598,5 @@ export const LAMBDA_RESPONSE = {
             representativeColor: '#000000',
         },
     ],
-    tileThree: [
-        {
-            entryId: '36alynPUUvN3B5u5tNiufZ',
-            gameId: 'zydMZNBcWNpQ1Kk1Ss2Cg',
-            name: 'play-igt-cleopatra-mines',
-            title: 'Cleopatra Mines',
-            imgUrlPattern: '/api/content/gametiles/cleopatra-mines/scale-s%s/cleopatra-mines-tile-r%s-w%s.jpg',
-            loggedOutImgUrlPattern: '/api/content/gametiles/cleopatra-mines/scale-s%s/cleopatra-mines-tile-r%s-w%s.jpg',
-            gameSkin: 'IGT_CLEOPATRA_MINES',
-            demoUrl: '/service/game/demo/play-igt-cleopatra-mines',
-            realUrl: '/service/game/play/play-igt-cleopatra-mines',
-            representativeColor: '#655E91',
-        },
-        {
-            entryId: '1ZUZahELRqSs6xGyqHJWGH',
-            gameId: '7DRU1QW6qER5OwXicGI4i1',
-            name: 'play-ev-first-person-deal-or-no-deal',
-            title: 'First Person Deal Or No Deal',
-            imgUrlPattern:
-                '/api/content/gametiles/first-person-dond-uk/scale-s%s/first-person-dond-uk-tile-r%s-w%s.jpg',
-            gameSkin: 'EVO_FIRST_PERSON_DEAL_OR_NO_DEAL',
-            demoUrl: '',
-            realUrl: '/service/game/play/play-ev-first-person-deal-or-no-deal',
-            representativeColor: '#000000',
-        },
-        {
-            entryId: '3FnoDO2cBp8iToVSqJgsZW',
-            gameId: '68GJ0diqYFXerYE7L5NYTC',
-            name: 'play-dond-scratchcard',
-            title: 'Deal or No Deal Scratchcard',
-            imgUrlPattern:
-                '/api/content/gametiles/deal-or-no-deal-scratchcard/scale-s%s/dond-scratchcard-tile-r%s-w%s.jpg',
-            gameSkin: 'play-dond-scratchcard',
-            demoUrl: '/service/game/demo/play-dond-scratchcard',
-            realUrl: '/service/game/play/play-dond-scratchcard',
-            representativeColor: '#000000',
-        },
-    ],
+    tileThree: [],
 };

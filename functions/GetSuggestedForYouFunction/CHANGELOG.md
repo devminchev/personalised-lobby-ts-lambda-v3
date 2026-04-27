@@ -2,6 +2,196 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.18.12](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-suggested-for-you-0.18.11...get-suggested-for-you-0.18.12) (2026-04-22)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.53.0`
+## [0.18.11](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-suggested-for-you-0.18.10...get-suggested-for-you-0.18.11) (2026-04-22)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.52.0`
+## [0.18.10](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-suggested-for-you-0.18.9...get-suggested-for-you-0.18.10) (2026-04-21)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.51.1`
+## [0.18.9](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-suggested-for-you-0.18.8...get-suggested-for-you-0.18.9) (2026-04-21)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.51.0`
+## [0.18.8](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-suggested-for-you-0.18.7...get-suggested-for-you-0.18.8) (2026-04-20)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.50.0`
+## [0.18.7](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-suggested-for-you-0.18.6...get-suggested-for-you-0.18.7) (2026-04-13)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.49.0`
+## [0.18.6](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-suggested-for-you-0.18.5...get-suggested-for-you-0.18.6) (2026-04-10)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.48.3`
+## [0.18.5](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-suggested-for-you-0.18.4...get-suggested-for-you-0.18.5) (2026-04-09)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.48.2`
+## [0.18.4](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-suggested-for-you-0.18.3...get-suggested-for-you-0.18.4) (2026-04-09)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.48.1`
+## [0.18.3](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-suggested-for-you-0.18.2...get-suggested-for-you-0.18.3) (2026-03-25)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.48.0`
+## [0.18.2](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-suggested-for-you-0.18.1...get-suggested-for-you-0.18.2) (2026-03-25)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.47.0`
+## [0.18.1](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-suggested-for-you-0.18.0...get-suggested-for-you-0.18.1) (2026-03-24)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.46.0`
+## [0.18.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-suggested-for-you-0.17.11...get-suggested-for-you-0.18.0) (2026-03-20)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.45.0`
+
+### Features
+
+* **gtech-1314814-1:** refactor lambdas to work with new game index mapping ([ac824da](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/commit/ac824daa58b93411881d2250ab79c32f331ffe90))
+
+## [0.17.11](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-suggested-for-you-0.17.10...get-suggested-for-you-0.17.11) (2026-03-17)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.44.0`
+## [0.17.10](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-suggested-for-you-0.17.9...get-suggested-for-you-0.17.10) (2026-03-17)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.43.5`
+## [0.17.9](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-suggested-for-you-0.17.8...get-suggested-for-you-0.17.9) (2026-03-06)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.43.4`
+## [0.17.8](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-suggested-for-you-0.17.7...get-suggested-for-you-0.17.8) (2026-03-06)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.43.3`
+## [0.17.7](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-suggested-for-you-0.17.6...get-suggested-for-you-0.17.7) (2026-03-06)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.43.2`
+## [0.17.6](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-suggested-for-you-0.17.5...get-suggested-for-you-0.17.6) (2026-03-05)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.43.1`
+## [0.17.5](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-suggested-for-you-0.17.4...get-suggested-for-you-0.17.5) (2026-03-05)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.43.0`
+## [0.17.4](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-suggested-for-you-0.17.3...get-suggested-for-you-0.17.4) (2026-03-05)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.42.1`
+## [0.17.3](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-suggested-for-you-0.17.2...get-suggested-for-you-0.17.3) (2026-02-25)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.42.0`
+## [0.17.2](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-suggested-for-you-0.17.1...get-suggested-for-you-0.17.2) (2026-02-23)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.41.2`
+## [0.17.1](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-suggested-for-you-0.17.0...get-suggested-for-you-0.17.1) (2026-02-20)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.41.1`
+## [0.17.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-suggested-for-you-0.16.0...get-suggested-for-you-0.17.0) (2026-01-28)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.41.0`
+
+### Features
+
+* **gtech-1317745:** add compression at the lambda level ([ed45cf3](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/commit/ed45cf3868056b4e8aebf4c3fa9baf6a3bd1b6fb))
+
+## [0.16.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-suggested-for-you-0.15.17...get-suggested-for-you-0.16.0) (2026-01-23)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.40.0`
+
+### Features
+
+* **gtech-1317745:** default encoding for uncompressed lambdas ([9dba5d2](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/commit/9dba5d25387276374a2c1ce46055ec224098953e))
+
+## [0.15.17](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-suggested-for-you-0.15.16...get-suggested-for-you-0.15.17) (2026-01-19)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.39.0`
+## [0.15.16](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-suggested-for-you-0.15.15...get-suggested-for-you-0.15.16) (2026-01-19)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.38.0`
+## [0.15.15](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-suggested-for-you-0.15.14...get-suggested-for-you-0.15.15) (2025-12-16)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.37.0`
+## [0.15.14](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-suggested-for-you-0.15.13...get-suggested-for-you-0.15.14) (2025-12-09)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.36.0`
+## [0.15.13](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-suggested-for-you-0.15.12...get-suggested-for-you-0.15.13) (2025-12-05)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.35.0`
+## [0.15.12](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-suggested-for-you-0.15.11...get-suggested-for-you-0.15.12) (2025-12-03)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.34.2`
+## [0.15.11](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-suggested-for-you-0.15.10...get-suggested-for-you-0.15.11) (2025-12-02)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.34.1`
+## [0.15.10](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-suggested-for-you-0.15.9...get-suggested-for-you-0.15.10) (2025-11-28)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.34.0`
+## [0.15.9](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-suggested-for-you-0.15.8...get-suggested-for-you-0.15.9) (2025-11-26)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.33.0`
 ## [0.15.8](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-suggested-for-you-0.15.7...get-suggested-for-you-0.15.8) (2025-11-14)
 
 ### Dependency Updates

@@ -14,7 +14,7 @@ import {
     logError,
     createError,
     SUGGESTED_GAMES_DEFAULTS_INDEX_ALIAS,
-    GAMES_V2_INDEX_ALIAS,
+    IG_GAMES_V2_READ_ALIAS,
 } from 'os-client';
 
 const SUGGESTED_GAMES_DEFAULTS_QUERY_SIZE = 10;
@@ -28,7 +28,7 @@ export const getGamesSiteGames = async (
     const hits: FullApiResponse[] = await getGameHits(
         client,
         sectionGamesListQuery,
-        GAMES_V2_INDEX_ALIAS,
+        IG_GAMES_V2_READ_ALIAS,
         siteName,
         platform,
     );

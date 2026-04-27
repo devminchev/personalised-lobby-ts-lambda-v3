@@ -1,13 +1,13 @@
 {
   "body": "",
   "resource": "/sites/{sitename}/platform/{platform}/game-config/{gamename}?locale={locale}",
-  "path": "sites/monopolycasino/platform/android/game-config/play-igt-hoggin-cash-cash-eruption",
+  "path": "/sites/virgingames/platform/android/game-config/play-micro-mining-pots-of-gold-m",
   "httpMethod": "GET",
   "isBase64Encoded": false,
   "pathParameters": {
-    "sitename": "monopolycasino",
+    "sitename": "virgingames",
     "platform": "android",
-    "gamename": "play-igt-hoggin-cash-cash-eruption"
+    "gamename": "play-micro-mining-pots-of-gold-m"
   },
   "queryStringParameters": {
     "locale": "en-GB"
@@ -52,7 +52,7 @@
       "userAgent": "Custom User Agent String",
       "user": null
     },
-    "path": "/sites/monopolycasino/platform/desktop/game-config/play-double-bubble-triple?locale=es",
+    "path": "/sites/virgingames/platform/desktop/game-config/play-double-bubble-triple?locale=es",
     "resourcePath": "/sites/{sitename}/platform/{platform}/game-config/{gamename}?locale={locale}",
     "httpMethod": "GET",
     "apiId": "1234567890",

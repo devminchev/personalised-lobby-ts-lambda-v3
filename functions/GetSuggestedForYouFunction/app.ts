@@ -11,6 +11,7 @@ import {
     getVentureId,
     validators,
     errorResponseHandler,
+    gzipResponse,
 } from 'os-client';
 import { handleMissingMLRecommendations } from './lib/personalisedSections';
 
@@ -73,10 +74,7 @@ export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGat
             showWebComponent: false,
         });
 
-        return {
-            statusCode: 200,
-            body: JSON.stringify(sectionGamesPayload),
-        };
+        return gzipResponse(sectionGamesPayload);
     } catch (err) {
         const errorLogParams = {
             eventReqId,

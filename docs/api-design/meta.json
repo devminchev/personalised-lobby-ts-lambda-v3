@@ -1,0 +1,9 @@
+{
+  "title": "API Design",
+  "pages": [
+    "index",
+    "url-structure",
+    "member-identification",
+    "personalised-resources"
+  ]
+}

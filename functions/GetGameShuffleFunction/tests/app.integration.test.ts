@@ -11,9 +11,10 @@ import { mockApiEvent } from './mocks/gatewayMocks';
 import {
     createError,
     ErrorCode,
-    GAMES_INDEX_V2_ALIAS,
+    IG_GAMES_V2_READ_ALIAS,
     getErrorMessage,
     ML_GAME_SHUFFLE_ALIAS,
+    parseCompressedBody,
     VENTURES_INDEX_ALIAS,
 } from 'os-client';
 import {
@@ -57,11 +58,11 @@ describe('Integration Test for Lambda Handler', () => {
                 .reply(200, SECOND_THIRD_BUCKET_GAME_SHUFFLE_HITS);
 
             nock('http://localhost:9200')
-                .post(`/${GAMES_INDEX_V2_ALIAS}/_search?request_cache=true`)
+                .post(`/${IG_GAMES_V2_READ_ALIAS}/_search?request_cache=true`)
                 .reply(200, FIRST_BUCKET_GAME_SITE_GAME_RESPONSE);
 
             nock('http://localhost:9200')
-                .post(`/${GAMES_INDEX_V2_ALIAS}/_search?request_cache=true`)
+                .post(`/${IG_GAMES_V2_READ_ALIAS}/_search?request_cache=true`)
                 .reply(200, SECOND_THIRD_BUCKET_GAME_SITE_GAME_RESPONSE);
 
             const event: APIGatewayProxyEvent = mockApiEvent(SITE_NAME, PLATFORM, LOCALE);
@@ -80,7 +81,7 @@ describe('Integration Test for Lambda Handler', () => {
                 .reply(200, FIRST_BUCKET_GAME_SHUFFLE_HITS);
 
             nock('http://localhost:9200')
-                .post(`/${GAMES_INDEX_V2_ALIAS}/_search?request_cache=true`)
+                .post(`/${IG_GAMES_V2_READ_ALIAS}/_search?request_cache=true`)
                 .reply(200, FIRST_BUCKET_GAME_SITE_GAME_RESPONSE);
 
             nock('http://localhost:9200')
@@ -88,14 +89,14 @@ describe('Integration Test for Lambda Handler', () => {
                 .reply(200, SECOND_THIRD_BUCKET_GAME_SHUFFLE_HITS);
 
             nock('http://localhost:9200')
-                .post(`/${GAMES_INDEX_V2_ALIAS}/_search?request_cache=true`)
+                .post(`/${IG_GAMES_V2_READ_ALIAS}/_search?request_cache=true`)
                 .reply(200, SECOND_THIRD_BUCKET_GAME_SITE_GAME_RESPONSE);
 
             const event: APIGatewayProxyEvent = mockApiEvent(SITE_NAME, PLATFORM, LOCALE);
             const result: APIGatewayProxyResult = await lambdaHandler(event);
 
             expect(result.statusCode).toEqual(200);
-            expect(result.body).toEqual(JSON.stringify(LAMBDA_RESPONSE));
+            expect(parseCompressedBody(result)).toEqual(LAMBDA_RESPONSE);
         });
 
         it('Should return RTP < 93 on first bucket', async () => {
@@ -108,7 +109,7 @@ describe('Integration Test for Lambda Handler', () => {
                 .reply(200, FIRST_BUCKET_GAME_SHUFFLE_HITS);
 
             nock('http://localhost:9200')
-                .post(`/${GAMES_INDEX_V2_ALIAS}/_search?request_cache=true`)
+                .post(`/${IG_GAMES_V2_READ_ALIAS}/_search?request_cache=true`)
                 .reply(200, FIRST_BUCKET_GAME_SITE_GAME_RESPONSE);
 
             nock('http://localhost:9200')
@@ -116,7 +117,7 @@ describe('Integration Test for Lambda Handler', () => {
                 .reply(200, SECOND_THIRD_BUCKET_GAME_SHUFFLE_HITS);
 
             nock('http://localhost:9200')
-                .post(`/${GAMES_INDEX_V2_ALIAS}/_search?request_cache=true`)
+                .post(`/${IG_GAMES_V2_READ_ALIAS}/_search?request_cache=true`)
                 .reply(200, SECOND_THIRD_BUCKET_GAME_SITE_GAME_RESPONSE);
 
             const event: APIGatewayProxyEvent = mockApiEvent(SITE_NAME, PLATFORM, LOCALE);
@@ -140,7 +141,7 @@ describe('Integration Test for Lambda Handler', () => {
                 .reply(200, FIRST_BUCKET_GAME_SHUFFLE_HITS);
 
             nock('http://localhost:9200')
-                .post(`/${GAMES_INDEX_V2_ALIAS}/_search?request_cache=true`)
+                .post(`/${IG_GAMES_V2_READ_ALIAS}/_search?request_cache=true`)
                 .reply(200, FIRST_BUCKET_GAME_SITE_GAME_RESPONSE);
 
             nock('http://localhost:9200')
@@ -148,7 +149,7 @@ describe('Integration Test for Lambda Handler', () => {
                 .reply(200, SECOND_THIRD_BUCKET_GAME_SHUFFLE_HITS);
 
             nock('http://localhost:9200')
-                .post(`/${GAMES_INDEX_V2_ALIAS}/_search?request_cache=true`)
+                .post(`/${IG_GAMES_V2_READ_ALIAS}/_search?request_cache=true`)
                 .reply(200, SECOND_THIRD_BUCKET_GAME_SITE_GAME_RESPONSE);
 
             const event: APIGatewayProxyEvent = mockApiEvent(SITE_NAME, PLATFORM, LOCALE);
@@ -186,7 +187,7 @@ describe('Integration Test for Lambda Handler', () => {
                 .reply(200, FIRST_BUCKET_GAME_SHUFFLE_HITS);
 
             nock('http://localhost:9200')
-                .post(`/${GAMES_INDEX_V2_ALIAS}/_search?request_cache=true`)
+                .post(`/${IG_GAMES_V2_READ_ALIAS}/_search?request_cache=true`)
                 .reply(200, FIRST_BUCKET_GAME_SITE_GAME_RESPONSE);
 
             nock('http://localhost:9200')
@@ -194,7 +195,7 @@ describe('Integration Test for Lambda Handler', () => {
                 .reply(200, NOT_FOUND_RESPONSE);
 
             nock('http://localhost:9200')
-                .post(`/${GAMES_INDEX_V2_ALIAS}/_search?request_cache=true`)
+                .post(`/${IG_GAMES_V2_READ_ALIAS}/_search?request_cache=true`)
                 .reply(200, NOT_FOUND_RESPONSE);
 
             const event: APIGatewayProxyEvent = mockApiEvent(SITE_NAME, PLATFORM, LOCALE);
@@ -214,7 +215,7 @@ describe('Integration Test for Lambda Handler', () => {
                 .reply(200, FIRST_BUCKET_GAME_SHUFFLE_HITS);
 
             nock('http://localhost:9200')
-                .post(`/${GAMES_INDEX_V2_ALIAS}/_search?request_cache=true`)
+                .post(`/${IG_GAMES_V2_READ_ALIAS}/_search?request_cache=true`)
                 .reply(200, FIRST_BUCKET_GAME_SITE_GAME_RESPONSE);
 
             nock('http://localhost:9200')
@@ -222,7 +223,7 @@ describe('Integration Test for Lambda Handler', () => {
                 .reply(200, SECOND_THIRD_BUCKET_GAME_SHUFFLE_HITS);
 
             nock('http://localhost:9200')
-                .post(`/${GAMES_INDEX_V2_ALIAS}/_search?request_cache=true`)
+                .post(`/${IG_GAMES_V2_READ_ALIAS}/_search?request_cache=true`)
                 .reply(200, SECOND_THIRD_BUCKET_GAME_SITE_GAME_RESPONSE);
 
             const event: APIGatewayProxyEvent = mockApiEvent(SITE_NAME, undefined, undefined);

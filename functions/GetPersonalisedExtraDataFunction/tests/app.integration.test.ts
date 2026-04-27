@@ -16,7 +16,7 @@ import {
     PERSONALISED_DATA_RESP_ES_NO_LOCALE_GUARD,
     PERSONALISED_DATA_RESP_NO_GAME_INDEX,
 } from './mocks/responses';
-import { ErrorCode, getErrorMessage, ML_BECAUSE_YOU_PLAYED_X_Y_Z_ALIAS } from 'os-client';
+import { ErrorCode, getErrorMessage, ML_BECAUSE_YOU_PLAYED_X_Y_Z_ALIAS, parseCompressedBody } from 'os-client';
 
 jest.mock('@opensearch-project/opensearch', () => {
     const actualOpenSearch: any = jest.requireActual('@opensearch-project/opensearch');
@@ -43,7 +43,7 @@ describe('Integration Test for Lambda Handler', () => {
         const result: APIGatewayProxyResult = await lambdaHandler(event);
 
         expect(result.statusCode).toEqual(200);
-        expect(result.body).toEqual(JSON.stringify(PERSONALISED_DATA_RESP_ES));
+        expect(parseCompressedBody(result)).toEqual(PERSONALISED_DATA_RESP_ES);
     });
 
     it('should return empty response for logged in user, with ML data available on personalized section, but the vendor is not infinity or roxor', async () => {
@@ -59,7 +59,7 @@ describe('Integration Test for Lambda Handler', () => {
         const result: APIGatewayProxyResult = await lambdaHandler(event);
 
         expect(result.statusCode).toEqual(200);
-        expect(result.body).toEqual(JSON.stringify({}));
+        expect(parseCompressedBody(result)).toEqual({});
     });
 
     it('should return ML Because You Played game title for logged in user when game index is unavailable, with ML data available on personalized section', async () => {
@@ -75,7 +75,7 @@ describe('Integration Test for Lambda Handler', () => {
         const result: APIGatewayProxyResult = await lambdaHandler(event);
 
         expect(result.statusCode).toEqual(200);
-        expect(result.body).toEqual(JSON.stringify(PERSONALISED_DATA_RESP_NO_GAME_INDEX));
+        expect(parseCompressedBody(result)).toEqual(PERSONALISED_DATA_RESP_NO_GAME_INDEX);
     });
 
     it('should return ML Because You Played game title for logged in user when locale is missing and default locale hits guard, with ML data available on personalized section', async () => {
@@ -90,7 +90,7 @@ describe('Integration Test for Lambda Handler', () => {
         const result: APIGatewayProxyResult = await lambdaHandler(event);
 
         expect(result.statusCode).toEqual(200);
-        expect(result.body).toEqual(JSON.stringify(PERSONALISED_DATA_RESP_ES_NO_LOCALE_GUARD));
+        expect(parseCompressedBody(result)).toEqual(PERSONALISED_DATA_RESP_ES_NO_LOCALE_GUARD);
     });
 
     it('should return an empty object for ML Because You Played for logged in user, when no ML data is available for the user', async () => {
@@ -105,7 +105,7 @@ describe('Integration Test for Lambda Handler', () => {
         const result: APIGatewayProxyResult = await lambdaHandler(event);
 
         expect(result.statusCode).toEqual(200);
-        expect(result.body).toEqual(JSON.stringify({}));
+        expect(parseCompressedBody(result)).toEqual({});
     });
 
     it('should return (400) to the client if memberid is missing', async () => {
@@ -134,7 +134,7 @@ describe('Integration Test for Lambda Handler', () => {
         const result = await lambdaHandler(event);
 
         expect(result.statusCode).toBe(200);
-        const body = JSON.parse(result.body);
+        const body = parseCompressedBody(result);
         expect(body).toEqual({});
     });
 });

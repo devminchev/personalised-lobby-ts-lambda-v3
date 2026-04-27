@@ -83,40 +83,30 @@ export const GAME_SITE_GAME_RESP = {
                         name: 'game',
                     },
                     game: {
-                        entryTitle: {
-                            'en-GB': 'play-double-bubble-super-7',
-                        },
+                        entryTitle: 'play-double-bubble-super-7',
+                        gameName: 'play-double-bubble-super-7',
+                        gameSkin: 'play-double-bubble-super-7',
+                        mobileGameName: '',
+                        mobileGameSkin: '',
+                        mobileOverride: false,
                         gamePlatformConfig: {
-                            'en-GB': {
-                                name: 'play-double-bubble-super-7',
-                                demoUrl: '/service/game/demo/play-double-bubble-super-7',
-                                realUrl: '/service/game/play/play-double-bubble-super-7',
-                                gameLoaderFileName: 'play-double-bubble-super-7',
-                                gameSkin: 'play-double-bubble-super-7',
-                            },
+                            name: 'play-double-bubble-super-7',
+                            demoUrl: '/service/game/demo/play-double-bubble-super-7',
+                            realUrl: '/service/game/play/play-double-bubble-super-7',
+                            mobileDemoUrl: '',
+                            mobileRealUrl: '',
+                            gameLoaderFileName: 'play-double-bubble-super-7',
                         },
                         platform: ['Desktop', 'Phone', 'Tablet'],
-                        vendor: {
-                            'en-GB': 'roxor-rgp',
-                        },
+                        vendor: 'roxor-rgp',
                         showGameName: {
                             'en-GB': false,
                         },
-                        progressiveJackpot: {
-                            'en-GB': true,
-                        },
-                        operatorBarDisabled: {
-                            'en-GB': false,
-                        },
-                        rgpEnabled: {
-                            'en-GB': true,
-                        },
-                        funPanelEnabled: {
-                            'en-GB': false,
-                        },
-                        funPanelDefaultCategory: {
-                            'en-GB': '',
-                        },
+                        progressiveJackpot: true,
+                        operatorBarDisabled: false,
+                        rgpEnabled: true,
+                        funPanelEnabled: false,
+                        funPanelDefaultCategory: '',
                         representativeColor: {
                             'en-GB': '#8CC8AC',
                         },
@@ -231,40 +221,30 @@ export const GAME_SITE_GAME_RESP = {
                         name: 'game',
                     },
                     game: {
-                        entryTitle: {
-                            'en-GB': 'EVO_SIGNATURE_SPEED_BLACKJACK_2',
-                        },
+                        entryTitle: 'EVO_SIGNATURE_SPEED_BLACKJACK_2',
+                        gameName: 'play-ev-signature-speed-blackjack-2',
+                        gameSkin: 'EVO_SIGNATURE_SPEED_BLACKJACK_2',
+                        mobileGameName: '',
+                        mobileGameSkin: '',
+                        mobileOverride: false,
                         gamePlatformConfig: {
-                            'en-GB': {
-                                name: 'play-ev-signature-speed-blackjack-2',
-                                demoUrl: '/service/game/play/play-ev-signature-speed-blackjack-2',
-                                realUrl: '/service/game/play/play-ev-signature-speed-blackjack-2',
-                                gameLoaderFileName: 'EVO_SIGNATURE_SPEED_BLACKJACK_2',
-                                gameSkin: 'EVO_SIGNATURE_SPEED_BLACKJACK_2',
-                            },
+                            name: 'play-ev-signature-speed-blackjack-2',
+                            demoUrl: '/service/game/play/play-ev-signature-speed-blackjack-2',
+                            realUrl: '/service/game/play/play-ev-signature-speed-blackjack-2',
+                            mobileDemoUrl: '',
+                            mobileRealUrl: '',
+                            gameLoaderFileName: 'EVO_SIGNATURE_SPEED_BLACKJACK_2',
                         },
                         platform: ['Phone', 'Desktop', 'Tablet'],
-                        vendor: {
-                            'en-GB': 'infinity',
-                        },
+                        vendor: 'infinity',
                         showGameName: {
                             'en-GB': false,
                         },
-                        progressiveJackpot: {
-                            'en-GB': false,
-                        },
-                        operatorBarDisabled: {
-                            'en-GB': false,
-                        },
-                        rgpEnabled: {
-                            'en-GB': true,
-                        },
-                        funPanelEnabled: {
-                            'en-GB': false,
-                        },
-                        funPanelDefaultCategory: {
-                            'en-GB': '',
-                        },
+                        progressiveJackpot: false,
+                        operatorBarDisabled: false,
+                        rgpEnabled: true,
+                        funPanelEnabled: false,
+                        funPanelDefaultCategory: '',
                         representativeColor: {
                             'en-GB': '#000B1D',
                         },
@@ -537,23 +517,28 @@ export const PERSONALISED_FALLBACK_GAMES_RESP = {
                                     _score: 1,
                                     _source: {
                                         game: {
+                                            entryTitle: 'play-double-bubble-triple',
+                                            gameName: 'play-double-bubble-triple',
+                                            gameSkin: 'play-double-bubble-triple',
+                                            mobileGameName: '',
+                                            mobileGameSkin: '',
+                                            mobileOverride: false,
+                                            vendor: 'roxor-rgp',
+                                            operatorBarDisabled: false,
+                                            rgpEnabled: true,
+                                            funPanelEnabled: false,
+                                            funPanelDefaultCategory: '',
                                             loggedOutImgUrlPattern: {
                                                 'en-GB':
                                                     '/api/content/gametiles/double-bubble-triple-jackpot-logged-out/scale-s%s/dbtj-loggedout-tile-r%s-w%s.jpg',
                                                 es: '/api/content/gametiles/double-bubble-triple-jackpot-es-logged-out/scale-s%s/dbtj-es-tile-r%s-w%s.jpg',
                                             },
                                             gamePlatformConfig: {
-                                                'en-GB': {
-                                                    demoUrl: '/service/game/demo/play-double-bubble-triple',
-                                                    gameSkin: 'play-double-bubble-triple',
-                                                    mobileOverride: false,
-                                                    name: 'play-double-bubble-triple',
-                                                    realUrl: '/service/game/play/play-double-bubble-triple',
-                                                    mobileDemoUrl: '',
-                                                    mobileRealUrl: '',
-                                                    mobileGameSkin: '',
-                                                    mobileName: '',
-                                                },
+                                                demoUrl: '/service/game/demo/play-double-bubble-triple',
+                                                realUrl: '/service/game/play/play-double-bubble-triple',
+                                                mobileDemoUrl: '',
+                                                mobileRealUrl: '',
+                                                name: 'play-double-bubble-triple',
                                             },
                                             imgUrlPattern: {
                                                 'en-GB':
@@ -573,9 +558,7 @@ export const PERSONALISED_FALLBACK_GAMES_RESP = {
                                                 'en-GB': 'Double Bubble Triple Jackpot',
                                                 es: 'Duble Buble Triple Bote',
                                             },
-                                            progressiveJackpot: {
-                                                'en-GB': true,
-                                            },
+                                            progressiveJackpot: true,
                                         },
                                     },
                                 },
@@ -612,21 +595,26 @@ export const PERSONALISED_FALLBACK_GAMES_RESP = {
                                     _score: 1,
                                     _source: {
                                         game: {
+                                            entryTitle: 'play-big-bass-splash',
+                                            gameName: 'play-big-bass-splash',
+                                            gameSkin: 'PP_BIG_BASS_SPLASH',
+                                            mobileGameName: '',
+                                            mobileGameSkin: '',
+                                            mobileOverride: false,
+                                            vendor: 'infinity',
+                                            operatorBarDisabled: false,
+                                            rgpEnabled: true,
+                                            funPanelEnabled: false,
+                                            funPanelDefaultCategory: '',
                                             loggedOutImgUrlPattern: {
                                                 es: '/api/content/gametiles/big-bass-splash/scale-s%s/big-bass-splash-tile-r%s-w%s.jpg',
                                             },
                                             gamePlatformConfig: {
-                                                'en-GB': {
-                                                    demoUrl: '/service/game/demo/play-big-bass-splash',
-                                                    gameSkin: 'PP_BIG_BASS_SPLASH',
-                                                    mobileOverride: false,
-                                                    name: 'play-big-bass-splash',
-                                                    realUrl: '/service/game/play/play-big-bass-splash',
-                                                    mobileDemoUrl: '',
-                                                    mobileRealUrl: '',
-                                                    mobileGameSkin: '',
-                                                    mobileName: '',
-                                                },
+                                                demoUrl: '/service/game/demo/play-big-bass-splash',
+                                                realUrl: '/service/game/play/play-big-bass-splash',
+                                                mobileDemoUrl: '',
+                                                mobileRealUrl: '',
+                                                name: 'play-big-bass-splash',
                                             },
                                             imgUrlPattern: {
                                                 'en-GB':
@@ -646,9 +634,7 @@ export const PERSONALISED_FALLBACK_GAMES_RESP = {
                                                 'en-GB': 'Big Bass Splash ',
                                                 es: 'Big Bass Splash',
                                             },
-                                            progressiveJackpot: {
-                                                'en-GB': false,
-                                            },
+                                            progressiveJackpot: false,
                                         },
                                     },
                                 },

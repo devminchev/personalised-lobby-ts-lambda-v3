@@ -1,6 +1,6 @@
 {
   "name": "get-recently-played",
-  "version": "0.1.0",
+  "version": "0.5.12",
   "description": "Get games for a section",
   "main": "app.js",
   "repository": "https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda",

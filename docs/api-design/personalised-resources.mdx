@@ -1,0 +1,26 @@
+---
+title: Personalised Sub-Resources
+description: How personalised variants of a collection are modelled in the URL hierarchy
+---
+
+# Personalised Sub-Resources
+
+When a personalised variant of an existing resource is needed, it is modelled as a **sub-resource** of the original collection rather than a separate top-level endpoint.
+
+```http
+GET /sections/{sectionid}/sitegames                 # anonymous (default game list)
+GET /sections/{sectionid}/sitegames/personalised    # personalised subset for a member
+```
+
+## Why a sub-resource
+
+The `/personalised` segment communicates that the personalised list is a **filtered, member-specific view of the same collection** — not an unrelated resource. Consumers can reason about the relationship from the URL alone: anything under `sitegames/` is a games list scoped to that section.
+
+## Why two distinct paths
+
+Keeping the anonymous and personalised variants on **separate paths** (rather than one path that branches on the presence of `memberid`) is a deliberate routing choice:
+
+- CloudFront performs **path-based routing** to different origins and behaviours. A single path with an optional query parameter cannot be routed differently.
+- Cache policies, origin configuration, and request handling can therefore be tuned independently for the anonymous and personalised flows.
+
+The personalised endpoint additionally requires `memberid` as a query parameter — see [Member identification](./member-identification) for the rules that apply.

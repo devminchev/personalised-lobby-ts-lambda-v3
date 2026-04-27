@@ -1,0 +1,8 @@
+{
+  "title": "Personalised Lobby Ts Lambda V3",
+  "pages": [
+    "index",
+    "api-design",
+    "resilience"
+  ]
+}

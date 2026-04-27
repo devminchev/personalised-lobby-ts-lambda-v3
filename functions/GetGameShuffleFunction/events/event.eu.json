@@ -10,7 +10,8 @@
   },
   "queryStringParameters": {
     "locale": "en-GB",
-    "auth": "true"
+    "auth": "true",
+    "exec": "seq"
   },
   "stageVariables": {},
   "headers": {

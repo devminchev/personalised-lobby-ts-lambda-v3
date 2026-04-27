@@ -53,9 +53,17 @@ interface InnerHits<T> {
     };
 }
 
+export interface GetDocResponse<T> {
+    _index: string;
+    _id: string;
+    found: boolean;
+    _source?: T;
+}
+
 // Define the CustomClient interface to include the custom search method
 interface CustomClient extends Client {
     searchWithHandling: <T, S = any>(query: object, index: string) => Promise<SearchResponse<T, S>>;
+    getDocWithHandling<T>(index: string, id: string): Promise<T | null>;
 }
 
 let client: CustomClient | null = null;
@@ -94,6 +102,42 @@ export const getClient = (): CustomClient => {
                     errorCode: ErrorCode.OpenSearchClientError,
                     details: {
                         origin: `opensearch client ApiError error (@opensearch-project/opensearch) when querying index ${index}`,
+                        name: err?.name,
+                        errorBody: err?.body || err,
+                    },
+                });
+
+                throw createError(ErrorCode.ServerError, 500, 'Internal Server Error');
+            }
+        };
+
+        newClient.getDocWithHandling = async <T>(index: string, id: string): Promise<T | null> => {
+            try {
+                const response = await newClient.get({
+                    index,
+                    id,
+                });
+
+                const body = response.body as GetDocResponse<T>;
+
+                // if found is false or _source is missing, return null
+                if (!body.found || !body._source) {
+                    return null;
+                }
+
+                return body._source;
+            } catch (err: any) {
+                // Treat 404 as "not found" instead of an error
+                if (err?.statusCode === 404) {
+                    return null;
+                }
+
+                console.error({
+                    error: err?.message,
+                    statusCode: err?.statusCode,
+                    errorCode: ErrorCode.OpenSearchClientError,
+                    details: {
+                        origin: `opensearch client ApiError error (@opensearch-project/opensearch) when getting document ${id} from index ${index}`,
                         name: err?.name,
                         errorBody: err?.body || err,
                     },

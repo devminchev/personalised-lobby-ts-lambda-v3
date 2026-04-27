@@ -2,6 +2,221 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.24.5](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-games-0.24.4...get-games-0.24.5) (2026-04-22)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.53.0`
+## [0.24.4](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-games-0.24.3...get-games-0.24.4) (2026-04-22)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.52.0`
+## [0.24.3](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-games-0.24.2...get-games-0.24.3) (2026-04-21)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.51.1`
+## [0.24.2](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-games-0.24.1...get-games-0.24.2) (2026-04-21)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.51.0`
+## [0.24.1](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-games-0.24.0...get-games-0.24.1) (2026-04-20)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.50.0`
+## [0.24.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-games-0.23.6...get-games-0.24.0) (2026-04-13)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.49.0`
+
+### Features
+
+* **gtech-1320574:** separate section games lambda for logged in members only using personalisation ([7c7f24f](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/commit/7c7f24fa03bf04087b7f025b51e4e0949b1c02bf))
+
+## [0.23.6](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-games-0.23.5...get-games-0.23.6) (2026-04-10)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.48.3`
+## [0.23.5](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-games-0.23.4...get-games-0.23.5) (2026-04-09)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.48.2`
+## [0.23.4](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-games-0.23.3...get-games-0.23.4) (2026-04-09)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.48.1`
+## [0.23.3](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-games-0.23.2...get-games-0.23.3) (2026-03-25)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.48.0`
+## [0.23.2](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-games-0.23.1...get-games-0.23.2) (2026-03-25)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.47.0`
+## [0.23.1](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-games-0.23.0...get-games-0.23.1) (2026-03-24)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.46.0`
+## [0.23.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-games-0.22.2...get-games-0.23.0) (2026-03-20)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.45.0`
+
+### Features
+
+* **gtech-1314814-1:** refactor lambdas to work with new game index mapping ([ac824da](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/commit/ac824daa58b93411881d2250ab79c32f331ffe90))
+
+## [0.22.2](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-games-0.22.1...get-games-0.22.2) (2026-03-17)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.44.0`
+## [0.22.1](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-games-0.22.0...get-games-0.22.1) (2026-03-17)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.43.5`
+## [0.22.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-games-0.21.9...get-games-0.22.0) (2026-03-09)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.43.4`
+
+### Features
+
+* **gtech-1319494:** implement pagination to lambda endpoints ([f495dce](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/commit/f495dced701c89c0f45683a0eec06bc8baa18c30))
+
+## [0.21.9](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-games-0.21.8...get-games-0.21.9) (2026-03-06)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.43.4`
+## [0.21.8](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-games-0.21.7...get-games-0.21.8) (2026-03-06)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.43.3`
+## [0.21.7](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-games-0.21.6...get-games-0.21.7) (2026-03-06)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.43.2`
+## [0.21.6](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-games-0.21.5...get-games-0.21.6) (2026-03-05)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.43.1`
+## [0.21.5](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-games-0.21.4...get-games-0.21.5) (2026-03-05)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.43.0`
+## [0.21.4](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-games-0.21.3...get-games-0.21.4) (2026-03-05)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.42.1`
+## [0.21.3](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-games-0.21.2...get-games-0.21.3) (2026-02-25)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.42.0`
+## [0.21.2](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-games-0.21.1...get-games-0.21.2) (2026-02-23)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.41.2`
+## [0.21.1](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-games-0.21.0...get-games-0.21.1) (2026-02-20)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.41.1`
+## [0.21.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-games-0.20.0...get-games-0.21.0) (2026-01-28)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.41.0`
+
+### Features
+
+* **gtech-1317745:** add compression at the lambda level ([ed45cf3](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/commit/ed45cf3868056b4e8aebf4c3fa9baf6a3bd1b6fb))
+
+## [0.20.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-games-0.19.4...get-games-0.20.0) (2026-01-23)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.40.0`
+
+### Features
+
+* **gtech-1317745:** default encoding for uncompressed lambdas ([9dba5d2](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/commit/9dba5d25387276374a2c1ce46055ec224098953e))
+
+## [0.19.4](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-games-0.19.3...get-games-0.19.4) (2026-01-19)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.39.0`
+## [0.19.3](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-games-0.19.2...get-games-0.19.3) (2026-01-19)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.38.0`
+## [0.19.2](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-games-0.19.1...get-games-0.19.2) (2025-12-16)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.37.0`
+## [0.19.1](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-games-0.19.0...get-games-0.19.1) (2025-12-09)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.36.0`
+## [0.19.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-games-0.18.2...get-games-0.19.0) (2025-12-05)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.35.0`
+
+### Features
+
+* **gtech-1317704:** return only relevant bynder properties, fix async function ([9eafe07](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/commit/9eafe0779febd879cd46361cff16cb0ffae0bee8))
+
+## [0.18.2](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-games-0.18.1...get-games-0.18.2) (2025-12-03)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.34.2`
+## [0.18.1](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-games-0.18.0...get-games-0.18.1) (2025-12-02)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.34.1`
+## [0.18.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-games-0.17.1...get-games-0.18.0) (2025-11-28)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.34.0`
+
+### Features
+
+* **gtech-1315952:** add ab testing capabilities to relevant lambdas ([5e3d175](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/commit/5e3d175c92b2b2674c82f1666786cbae248281e0))
+
+## [0.17.1](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-games-0.17.0...get-games-0.17.1) (2025-11-26)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.33.0`
 ## [0.17.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-games-0.16.6...get-games-0.17.0) (2025-11-14)
 
 ### Dependency Updates

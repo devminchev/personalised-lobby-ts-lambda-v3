@@ -22,5 +22,5 @@ export interface IGameShuffleRecord {
 export interface IGameShuffleResponse {
     tileOne: IGameShuffleRecord[];
     tileTwo: IGameShuffleRecord[];
-    tileThree: IGameShuffleRecord[];
+    tileThree?: IGameShuffleRecord[];
 }

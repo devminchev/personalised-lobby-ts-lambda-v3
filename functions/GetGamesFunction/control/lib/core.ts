@@ -9,12 +9,17 @@ import {
     createError,
     IMlPersonalizedSection,
     ALL_SECTIONS_SHARED_READ_ALIAS,
-    GAMES_INDEX_V2_ALIAS,
+    IG_GAMES_V2_READ_ALIAS,
     logMessage,
     OrderCriteriaContentful,
 } from 'os-client';
 
 const SECTION_GAMES_SECTION_RECORDS_LIMIT = 100;
+
+export interface ISectionGamesPagination {
+    offset?: number;
+    limit?: number;
+}
 
 export interface ISectionGamesList {
     sectionGameIds: string[];
@@ -29,6 +34,7 @@ export const getGamesListForSection = async (
     siteName: string,
     platform: string,
     envVisibility: string,
+    pagination: ISectionGamesPagination = {},
 ): Promise<ISectionGamesList> => {
     const platformField = `platformVisibility.${locale}.keyword`;
     const environmentField = `environmentVisibility.${locale}.keyword`;
@@ -79,7 +85,12 @@ export const getGamesListForSection = async (
         return acc;
     }, []);
 
-    return { sectionGameIds, sectionType, sortCriteria };
+    const paginatedSectionGameIds = sectionGameIds.slice(
+        pagination.offset ?? 0,
+        pagination.limit ? (pagination.offset ?? 0) + pagination.limit : undefined,
+    );
+
+    return { sectionGameIds: paginatedSectionGameIds, sectionType, sortCriteria };
 };
 
 export const getGamesSiteGames = async (
@@ -91,7 +102,7 @@ export const getGamesSiteGames = async (
     const hits: FullApiResponse[] = await getGameHits(
         client,
         sectionGamesListQuery,
-        GAMES_INDEX_V2_ALIAS,
+        IG_GAMES_V2_READ_ALIAS,
         siteName,
         platform,
     );

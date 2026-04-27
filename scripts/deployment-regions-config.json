@@ -1,4 +1,5 @@
 {
-  "eu": ["eu"],
+  "uk_es": ["uk", "es"],
+  "eu03": ["aws-prod-eu03"],
   "na": ["caon1", "usri1", "usnj1", "uspa1"]
 }

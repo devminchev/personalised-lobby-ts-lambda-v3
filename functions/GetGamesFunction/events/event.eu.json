@@ -1,18 +1,20 @@
 {
   "body": "",
-  "resource": "/sites/{sitename}/platform/{platform}/view/{viewslug}/sections/{sectionid}/sitegames?memberid={memberId}",
-  "path": "/sites/doublebubblebingo/platform/web/view/homepage/sections/6NBGF7dCAX3silldblHBlI/sitegames?memberid=13439972&locale=en-GB",
+  "resource": "/sites/{sitename}/platform/{platform}/view/{viewslug}/sections/{sectionid}/sitegames?memberid={memberId}&offset={offset}&limit={limit}",
+  "path": "/sites/doublebubblebingo/platform/web/view/homepage/sections/67qn1jZbtaKQFlmZaHqMAa/sitegames?memberid=13439972&locale=en-GB&offset=0&limit=10",
   "httpMethod": "GET",
   "isBase64Encoded": false,
   "pathParameters": {
-    "sectionid": "6NBGF7dCAX3silldblHBlI",
+    "sectionid": "67qn1jZbtaKQFlmZaHqMAa",
     "sitename": "doublebubblebingo",
     "viewslug": "homepage",
     "platform": "web"
   },
   "queryStringParameters": {
     "memberid": "13439972",
-    "locale": "en-GB"
+    "locale": "en-GB",
+    "offset": "0",
+    "limit": "10"
   },
   "stageVariables": {},
   "headers": {
@@ -33,7 +35,8 @@
     "X-Amz-Cf-Id": "cDehVQoZnx43VYQb9j2-nvCh-9z396Uhbp027Y2JvkCPNLmGJHqlaA==",
     "X-Forwarded-For": "127.0.0.1, 127.0.0.2",
     "X-Forwarded-Port": "443",
-    "X-Forwarded-Proto": "https"
+    "X-Forwarded-Proto": "https",
+    "X-LOBBY-VARIANT": "control"
   },
   "requestContext": {
     "accountId": "1326780156789012",
@@ -55,8 +58,8 @@
       "userAgent": "Custom User Agent String",
       "user": null
     },
-    "path": "/sites/doublebubblebingo/platform/web/view/homepage/sections/6AVNkV28m7T150Xk8kFTXQ/sitegames?member=13439972",
-    "resourcePath": "/sites/{sitename}/platform/{platform}/view/{viewslug}/sections/{sectionid}/sitegames?member={memberId}",
+    "path": "/sites/doublebubblebingo/platform/web/view/homepage/sections/6AVNkV28m7T150Xk8kFTXQ/sitegames?member=13439972&offset=0&limit=10",
+    "resourcePath": "/sites/{sitename}/platform/{platform}/view/{viewslug}/sections/{sectionid}/sitegames?member={memberId}&offset={offset}&limit={limit}",
     "httpMethod": "get",
     "apiId": "13267801567890",
     "protocol": "HTTP/1.1"

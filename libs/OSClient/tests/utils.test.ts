@@ -10,7 +10,7 @@ jest.mock('../lib/errors', () => ({
     },
 }));
 import { logError } from '../lib/errors';
-import { checkRequestParams, validators } from '../lib/utils';
+import { checkRequestParams, validators, jsonSizeInMb } from '../lib/utils';
 
 describe('utils', () => {
     describe('checkRequestParams', () => {
@@ -40,6 +40,7 @@ describe('utils', () => {
                 ['windows', validators.platform],
                 ['', validators.siteName],
                 ['Jackpotjoy', validators.siteName],
+                ['all', validators.siteName],
                 ['-start', validators.viewSlug],
                 ['Upper', validators.viewSlug],
                 ['-start', validators.slug],
@@ -70,11 +71,25 @@ describe('utils', () => {
                 expect(validators.siteName('rainbowriches')).toBe(true);
             });
 
-            it('rejects uppercase, digits, dashes, and empty', () => {
+            it('rejects uppercase, digits, dashes, empty, and "all"', () => {
                 expect(validators.siteName('Jackpotjoy')).toBe(false);
                 expect(validators.siteName('jackpotjoy1')).toBe(false);
                 expect(validators.siteName('jackpot-joy')).toBe(false);
                 expect(validators.siteName('')).toBe(false);
+                expect(validators.siteName('all')).toBe(false);
+            });
+        });
+
+        describe('allSiteName', () => {
+            it('accepts only "all"', () => {
+                expect(validators.allSiteName('all')).toBe(true);
+            });
+
+            it('rejects anything other than "all"', () => {
+                expect(validators.allSiteName('jackpotjoy')).toBe(false);
+                expect(validators.allSiteName('ALL')).toBe(false);
+                expect(validators.allSiteName('')).toBe(false);
+                expect(validators.allSiteName('all ')).toBe(false);
             });
         });
 
@@ -184,6 +199,23 @@ describe('utils', () => {
                 expect(validators.auth('0')).toBe(false);
                 expect(validators.auth('1')).toBe(false);
             });
+        });
+    });
+
+    describe('jsonSizeInMb', () => {
+        it('measures object payload by stringifying', () => {
+            const payload = { a: 1, b: 'two' };
+            const size = jsonSizeInMb(payload);
+
+            expect(size).toBeGreaterThan(0);
+            expect(size).toBeCloseTo(Buffer.byteLength(JSON.stringify(payload), 'utf8') / (1024 * 1024));
+        });
+
+        it('measures string payload directly without double stringify', () => {
+            const payload = JSON.stringify({ a: 1, b: 'two' });
+            const size = jsonSizeInMb(payload);
+
+            expect(size).toBeCloseTo(Buffer.byteLength(payload, 'utf8') / (1024 * 1024));
         });
     });
 });

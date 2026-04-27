@@ -34,10 +34,6 @@ export const SUCCESSFUL_GAME_RESPONSE: any = {
                     },
                     game: {
                         id: '4SyNbkt0IMFdqhWb41Gki',
-                        contentType: 'gameV2',
-                        entryTitle: {
-                            'en-GB': 'MGSD_GOLD_BLITZ',
-                        },
                         infoImgUrlPattern: {
                             'en-GB': '/api/content/gametiles/gold-blitz/scale-s%s/gold-blitz-tile-r%s-w%s.jpg',
                         },
@@ -61,20 +57,17 @@ export const SUCCESSFUL_GAME_RESPONSE: any = {
                         title: {
                             'en-GB': 'Gold Blitz',
                         },
+                        gameName: 'play-micro-gold-blitz',
+                        gameSkin: 'MGSD_GOLD_BLITZ',
+                        mobileOverride: false,
                         gamePlatformConfig: {
-                            'en-GB': {
-                                demoUrl: '/service/game/demo/play-micro-gold-blitz',
-                                gameSkin: 'MGSD_GOLD_BLITZ',
-                                gameType: { type: 'Slots' },
-                                mobileOverride: false,
-                                gameLoaderFileName: 'MGSD_GOLD_BLITZ',
-                                name: 'play-micro-gold-blitz',
-                                realUrl: '/service/game/play/play-micro-gold-blitz',
-                            },
+                            demoUrl: '/service/game/demo/play-micro-gold-blitz',
+                            gameType: { type: 'Slots' },
+                            gameLoaderFileName: 'MGSD_GOLD_BLITZ',
+                            realUrl: '/service/game/play/play-micro-gold-blitz',
                         },
-                        funPanelEnabled: {
-                            'en-GB': false,
-                        },
+                        funPanelDefaultCategory: '',
+                        funPanelEnabled: false,
                         showNetPosition: {
                             'en-GB': true,
                         },
@@ -132,10 +125,6 @@ export const SUCCESS_MOBILE_GAME_OVERRIDES: any = {
                     },
                     game: {
                         id: '4SyNbkt0IMFdqhWb41Gki',
-                        contentType: 'gameV2',
-                        entryTitle: {
-                            'en-GB': 'MGSD_GOLD_BLITZ',
-                        },
                         infoImgUrlPattern: {
                             'en-GB': '/api/content/gametiles/gold-blitz/scale-s%s/gold-blitz-tile-r%s-w%s.jpg',
                         },
@@ -162,28 +151,22 @@ export const SUCCESS_MOBILE_GAME_OVERRIDES: any = {
                         title: {
                             'en-GB': 'Gold Blitz',
                         },
+                        gameName: 'play-micro-gold-blitz',
+                        gameSkin: 'MGSD_GOLD_BLITZ',
+                        mobileGameName: 'play-micro-gold-blitz-m',
+                        mobileGameSkin: 'MGSM_GOLD_BLITZ',
+                        mobileOverride: true,
                         gamePlatformConfig: {
-                            'en-GB': {
-                                demoUrl: '/service/game/demo/play-micro-gold-blitz',
-                                gameSkin: 'MGSD_GOLD_BLITZ',
-                                gameType: { type: 'Slots' },
-                                mobileOverride: true,
-                                mobileGameLoaderFileName: 'MGSM_GOLD_BLITZ',
-                                gameLoaderFileName: 'MGSD_GOLD_BLITZ',
-                                name: 'play-micro-gold-blitz',
-                                realUrl: '/service/game/play/play-micro-gold-blitz',
-                                mobileDemoUrl: '/service/game/demo/play-micro-gold-blitz-m',
-                                mobileRealUrl: '/service/game/play/play-micro-gold-blitz-m',
-                                mobileGameSkin: 'MGSM_GOLD_BLITZ',
-                                mobileName: 'play-micro-gold-blitz-m',
-                            },
+                            demoUrl: '/service/game/demo/play-micro-gold-blitz',
+                            gameType: { type: 'Slots' },
+                            mobileGameLoaderFileName: 'MGSM_GOLD_BLITZ',
+                            gameLoaderFileName: 'MGSD_GOLD_BLITZ',
+                            realUrl: '/service/game/play/play-micro-gold-blitz',
+                            mobileDemoUrl: '/service/game/demo/play-micro-gold-blitz-m',
+                            mobileRealUrl: '/service/game/play/play-micro-gold-blitz-m',
                         },
-                        funPanelDefaultCategory: {
-                            'en-GB': '',
-                        },
-                        funPanelEnabled: {
-                            'en-GB': false,
-                        },
+                        funPanelDefaultCategory: '',
+                        funPanelEnabled: false,
                         showNetPosition: {
                             'en-GB': true,
                         },

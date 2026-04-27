@@ -22,6 +22,7 @@ import {
     VENTURES_INDEX_ALIAS,
     NAVIGATION_INDEX_READ_ALIAS,
     VIEW_INDEX_READ_ALIAS,
+    parseCompressedBody,
 } from 'os-client';
 
 jest.mock('@opensearch-project/opensearch', () => {
@@ -65,7 +66,7 @@ describe('Integration Test for Lambda Handler', () => {
         const event: APIGatewayProxyEvent = mockApiEvent(siteName, platform);
         const result = await lambdaHandler(event);
         expect(result.statusCode).toBe(200);
-        const body = JSON.parse(result.body);
+        const body = parseCompressedBody<{ links: Array<{ entryId: string }> }>(result);
         expect(body.links).toHaveLength(1);
         expect(body.links[0].entryId).toBe('link-id-1');
     });
@@ -130,7 +131,7 @@ describe('Integration Test for Lambda Handler', () => {
         const result = await lambdaHandler(event);
 
         expect(result.statusCode).toBe(200);
-        const body = JSON.parse(result.body);
+        const body = parseCompressedBody<{ links: Array<unknown>; bottomNavLinks: Array<unknown> }>(result);
         expect(body).toEqual({
             links: [],
             bottomNavLinks: [],
@@ -143,7 +144,7 @@ describe('Integration Test for Lambda Handler', () => {
         const result = await lambdaHandler(event);
 
         expect(result.statusCode).toEqual(400);
-        const body = JSON.parse(result.body);
+        const body = parseCompressedBody<{ code: string; message: string }>(result);
         expect(body.code).toBe(ErrorCode.InvalidRequest);
         expect(body.message).toBe(getErrorMessage(ErrorCode.InvalidRequest));
     });
@@ -162,7 +163,7 @@ describe('Integration Test for Lambda Handler', () => {
         const result = await lambdaHandler(event);
 
         expect(result.statusCode).toBe(500);
-        const body = JSON.parse(result.body);
+        const body = parseCompressedBody<{ message: string }>(result);
         expect(body.message).toBe('Internal Server Error');
     });
 });

@@ -120,7 +120,7 @@ export const EXPECTED_ML_SUGGESTED_RESPONSE = [
         realUrl: '/service/game/play/play-double-bubble-triple',
         representativeColor: '#40c37f',
         sash: 'EXCLUSIVE',
-        headlessJackpot: { id: 2, name: 'LIVE_HIDDEN_TEST_USER' }, // Added missing property
+        headlessJackpot: { id: 2, name: 'LIVE_HIDDEN_TEST_USER' },
     },
     {
         entryId: '6nEU5zeEOE7w1fRLJfZDBa',

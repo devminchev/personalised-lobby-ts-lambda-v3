@@ -1,4 +1,4 @@
-import { GAMES_V2_INDEX_ALIAS } from '../../constants';
+import { IG_GAMES_V2_READ_ALIAS } from '../../constants';
 import { ErrorCode, logError } from '../../errors';
 import { LogCode, logMessage } from '../../logger';
 import { IClient } from '../../osClient';
@@ -151,7 +151,7 @@ export const getMLRecommendedGamesFromGamesIndexBySkin = async (
         match: {},
     };
     ventureMatchExpression.match[ventureKey] = ventureId;
-    const gameSkinKey = `game.gamePlatformConfig.${spaceLocale}.gameSkin.keyword`;
+    const gameSkinKey = `game.gameSkin`;
     const gameDataQuery = {
         _source: [
             'game.id',
@@ -169,16 +169,16 @@ export const getMLRecommendedGamesFromGamesIndexBySkin = async (
             'game.animationMedia',
             'game.foregroundLogoMedia',
             'game.backgroundMedia',
-            `game.gamePlatformConfig.${spaceLocale}.name`,
-            `game.gamePlatformConfig.${spaceLocale}.gameType.type`,
-            `game.gamePlatformConfig.${spaceLocale}.demoUrl`,
-            `game.gamePlatformConfig.${spaceLocale}.gameSkin`,
-            `game.gamePlatformConfig.${spaceLocale}.realUrl`,
-            `game.gamePlatformConfig.${spaceLocale}.mobileOverride`,
-            `game.gamePlatformConfig.${spaceLocale}.mobileName`,
-            `game.gamePlatformConfig.${spaceLocale}.mobileDemoUrl`,
-            `game.gamePlatformConfig.${spaceLocale}.mobileGameSkin`,
-            `game.gamePlatformConfig.${spaceLocale}.mobileRealUrl`,
+            'game.gameName',
+            'game.gameSkin',
+            'game.mobileGameName',
+            'game.mobileGameSkin',
+            'game.mobileOverride',
+            `game.gamePlatformConfig.gameType.type`,
+            `game.gamePlatformConfig.demoUrl`,
+            `game.gamePlatformConfig.realUrl`,
+            `game.gamePlatformConfig.mobileDemoUrl`,
+            `game.gamePlatformConfig.mobileRealUrl`,
         ],
         query: {
             constant_score: {
@@ -219,7 +219,7 @@ export const getMLRecommendedGamesFromGamesIndexBySkin = async (
     const hits: FullApiResponseByGame[] = await getSiteGameHits(
         client,
         gameDataQuery,
-        GAMES_V2_INDEX_ALIAS,
+        IG_GAMES_V2_READ_ALIAS,
         siteName,
         platform,
     );
@@ -264,15 +264,21 @@ export const getMLRecommendedGamesFromGamesIndex = async (
             'game.tags',
             'game.webComponentData',
             'game.launchCode',
-            `game.gamePlatformConfig.${spaceLocale}.name`,
-            `game.gamePlatformConfig.${spaceLocale}.demoUrl`,
-            `game.gamePlatformConfig.${spaceLocale}.gameSkin`,
-            `game.gamePlatformConfig.${spaceLocale}.realUrl`,
-            `game.gamePlatformConfig.${spaceLocale}.mobileOverride`,
-            `game.gamePlatformConfig.${spaceLocale}.mobileName`,
-            `game.gamePlatformConfig.${spaceLocale}.mobileDemoUrl`,
-            `game.gamePlatformConfig.${spaceLocale}.mobileGameSkin`,
-            `game.gamePlatformConfig.${spaceLocale}.mobileRealUrl`,
+            'game.animationMedia',
+            'game.loggedOutAnimationMedia',
+            'game.foregroundLogoMedia',
+            'game.loggedOutForegroundLogoMedia',
+            'game.backgroundMedia',
+            'game.loggedOutBackgroundMedia',
+            'game.gameName',
+            'game.gameSkin',
+            'game.mobileGameName',
+            'game.mobileGameSkin',
+            'game.mobileOverride',
+            `game.gamePlatformConfig.demoUrl`,
+            `game.gamePlatformConfig.realUrl`,
+            `game.gamePlatformConfig.mobileDemoUrl`,
+            `game.gamePlatformConfig.mobileRealUrl`,
         ],
         query: {
             constant_score: {
@@ -312,7 +318,7 @@ export const getMLRecommendedGamesFromGamesIndex = async (
     const hits: FullApiResponseByGame[] = await getSiteGameHits(
         client,
         gameDataQuery,
-        GAMES_V2_INDEX_ALIAS,
+        IG_GAMES_V2_READ_ALIAS,
         siteName,
         platform,
     );

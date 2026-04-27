@@ -2,6 +2,225 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.18.1](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-bulk-game-data-0.18.0...get-bulk-game-data-0.18.1) (2026-04-22)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.53.0`
+## [0.18.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-bulk-game-data-0.17.10...get-bulk-game-data-0.18.0) (2026-04-22)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.52.0`
+
+### Features
+
+* **gtech-1320067:** remove fallbacks for the game properties ([39f6b16](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/commit/39f6b16be6c008f9f4ee1caa9f6dbfc7762475ee))
+
+## [0.17.10](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-bulk-game-data-0.17.9...get-bulk-game-data-0.17.10) (2026-04-21)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.51.1`
+## [0.17.9](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-bulk-game-data-0.17.8...get-bulk-game-data-0.17.9) (2026-04-21)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.51.0`
+## [0.17.8](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-bulk-game-data-0.17.7...get-bulk-game-data-0.17.8) (2026-04-20)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.50.0`
+## [0.17.7](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-bulk-game-data-0.17.6...get-bulk-game-data-0.17.7) (2026-04-13)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.49.0`
+## [0.17.6](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-bulk-game-data-0.17.5...get-bulk-game-data-0.17.6) (2026-04-10)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.48.3`
+## [0.17.5](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-bulk-game-data-0.17.4...get-bulk-game-data-0.17.5) (2026-04-09)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.48.2`
+## [0.17.4](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-bulk-game-data-0.17.3...get-bulk-game-data-0.17.4) (2026-04-09)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.48.1`
+## [0.17.3](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-bulk-game-data-0.17.2...get-bulk-game-data-0.17.3) (2026-03-25)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.48.0`
+## [0.17.2](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-bulk-game-data-0.17.1...get-bulk-game-data-0.17.2) (2026-03-25)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.47.0`
+## [0.17.1](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-bulk-game-data-0.17.0...get-bulk-game-data-0.17.1) (2026-03-24)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.46.0`
+## [0.17.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-bulk-game-data-0.16.0...get-bulk-game-data-0.17.0) (2026-03-20)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.45.0`
+
+### Features
+
+* **gtech-1314814-1:** refactor lambdas to work with new game index mapping ([ac824da](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/commit/ac824daa58b93411881d2250ab79c32f331ffe90))
+
+## [0.16.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-bulk-game-data-0.15.13...get-bulk-game-data-0.16.0) (2026-03-17)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.44.0`
+
+### Features
+
+* **gtech-1320448:** add game aggregator to bulk endpoint ([cd7f4d2](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/commit/cd7f4d27c9527d486683ffe453bafa6c28a1861e))
+
+## [0.15.13](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-bulk-game-data-0.15.12...get-bulk-game-data-0.15.13) (2026-03-17)
+
+## [0.15.12](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-bulk-game-data-0.15.11...get-bulk-game-data-0.15.12) (2026-03-17)
+
+## [0.15.11](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-bulk-game-data-0.15.10...get-bulk-game-data-0.15.11) (2026-03-17)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.43.5`
+## [0.15.10](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-bulk-game-data-0.15.9...get-bulk-game-data-0.15.10) (2026-03-17)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.43.5`
+## [0.15.9](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-bulk-game-data-0.15.8...get-bulk-game-data-0.15.9) (2026-03-06)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.43.4`
+## [0.15.8](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-bulk-game-data-0.15.7...get-bulk-game-data-0.15.8) (2026-03-06)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.43.3`
+## [0.15.7](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-bulk-game-data-0.15.6...get-bulk-game-data-0.15.7) (2026-03-06)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.43.2`
+## [0.15.6](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-bulk-game-data-0.15.5...get-bulk-game-data-0.15.6) (2026-03-05)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.43.1`
+## [0.15.5](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-bulk-game-data-0.15.4...get-bulk-game-data-0.15.5) (2026-03-05)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.43.0`
+## [0.15.4](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-bulk-game-data-0.15.3...get-bulk-game-data-0.15.4) (2026-03-05)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.42.1`
+## [0.15.3](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-bulk-game-data-0.15.2...get-bulk-game-data-0.15.3) (2026-02-25)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.42.0`
+## [0.15.2](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-bulk-game-data-0.15.1...get-bulk-game-data-0.15.2) (2026-02-23)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.41.2`
+## [0.15.1](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-bulk-game-data-0.15.0...get-bulk-game-data-0.15.1) (2026-02-20)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.41.1`
+## [0.15.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-bulk-game-data-0.14.0...get-bulk-game-data-0.15.0) (2026-01-28)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.41.0`
+
+### Features
+
+* **gtech-1317745:** add compression at the lambda level ([ed45cf3](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/commit/ed45cf3868056b4e8aebf4c3fa9baf6a3bd1b6fb))
+
+## [0.14.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-bulk-game-data-0.13.7...get-bulk-game-data-0.14.0) (2026-01-23)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.40.0`
+
+### Features
+
+* **gtech-1317745:** default encoding for uncompressed lambdas ([9dba5d2](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/commit/9dba5d25387276374a2c1ce46055ec224098953e))
+
+## [0.13.7](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-bulk-game-data-0.13.6...get-bulk-game-data-0.13.7) (2026-01-19)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.39.0`
+## [0.13.6](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-bulk-game-data-0.13.5...get-bulk-game-data-0.13.6) (2026-01-19)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.38.0`
+## [0.13.5](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-bulk-game-data-0.13.4...get-bulk-game-data-0.13.5) (2025-12-16)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.37.0`
+## [0.13.4](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-bulk-game-data-0.13.3...get-bulk-game-data-0.13.4) (2025-12-09)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.36.0`
+## [0.13.3](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-bulk-game-data-0.13.2...get-bulk-game-data-0.13.3) (2025-12-05)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.35.0`
+## [0.13.2](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-bulk-game-data-0.13.1...get-bulk-game-data-0.13.2) (2025-12-03)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.34.2`
+## [0.13.1](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-bulk-game-data-0.13.0...get-bulk-game-data-0.13.1) (2025-12-02)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.34.1`
+## [0.13.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-bulk-game-data-0.12.17...get-bulk-game-data-0.13.0) (2025-12-01)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.34.0`
+
+### Features
+
+* **gtech-1317455:** return list of sectionids per game ([8263aca](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/commit/8263acaf926786ae37ff33c2e1aa2b64ea81a6a0))
+
+## [0.12.17](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-bulk-game-data-0.12.16...get-bulk-game-data-0.12.17) (2025-11-28)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.34.0`
+## [0.12.16](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-bulk-game-data-0.12.15...get-bulk-game-data-0.12.16) (2025-11-26)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.33.0`
 ## [0.12.15](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-bulk-game-data-0.12.14...get-bulk-game-data-0.12.15) (2025-11-14)
 
 ### Dependency Updates

@@ -3,7 +3,7 @@ import {
     createError,
     ErrorCode,
     FullApiResponse,
-    GAMES_INDEX_V2_ALIAS,
+    IG_GAMES_V2_READ_ALIAS,
     getGameHits,
     getHits,
     getLambdaExecutionEnvironment,
@@ -21,7 +21,7 @@ export const getGamesFromSections = async (
     sectionsIds: string[],
     spaceLocale: string,
     siteName: string,
-): Promise<string[]> => {
+): Promise<{ gameIds: string[]; gameSectionsMap: Record<string, string[]> }> => {
     const envKey = `environmentVisibility.${spaceLocale}.keyword`;
     const platformKey = `platformVisibility.${spaceLocale}.keyword`;
 
@@ -50,12 +50,39 @@ export const getGamesFromSections = async (
         throw createError(errorCode, 404);
     }
 
-    // some sections do not have games so we skip them
-    const gameIds = sectionHits.flatMap((item) => {
-        return item?.games?.[spaceLocale].map((game) => game.sys.id) ?? [];
+    const gameSectionsMap: Record<string, string[]> = {};
+    const gameIds: string[] = [];
+    const seenGameIds = new Set<string>();
+
+    sectionHits.forEach((section) => {
+        const sectionId = section.id;
+        if (!sectionId) {
+            return;
+        }
+
+        const localizedGames = section.games?.[spaceLocale] ?? [];
+        localizedGames.forEach((game) => {
+            const gameId = game?.sys?.id;
+            if (!gameId) {
+                return;
+            }
+
+            if (!gameSectionsMap[gameId]) {
+                gameSectionsMap[gameId] = [];
+            }
+
+            if (!gameSectionsMap[gameId].includes(sectionId)) {
+                gameSectionsMap[gameId].push(sectionId);
+            }
+
+            if (!seenGameIds.has(gameId)) {
+                seenGameIds.add(gameId);
+                gameIds.push(gameId);
+            }
+        });
     });
 
-    return gameIds;
+    return { gameIds, gameSectionsMap };
 };
 
 export const getUserVisibleGameAndSiteGames = async (
@@ -91,6 +118,11 @@ export const getUserVisibleGameAndSiteGames = async (
                                             'game.minBet',
                                             'game.maxBet',
                                             `game.gamePlatformConfig`,
+                                            'game.gameName',
+                                            'game.gameSkin',
+                                            'game.mobileGameName',
+                                            'game.mobileGameSkin',
+                                            'game.rtp',
                                             'game.id',
                                             'game.contentType',
                                             'game.platformVisibility',
@@ -111,7 +143,7 @@ export const getUserVisibleGameAndSiteGames = async (
         },
     };
 
-    const gameHits: FullApiResponse[] = await getGameHits(client, query, GAMES_INDEX_V2_ALIAS, siteName, platform);
+    const gameHits: FullApiResponse[] = await getGameHits(client, query, IG_GAMES_V2_READ_ALIAS, siteName, platform);
     if (gameHits.length === 0) {
         const errorCode = ErrorCode.NoGamesReturned;
         logError(errorCode, 404, { siteName, platform, gameHits });

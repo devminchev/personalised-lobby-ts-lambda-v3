@@ -24,7 +24,8 @@ import {
     ML_GAMES_RECOMMENDER_INDEX_ALIAS,
     SUGGESTED_GAMES_DEFAULTS_INDEX_ALIAS,
     VENTURES_INDEX_ALIAS,
-    GAMES_V2_INDEX_ALIAS,
+    IG_GAMES_V2_READ_ALIAS,
+    parseCompressedBody,
 } from 'os-client';
 
 jest.mock('@opensearch-project/opensearch', () => {
@@ -57,14 +58,14 @@ describe('Integration Test for Lambda Handler', () => {
             .reply(200, VENTURE_SUCCESS_RESP);
 
         nock('http://localhost:9200')
-            .post(`/${GAMES_V2_INDEX_ALIAS}/_search?request_cache=true`)
+            .post(`/${IG_GAMES_V2_READ_ALIAS}/_search?request_cache=true`)
             .reply(200, GAME_SITE_GAME_RESP);
 
         const event: APIGatewayProxyEvent = mockApiEvent(sitename, platform, memberid);
         const result: APIGatewayProxyResult = await lambdaHandler(event);
 
         expect(result.statusCode).toEqual(200);
-        expect(result.body).toEqual(JSON.stringify(PERSONALIZED_ML_RESP));
+        expect(parseCompressedBody(result)).toEqual(PERSONALIZED_ML_RESP);
     });
 
     it('should return a list of fallback games for ML Suggested games for logged in user, when no ML data is available for the user', async () => {
@@ -89,14 +90,14 @@ describe('Integration Test for Lambda Handler', () => {
             .reply(200, PERSONALISED_GAMES_DEFAULT_RESP);
 
         nock('http://localhost:9200')
-            .post(`/${GAMES_V2_INDEX_ALIAS}/_search?request_cache=true`)
+            .post(`/${IG_GAMES_V2_READ_ALIAS}/_search?request_cache=true`)
             .reply(200, PERSONALISED_FALLBACK_GAMES_RESP);
 
         const event: APIGatewayProxyEvent = mockApiEvent(sitename, platform, memberid);
         const result: APIGatewayProxyResult = await lambdaHandler(event);
 
         expect(result.statusCode).toEqual(200);
-        expect(result.body).toEqual(JSON.stringify(PERSONALISED_FALLBACK_RESP));
+        expect(parseCompressedBody(result)).toEqual(PERSONALISED_FALLBACK_RESP);
     });
 
     it('should return a list of fallback games for ML Suggested games for logged in user, when game from ML are not found in the games index', async () => {
@@ -117,7 +118,7 @@ describe('Integration Test for Lambda Handler', () => {
             .reply(200, VENTURE_SUCCESS_RESP);
 
         nock('http://localhost:9200')
-            .post(`/${GAMES_V2_INDEX_ALIAS}/_search?request_cache=true`)
+            .post(`/${IG_GAMES_V2_READ_ALIAS}/_search?request_cache=true`)
             .reply(200, INDEX_EMPTY_RESP);
 
         nock('http://localhost:9200')
@@ -125,14 +126,14 @@ describe('Integration Test for Lambda Handler', () => {
             .reply(200, PERSONALISED_GAMES_DEFAULT_RESP);
 
         nock('http://localhost:9200')
-            .post(`/${GAMES_V2_INDEX_ALIAS}/_search?request_cache=true`)
+            .post(`/${IG_GAMES_V2_READ_ALIAS}/_search?request_cache=true`)
             .reply(200, PERSONALISED_FALLBACK_GAMES_RESP);
 
         const event: APIGatewayProxyEvent = mockApiEvent(sitename, platform, memberid);
         const result: APIGatewayProxyResult = await lambdaHandler(event);
 
         expect(result.statusCode).toEqual(200);
-        expect(result.body).toEqual(JSON.stringify(PERSONALISED_FALLBACK_RESP));
+        expect(parseCompressedBody(result)).toEqual(PERSONALISED_FALLBACK_RESP);
     });
 
     it('should return (400) to the client if memberid is missing', async () => {
@@ -175,7 +176,7 @@ describe('Integration Test for Lambda Handler', () => {
         const result = await lambdaHandler(event);
 
         expect(result.statusCode).toBe(200);
-        const body = JSON.parse(result.body);
+        const body = parseCompressedBody(result);
         expect(body).toEqual([]);
     });
 });

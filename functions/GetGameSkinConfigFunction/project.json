@@ -1,0 +1,35 @@
+{
+  "$schema": "https://nx.dev/reference/project-configuration",
+  "name": "get-game-skin-config",
+  "sourceRoot": "functions/get-game-skin-config",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "options": {
+        "outputPath": "dist/functions/GetGameSkinConfigFunction"
+      },
+      "configurations": {
+        "production": {
+          "configuration": "application"
+        }
+      }
+    },
+    "test": {},
+    "lint": {},
+    "format": {},
+    "version": {},
+    "changelog": {},
+    "docker": {},
+    "docker-push": {},
+    "run-docker": {},
+    "sync-project-versions": {}
+  },
+  "tags": [
+    "type:app",
+    "scope:pl"
+  ],
+  "dependencies": [
+    "os-client"
+  ],
+  "version": "0.2.12"
+}

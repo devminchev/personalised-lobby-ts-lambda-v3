@@ -1,5 +1,12 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { getClient, checkRequestParams, patchVentureName, validators, errorResponseHandler } from 'os-client';
+import {
+    getClient,
+    checkRequestParams,
+    patchVentureName,
+    validators,
+    errorResponseHandler,
+    gzipResponse,
+} from 'os-client';
 import { getPersData } from './lib';
 
 /**
@@ -34,10 +41,7 @@ export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGat
 
         const extraData = await getPersData(client, memberId, siteName, platform);
 
-        return {
-            statusCode: 200,
-            body: JSON.stringify(extraData),
-        };
+        return gzipResponse(extraData);
     } catch (err) {
         const errorLogParams = {
             eventReqId,

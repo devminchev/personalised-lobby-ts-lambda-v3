@@ -3,6 +3,7 @@ import { Sys } from 'os-client/lib/sharedInterfaces/common';
 import { GameType } from 'os-client/lib/sharedInterfaces/interfaces';
 
 export interface ISectionGameIds {
+    id?: string;
     games?: LocalizedField<Sys[]>;
 }
 
@@ -16,4 +17,5 @@ export interface FreshGameResponse {
     entryTitle: string;
     vendor: string;
     platform: string[];
+    sections: string[];
 }

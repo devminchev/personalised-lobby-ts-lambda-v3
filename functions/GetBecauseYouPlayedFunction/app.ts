@@ -11,6 +11,8 @@ import {
     becauseYouPlayedShared,
     IBecauseYouPlayedResult,
     getVentureId,
+    gzipResponse,
+    jsonResponse,
 } from 'os-client';
 import { createPayload } from './lib';
 
@@ -70,22 +72,19 @@ export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGat
                       platform,
                   });
 
-        return {
-            statusCode: 200,
-            body: JSON.stringify(sectionGamesPayload),
-        };
+        return gzipResponse(sectionGamesPayload);
     } catch (err) {
         const errorCode = (err as any).code;
         const statusCode = (err as any).statusCode || 500;
         const errorMessage = (err as Error).message;
         logError(ErrorCode.ExecutionError, statusCode, { siteName, platform, memberId, userLocale, err });
 
-        return {
-            statusCode: statusCode,
-            body: JSON.stringify({
+        return jsonResponse(
+            {
                 code: errorCode,
                 message: errorMessage,
-            }),
-        };
+            },
+            statusCode,
+        );
     }
 };

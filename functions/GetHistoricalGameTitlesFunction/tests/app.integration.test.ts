@@ -8,11 +8,17 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import nock from 'nock';
 import { jest, describe, beforeEach, it, expect } from '@jest/globals';
 import { mockApiEvent } from './mocks/gatewayMocks';
-import { VENTURE_SUCCESS_RESP, GAME_TITLES_SUCCESS_RESP, NOT_FOUND_RESPONSE } from './mocks/responses';
+import {
+    VENTURE_SUCCESS_RESP,
+    GAME_TITLES_SUCCESS_RESP,
+    GAME_TITLES_LEGACY_PLATFORM_SKIN_RESP,
+    GAME_TITLES_NEW_GAME_SKIN_RESP,
+    NOT_FOUND_RESPONSE,
+} from './mocks/responses';
 import {
     ErrorCode,
     getErrorMessage,
-    GAMES_V2_INDEX_ALIAS,
+    IG_GAMES_V2_READ_ALIAS,
     ARCHIVED_GAMES_READ_ALIAS,
     VENTURES_INDEX_ALIAS,
     SECTIONS_INDEX_ALIAS,
@@ -47,7 +53,7 @@ describe('Integration Test for Lambda Handler', () => {
             .post(`/${VENTURES_INDEX_ALIAS}/_search?request_cache=true`)
             .reply(200, VENTURE_SUCCESS_RESP);
         nock('http://localhost:9200')
-            .post(`/${GAMES_V2_INDEX_ALIAS}/_search?request_cache=true`)
+            .post(`/${IG_GAMES_V2_READ_ALIAS}/_search?request_cache=true`)
             .reply(200, GAME_TITLES_SUCCESS_RESP);
         nock('http://localhost:9200')
             .post(`/${ARCHIVED_GAMES_READ_ALIAS}/_search?request_cache=true`)
@@ -76,5 +82,43 @@ describe('Integration Test for Lambda Handler', () => {
         expect(result.statusCode).toBe(500);
         const body = JSON.parse(result.body);
         expect(body.message).toBe('Internal Server Error');
+    });
+
+    it('should return title list using legacy gamePlatformConfig locale skin', async () => {
+        nock('http://localhost:9200')
+            .post(`/${VENTURES_INDEX_ALIAS}/_search?request_cache=true`)
+            .reply(200, VENTURE_SUCCESS_RESP);
+        nock('http://localhost:9200')
+            .post(`/${IG_GAMES_V2_READ_ALIAS}/_search?request_cache=true`)
+            .reply(200, GAME_TITLES_LEGACY_PLATFORM_SKIN_RESP);
+        nock('http://localhost:9200')
+            .post(`/${ARCHIVED_GAMES_READ_ALIAS}/_search?request_cache=true`)
+            .twice()
+            .reply(200, NOT_FOUND_RESPONSE);
+
+        const event: APIGatewayProxyEvent = mockApiEvent(SITENAME);
+        const result: APIGatewayProxyResult = await lambdaHandler(event);
+
+        expect(result.statusCode).toEqual(200);
+        expect(JSON.parse(result.body)).toEqual([{ gameSkin: 'legacy-skin', title: 'Legacy Game Title' }]);
+    });
+
+    it('should return title list using new gameSkin on game object when platform config has no locale key', async () => {
+        nock('http://localhost:9200')
+            .post(`/${VENTURES_INDEX_ALIAS}/_search?request_cache=true`)
+            .reply(200, VENTURE_SUCCESS_RESP);
+        nock('http://localhost:9200')
+            .post(`/${IG_GAMES_V2_READ_ALIAS}/_search?request_cache=true`)
+            .reply(200, GAME_TITLES_NEW_GAME_SKIN_RESP);
+        nock('http://localhost:9200')
+            .post(`/${ARCHIVED_GAMES_READ_ALIAS}/_search?request_cache=true`)
+            .twice()
+            .reply(200, NOT_FOUND_RESPONSE);
+
+        const event: APIGatewayProxyEvent = mockApiEvent(SITENAME);
+        const result: APIGatewayProxyResult = await lambdaHandler(event);
+
+        expect(result.statusCode).toEqual(200);
+        expect(JSON.parse(result.body)).toEqual([{ gameSkin: 'new-skin', title: 'New Game Title' }]);
     });
 });

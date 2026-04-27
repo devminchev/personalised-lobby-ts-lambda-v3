@@ -2,6 +2,206 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.15.13](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-because-you-played-0.15.12...get-because-you-played-0.15.13) (2026-04-22)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.53.0`
+## [0.15.12](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-because-you-played-0.15.11...get-because-you-played-0.15.12) (2026-04-22)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.52.0`
+## [0.15.11](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-because-you-played-0.15.10...get-because-you-played-0.15.11) (2026-04-21)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.51.1`
+## [0.15.10](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-because-you-played-0.15.9...get-because-you-played-0.15.10) (2026-04-21)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.51.0`
+
+### Bug Fixes
+
+* **gtech-1321563:** attach glab pipeline url to rel tickets ([9eeb15d](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/commit/9eeb15d0ae6bdc88872281660a4db87d47c03f38))
+
+## [0.15.9](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-because-you-played-0.15.8...get-because-you-played-0.15.9) (2026-04-21)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.51.0`
+## [0.15.8](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-because-you-played-0.15.7...get-because-you-played-0.15.8) (2026-04-20)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.50.0`
+## [0.15.7](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-because-you-played-0.15.6...get-because-you-played-0.15.7) (2026-04-13)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.49.0`
+## [0.15.6](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-because-you-played-0.15.5...get-because-you-played-0.15.6) (2026-04-10)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.48.3`
+## [0.15.5](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-because-you-played-0.15.4...get-because-you-played-0.15.5) (2026-04-09)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.48.2`
+## [0.15.4](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-because-you-played-0.15.3...get-because-you-played-0.15.4) (2026-04-09)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.48.1`
+## [0.15.3](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-because-you-played-0.15.2...get-because-you-played-0.15.3) (2026-03-25)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.48.0`
+## [0.15.2](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-because-you-played-0.15.1...get-because-you-played-0.15.2) (2026-03-25)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.47.0`
+## [0.15.1](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-because-you-played-0.15.0...get-because-you-played-0.15.1) (2026-03-24)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.46.0`
+## [0.15.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-because-you-played-0.14.11...get-because-you-played-0.15.0) (2026-03-20)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.45.0`
+
+### Features
+
+* **gtech-1314814-1:** refactor lambdas to work with new game index mapping ([ac824da](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/commit/ac824daa58b93411881d2250ab79c32f331ffe90))
+
+## [0.14.11](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-because-you-played-0.14.10...get-because-you-played-0.14.11) (2026-03-17)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.44.0`
+## [0.14.10](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-because-you-played-0.14.9...get-because-you-played-0.14.10) (2026-03-17)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.43.5`
+## [0.14.9](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-because-you-played-0.14.8...get-because-you-played-0.14.9) (2026-03-06)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.43.4`
+## [0.14.8](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-because-you-played-0.14.7...get-because-you-played-0.14.8) (2026-03-06)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.43.3`
+## [0.14.7](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-because-you-played-0.14.6...get-because-you-played-0.14.7) (2026-03-06)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.43.2`
+## [0.14.6](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-because-you-played-0.14.5...get-because-you-played-0.14.6) (2026-03-05)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.43.1`
+## [0.14.5](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-because-you-played-0.14.4...get-because-you-played-0.14.5) (2026-03-05)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.43.0`
+## [0.14.4](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-because-you-played-0.14.3...get-because-you-played-0.14.4) (2026-03-05)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.42.1`
+## [0.14.3](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-because-you-played-0.14.2...get-because-you-played-0.14.3) (2026-02-25)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.42.0`
+## [0.14.2](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-because-you-played-0.14.1...get-because-you-played-0.14.2) (2026-02-23)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.41.2`
+## [0.14.1](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-because-you-played-0.14.0...get-because-you-played-0.14.1) (2026-02-20)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.41.1`
+## [0.14.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-because-you-played-0.13.0...get-because-you-played-0.14.0) (2026-01-28)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.41.0`
+
+### Features
+
+* **gtech-1317745:** add compression at the lambda level ([ed45cf3](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/commit/ed45cf3868056b4e8aebf4c3fa9baf6a3bd1b6fb))
+
+## [0.13.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-because-you-played-0.12.20...get-because-you-played-0.13.0) (2026-01-23)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.40.0`
+
+### Features
+
+* **gtech-1317745:** default encoding for uncompressed lambdas ([9dba5d2](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/commit/9dba5d25387276374a2c1ce46055ec224098953e))
+
+## [0.12.20](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-because-you-played-0.12.19...get-because-you-played-0.12.20) (2026-01-19)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.39.0`
+## [0.12.19](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-because-you-played-0.12.18...get-because-you-played-0.12.19) (2026-01-19)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.38.0`
+## [0.12.18](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-because-you-played-0.12.17...get-because-you-played-0.12.18) (2025-12-16)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.37.0`
+## [0.12.17](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-because-you-played-0.12.16...get-because-you-played-0.12.17) (2025-12-09)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.36.0`
+## [0.12.16](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-because-you-played-0.12.15...get-because-you-played-0.12.16) (2025-12-05)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.35.0`
+## [0.12.15](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-because-you-played-0.12.14...get-because-you-played-0.12.15) (2025-12-03)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.34.2`
+## [0.12.14](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-because-you-played-0.12.13...get-because-you-played-0.12.14) (2025-12-02)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.34.1`
+## [0.12.13](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-because-you-played-0.12.12...get-because-you-played-0.12.13) (2025-11-28)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.34.0`
+## [0.12.12](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-because-you-played-0.12.11...get-because-you-played-0.12.12) (2025-11-26)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.33.0`
 ## [0.12.11](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-because-you-played-0.12.10...get-because-you-played-0.12.11) (2025-11-14)
 
 ### Dependency Updates

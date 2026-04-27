@@ -10,6 +10,7 @@ import {
     getVentureId,
     logMessage,
     LogCode,
+    jsonResponse,
 } from 'os-client';
 import { FreshGameResponse } from './lib/interface';
 import { getGamesFromSections, getUserVisibleGameAndSiteGames } from './lib/processSiteVisibleGames';
@@ -55,33 +56,41 @@ export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGat
         const contentToLinkData = await getLinks(client, linkdIds, spaceLocale, platform);
 
         const sectionIds: string[] = Array.from(contentToLinkData.keys());
-        const gameIdsFromSection = await getGamesFromSections(client, platform, sectionIds, spaceLocale, siteName);
+        const { gameIds, gameSectionsMap } = await getGamesFromSections(
+            client,
+            platform,
+            sectionIds,
+            spaceLocale,
+            siteName,
+        );
 
         const userVisisbleGames = await getUserVisibleGameAndSiteGames(
             client,
             ventureId,
             platform,
-            gameIdsFromSection,
+            gameIds,
             spaceLocale,
             siteName,
         );
-        const response: FreshGameResponse[] = createResponseObject(userVisisbleGames, userLocale, spaceLocale);
-        return {
-            statusCode: 200,
-            body: JSON.stringify(response),
-        };
+        const response: FreshGameResponse[] = createResponseObject(
+            userVisisbleGames,
+            userLocale,
+            spaceLocale,
+            gameSectionsMap,
+        );
+        return jsonResponse(response);
     } catch (err) {
         const errorCode = (err as any).code;
         const statusCode = (err as any).statusCode || 500;
         const errorMessage = (err as Error).message;
         logError(ErrorCode.ExecutionError, statusCode, { siteName, platform, userLocale, err });
 
-        return {
-            statusCode: statusCode,
-            body: JSON.stringify({
+        return jsonResponse(
+            {
                 code: errorCode,
                 message: errorMessage,
-            }),
-        };
+            },
+            statusCode,
+        );
     }
 };

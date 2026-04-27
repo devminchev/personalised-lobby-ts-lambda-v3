@@ -251,6 +251,7 @@ export const IG_GAME_SECTION_SUCCESS_RESP: any = {
                     },
                     title: {
                         'en-GB': 'New Slots',
+                        es: 'New Slots - Spanish',
                     },
                     classification: {
                         'en-GB': 'GameSection',

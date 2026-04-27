@@ -6,6 +6,7 @@ export {
     EmptySectionViewResponse,
     EmptyDataResponse,
 } from './lib/responseErrorHandler';
+export { gzipResponse, jsonResponse, parseCompressedBody, ICompressionRespResult } from './lib/responseCompression';
 export {
     VENTURES_INDEX,
     VENTURES_INDEX_ALIAS,
@@ -44,6 +45,9 @@ export {
     ML_BECAUSE_YOU_PLAYED_X_ALIAS,
     ML_RECENTLY_PLAYED_ALIAS,
     ML_SECTIONS_READ_ALIAS,
+    AB_VARIANT_INDEX_ALIAS,
+    IG_GAMES_V2_WRITE_ALIAS,
+    IG_GAMES_V2_READ_ALIAS,
 } from './lib/constants';
 export { ErrorCode, createError, logError, getErrorMessage, clientError } from './lib/errors';
 export { logMessage, LogCode } from './lib/logger';
@@ -90,6 +94,8 @@ export {
     IView,
     IHeadlessJackpot,
     IBynderAsset,
+    IBynderAssets,
+    SanitizedBynder,
     IViewAll,
     IGLinkItem,
     IGLinkItemOS,
@@ -97,6 +103,7 @@ export {
     extendedViewSlugProp,
     IIGTheme,
     IIGThemeOS,
+    IGameSkinConfigResponse,
 } from './lib/sharedInterfaces/interfaces';
 export {
     LocalizedField,
@@ -104,6 +111,7 @@ export {
     SystemLink,
     IOpenSearchQuery,
     SysReference,
+    Sys,
 } from './lib/sharedInterfaces/common';
 export { ISiteGameToLayout, IGamesSource } from './lib/sharedInterfaces/search';
 export {
@@ -122,7 +130,12 @@ export {
     replaceEmptyStringsWithNull,
     coalescePropValue,
     pickGameOrSiteGameValue,
+    pickGameOrConfigValue,
+    resolveGameProp,
     validators,
+    extractBynderObject,
+    sanitiseBynderAssets,
+    jsonSizeInMb,
 } from './lib/utils';
 export { getVentureId, getGamesSiteGames } from './lib/commonOsRequests';
 export {
@@ -134,6 +147,7 @@ export {
     checkAndGuardSectionType,
     isMlPersonalizedSection,
     handlePersonalizedGames,
+    handleMissingMLRecommendations,
     becauseYouPlayedShared,
     handleRecentlyPlayed,
     IBecauseYouPlayedResult,
@@ -160,3 +174,5 @@ export {
     Entry,
     Space,
 } from './lib/validatorWrapper';
+export { AbVariant, AB_VARIANT_HEADER, isAbVariant } from './lib/abTesting';
+export { preferredOrFallback, getPreferredOrFallbackLocalised } from './lib/mediaAssetsFallback';

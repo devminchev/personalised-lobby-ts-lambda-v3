@@ -1,6 +1,6 @@
 {
   "name": "get-personalised-extra-data",
-  "version": "0.12.8",
+  "version": "0.14.24",
   "description": "Returns personalised extra data for a specific game",
   "main": "app.js",
   "repository": "https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda",

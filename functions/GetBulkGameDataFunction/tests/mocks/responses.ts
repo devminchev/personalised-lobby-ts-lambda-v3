@@ -92,6 +92,7 @@ export const SECTIONS_SUCCESS_RESP: any = {
         hits: [
             {
                 _source: {
+                    id: 'section-id-1',
                     games: {
                         'en-GB': [
                             {

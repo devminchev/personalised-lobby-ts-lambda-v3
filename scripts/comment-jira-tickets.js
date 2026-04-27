@@ -1,16 +1,15 @@
 #!/usr/bin/env node
 
-const axios = require('axios');
+const { execFileSync } = require('child_process');
 
-// Configuration - using same base URL as transition script
-const JIRA_COMMENT_ENDPOINT = 'http://nja.psnative.pgt.gaia/ticket';
-
-// Environment mapping - maps CI environment names to comment types and display names
+// Environment mapping - maps CI environment names to NJA CLI command and display names
 const ENVIRONMENT_CONFIG = {
-    stg_eu00: { endpoint: 'ppc', displayName: 'NPE' },
-    stg_na03: { endpoint: 'ppc', displayName: 'NPE' },
-    prod_eu00: { endpoint: 'ppc', displayName: 'PROD' },
-    prod_na03: { endpoint: 'ppc', displayName: 'PROD' },
+    stg_eu00: { command: 'comment-ppc', displayName: 'NPE' },
+    stg_eu03: { command: 'comment-ppc', displayName: 'NPE' },
+    stg_na03: { command: 'comment-ppc', displayName: 'NPE' },
+    prod_eu00: { command: 'comment-live', displayName: 'PROD' },
+    prod_eu03: { command: 'comment-live', displayName: 'PROD' },
+    prod_na03: { command: 'comment-live', displayName: 'PROD' },
 };
 
 // Command line argument parsing
@@ -19,7 +18,9 @@ const envArg = args.find((arg) => arg.startsWith('--environment='));
 
 if (!envArg) {
     console.error('Error: --environment parameter is required');
-    console.error('Usage: ./comment-jira-tickets.js --environment=stg_eu00|stg_na03|prod_eu00|prod_na03');
+    console.error(
+        'Usage: ./comment-jira-tickets.js --environment=stg_eu00|stg_eu03|stg_na03|prod_eu00|prod_eu03|prod_na03',
+    );
     process.exit(1);
 }
 
@@ -35,42 +36,29 @@ console.log(
     `Adding deployment comments for environment: ${environment} (automation service environment: ${envConfig.displayName})`,
 );
 
-// Function to add comment to a Jira ticket
-async function commentJiraTicket(ticketId, version, displayEnvironment, endpoint) {
-    const url = `${JIRA_COMMENT_ENDPOINT}/${ticketId}/comment/${endpoint}?additive=true`;
-    const payload = {
-        environment: displayEnvironment,
-        deployable_version: version,
-    };
+// Function to add comment to a Jira ticket via NJA CLI
+function commentJiraTicket(ticketId, version, displayEnvironment, command) {
+    const cliArgs = ['ticket', command, ticketId, '--environment', displayEnvironment, '--deployable-version', version];
+
+    // PPC comments use --additive; live comments require --stage
+    if (command === 'comment-ppc') {
+        cliArgs.push('--additive');
+    } else if (command === 'comment-live') {
+        cliArgs.push('--stage', 'POST_DEPLOY');
+    }
 
     console.log(`Adding comment to ticket ${ticketId}: Version ${version} deployed to ${displayEnvironment}`);
 
     try {
-        const response = await axios.post(url, payload, {
-            headers: {
-                'Content-Type': 'application/json',
-                apikey: 'secret',
-            },
-        });
-
-        console.log(`✓ Successfully added comment to ${ticketId}`);
-
-        return {
-            success: true,
-            ticketId: ticketId,
-            version: version,
-            environment: displayEnvironment,
-            response: response.data,
-        };
+        execFileSync('nja', cliArgs, { encoding: 'utf-8' });
+        console.log(`Successfully added comment to ${ticketId}`);
+        return { success: true, ticketId, version, environment: displayEnvironment };
     } catch (error) {
-        const errorMessage = error.response?.data || error.message;
-        const statusCode = error.response?.status || 'Unknown';
-        console.error(`✗ Failed to add comment to ticket ${ticketId}: HTTP ${statusCode}: ${errorMessage}`);
-        return {
-            success: false,
-            ticketId: ticketId,
-            error: `HTTP ${statusCode}: ${errorMessage}`,
-        };
+        const stdout = error.stdout || '';
+        const stderr = error.stderr || '';
+        const errorDetail = stdout || stderr || error.message;
+        console.error(`Failed to add comment to ticket ${ticketId}: ${errorDetail}`);
+        return { success: false, ticketId, error: errorDetail };
     }
 }
 
@@ -100,10 +88,11 @@ function validateInput(versions) {
     const ticketsWithRelIds = Object.entries(versions).filter(([, data]) => data.relTicket);
 
     if (ticketsWithRelIds.length === 0) {
-        throw new Error('No tickets with relTicket IDs found in versions.json');
+        return false;
     }
 
     console.log(`Found ${ticketsWithRelIds.length} tickets to comment on`);
+    return true;
 }
 
 // Main execution
@@ -118,7 +107,15 @@ async function main() {
     try {
         // Parse and validate the JSON input
         const versions = JSON.parse(inputData);
-        validateInput(versions);
+        const hasTickets = validateInput(versions);
+
+        if (!hasTickets) {
+            console.log('No tickets with relTicket IDs found in versions.json - nothing to comment on, skipping.');
+            console.log(
+                '\nNo tickets to add comments to - skipping (this is expected when all functions use skipRelTicket)',
+            );
+            return;
+        }
 
         // Extract ticket data
         const ticketsToComment = extractTicketData(versions);
@@ -131,11 +128,11 @@ async function main() {
         // Process each ticket
         for (const ticket of ticketsToComment) {
             try {
-                const result = await commentJiraTicket(
+                const result = commentJiraTicket(
                     ticket.ticketId,
                     ticket.version,
                     envConfig.displayName,
-                    envConfig.endpoint,
+                    envConfig.command,
                 );
 
                 results.push({
@@ -180,7 +177,7 @@ async function main() {
         if (successful.length > 0) {
             console.log(`\nSuccessful comments added for "${envConfig.displayName}" environment:`);
             for (const result of successful) {
-                console.log(`  ✓ ${result.packageKey} → ${result.ticketId} (v${result.version})`);
+                console.log(`  ${result.packageKey} -> ${result.ticketId} (v${result.version})`);
             }
         }
 
@@ -188,20 +185,17 @@ async function main() {
             console.log(`\nFailed comments:`);
             for (const result of failed) {
                 const error = errors.find((e) => e.ticketId === result.ticketId);
-                console.log(`  ✗ ${result.packageKey} → ${result.ticketId}${error ? `: ${error.error}` : ''}`);
+                console.log(`  ${result.packageKey} -> ${result.ticketId}${error ? `: ${error.error}` : ''}`);
             }
         }
 
-        // Note: Unlike transitions, comment failures should not fail the pipeline
-        // Pipeline jobs should use allow_failure: true for comment jobs
+        // Comment failures exit with error but pipeline uses allow_failure: true
         if (failed.length > 0) {
-            console.log(`\n⚠️  ${failed.length} comment(s) failed but pipeline continues (allow_failure: true)`);
-            console.log('This job will show as yellow/warning in GitLab CI but will not block the pipeline');
-            // Exit with error code to make job show as failed/warning, but pipeline continues due to allow_failure
+            console.log(`\n${failed.length} comment(s) failed but pipeline continues (allow_failure: true)`);
             process.exit(1);
         }
 
-        console.log(`\n✅ Successfully added deployment comments to ${successful.length} tickets`);
+        console.log(`\nSuccessfully added deployment comments to ${successful.length} tickets`);
     } catch (error) {
         console.error('Error:', error.message);
         process.exit(1);

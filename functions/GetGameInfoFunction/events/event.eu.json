@@ -1,13 +1,13 @@
 {
   "body": "",
   "resource": "/sites/{sitename}/platform/{platform}/games/{gamename}?locale={locale}",
-  "path": "/sites/monopolycasinospain/platform/web/games/play-dark-waters-2-power-combo=es-ES",
+  "path": "/sites/monopolycasinospain/platform/web/games/play-bp-eye-of-horus-92=es-ES",
   "httpMethod": "GET",
   "isBase64Encoded": false,
   "pathParameters": {
     "sitename": "monopolycasinospain",
     "platform": "web",
-    "gamename": "play-dark-waters-2-power-combo"
+    "gamename": "play-bp-eye-of-horus-92"
   },
   "queryStringParameters": {
     "locale": "es-ES"
@@ -54,7 +54,7 @@
       "user": null
     },
     "path": "/sites/{sitename}/platform/{platform}/games/{gamename}?locale={locale}",
-    "resourcePath": "/sites/monopolycasinospain/platform/web/games/play-dark-waters-2-power-combo=es-ES",
+    "resourcePath": "/sites/monopolycasinospain/platform/web/games/play-bp-eye-of-horus-92=es-ES",
     "httpMethod": "get",
     "apiId": "1234567890",
     "protocol": "HTTP/1.1"

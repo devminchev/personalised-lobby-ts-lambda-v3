@@ -16,16 +16,19 @@ import {
     getLambdaExecutionEnvironment,
     ALL_SECTIONS_SHARED_READ_ALIAS,
     LocalizedField,
-    GAMES_INDEX_V2_ALIAS,
+    IG_GAMES_V2_READ_ALIAS,
     VIEW_INDEX_READ_ALIAS,
     createError,
-    IBynderAsset,
     errorResponseHandler,
     logMessage,
+    gzipResponse,
+    SanitizedBynder,
+    Sys,
+    extractBynderObject,
+    pickGameOrSiteGameValue,
+    resolveGameProp,
+    validators,
 } from 'os-client';
-import { Sys } from 'os-client/lib/sharedInterfaces/common';
-import { extractBynderObject, pickGameOrSiteGameValue, validators } from 'os-client/lib/utils';
-
 /**
  * GetMiniGamesFunction
  * Version: 1.0.1
@@ -55,8 +58,8 @@ interface IGameObject {
     imgUrlPattern?: string;
     animationMedia?: string;
     representativeColor?: string;
-    foregroundLogoMedia?: IBynderAsset;
-    backgroundMedia?: IBynderAsset;
+    foregroundLogoMedia?: SanitizedBynder;
+    backgroundMedia?: SanitizedBynder;
     sash?: string;
 }
 export interface IMinigameSectionInfo {
@@ -186,6 +189,10 @@ export const getMinigames = async (
                                         _source: [
                                             'game.id',
                                             'game.gamePlatformConfig',
+                                            'game.gameName',
+                                            'game.gameSkin',
+                                            'game.mobileGameName',
+                                            'game.mobileGameSkin',
                                             'game.title',
                                             'game.imgUrlPattern',
                                             'game.representativeColor',
@@ -221,7 +228,7 @@ export const getMinigames = async (
         size: MINI_GAMES_SITEGAMES_LIMIT,
     };
 
-    return await getGamesSiteGames(client, minigamesQuery, GAMES_INDEX_V2_ALIAS, ventureId, siteName, platform);
+    return await getGamesSiteGames(client, minigamesQuery, IG_GAMES_V2_READ_ALIAS, ventureId, siteName, platform);
 };
 
 export const createMinigamesLobby = (
@@ -233,8 +240,8 @@ export const createMinigamesLobby = (
     const sanitizedMinigames = minigames.reduce<{ [key: string]: IGameObject }>((acc, item) => {
         const siteGameData = item.hit?.siteGame;
         const gameData = item.innerHit?.game;
-        const gamePlatformObject = gameData?.gamePlatformConfig[spaceLocale] || {};
-        const tags = pickGameOrSiteGameValue(siteGameData?.tags?.[spaceLocale], gameData?.tags?.[spaceLocale], null);
+        const gamePlatformObject = gameData?.gamePlatformConfig || {};
+        const tags = pickGameOrSiteGameValue(siteGameData?.tags?.[spaceLocale], gameData?.tags, null);
         const localizedGameTitle = tryGetValueFromLocalised(userLocale, spaceLocale, gameData?.title, null);
         const imgUrlPattern = tryGetValueFromLocalised(userLocale, spaceLocale, gameData?.imgUrlPattern, null);
         const representativeColor = tryGetValueFromLocalised(
@@ -254,16 +261,16 @@ export const createMinigamesLobby = (
 
         const foregroundLogoMediaObj = extractBynderObject(foregroundLogoMedia);
         const backgroundMediaObj = extractBynderObject(backgroundMedia);
-        const vendor = gameData?.vendor?.[spaceLocale];
+        const vendor = resolveGameProp(gameData?.vendor, spaceLocale, null);
 
         const gameObject: IGameObject = {
             entryId: siteGameData.id,
             gameId: gameData.id,
-            ...(gamePlatformObject?.name && { name: gamePlatformObject.name }), // gamePlatformObject
+            ...(gameData?.gameName && { name: gameData.gameName }), // game
             ...(localizedGameTitle && { title: localizedGameTitle }),
             ...(gamePlatformObject?.realUrl && { realUrl: gamePlatformObject.realUrl }), // gamePlatformObject
             ...(gamePlatformObject?.demoUrl && { demoUrl: gamePlatformObject.demoUrl }), // gamePlatformObject
-            ...(gamePlatformObject?.gameSkin && { gameSkin: gamePlatformObject.gameSkin }), // gamePlatformObject
+            ...(gameData?.gameSkin && { gameSkin: gameData.gameSkin }), // game
             ...(imgUrlPattern && { imgUrlPattern }), // game
             ...(animationMedia && { animationMedia }), // game
             ...(representativeColor && { representativeColor }), // game
@@ -271,10 +278,10 @@ export const createMinigamesLobby = (
             ...(foregroundLogoMediaObj && { foregroundLogoMedia: foregroundLogoMediaObj }), // game
             ...(backgroundMediaObj && { backgroundMedia: backgroundMediaObj }), // game
             // Those overrides are there if the mobileOvveride field is checked in in Contentful. Adding this lookign forward to when apps need to use it.
-            ...(gamePlatformObject?.mobileName && { mobileName: gamePlatformObject.mobileName }), // gamePlatformObject
+            ...(gameData?.mobileGameName && { mobileName: gameData.mobileGameName }), // game
             ...(gamePlatformObject?.mobileRealUrl && { mobileRealUrl: gamePlatformObject.mobileRealUrl }), // gamePlatformObject
             ...(gamePlatformObject?.mobileDemoUrl && { mobileDemoUrl: gamePlatformObject.mobileDemoUrl }), // gamePlatformObject
-            ...(gamePlatformObject?.mobileGameSkin && { mobileGameSkin: gamePlatformObject.mobileGameSkin }), // gamePlatformObject
+            ...(gameData?.mobileGameSkin && { mobileGameSkin: gameData.mobileGameSkin }), // game
             ...(tags && { tags }),
             ...(vendor && { vendor }),
         };
@@ -386,10 +393,7 @@ export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGat
 
         const minigamesLobby = createMinigamesLobby(sectionData, minigames, spaceLocale, userLocale);
 
-        return {
-            statusCode: 200,
-            body: JSON.stringify(minigamesLobby),
-        };
+        return gzipResponse(minigamesLobby);
     } catch (err) {
         const errorLogParams = {
             eventReqId,

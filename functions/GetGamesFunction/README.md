@@ -97,7 +97,7 @@ sequenceDiagram
         L-->>API: 400 BadWolf
     else authorised or non-personalised
         alt Non-personalised
-            L->>OS: Search GAMES_INDEX_V2_ALIAS (siteGame ids)
+            L->>OS: Search IG_GAMES_V2_READ_ALIAS (siteGame ids)
             OS-->>L: SiteGame hits + inner_hits.game
             L->>L: gamesPayloadBySiteGame + orderedPayload
         else Personalised
@@ -106,7 +106,7 @@ sequenceDiagram
             alt Suggested
                 L->>OS: ML_GAMES_RECOMMENDER_INDEX_ALIAS (member+site)
                 OS-->>L: ML game ids (ranked)
-                L->>OS: GAMES_V2_INDEX_ALIAS (ids + child sitegame)
+                L->>OS: IG_GAMES_V2_READ_ALIAS (ids + child sitegame)
                 OS-->>L: Game hits + inner_hits.sitegame
                 L->>L: gamesPayloadBySiteGame + orderedPayload
             else Recently-played
@@ -114,14 +114,14 @@ sequenceDiagram
                 L->>OS: ML_RECENTLY_PLAYED_ALIAS (member+site)
                 OS-->>L: recently_played_games[]
                 L->>L: top30Desc + min threshold
-                L->>OS: GAMES_V2_INDEX_ALIAS (skins + child sitegame)
+                L->>OS: IG_GAMES_V2_READ_ALIAS (skins + child sitegame)
                 OS-->>L: Game hits + inner_hits.sitegame
                 L->>L: Filter exclude_recently_played metadata
                 L->>L: gamesPayloadByGame + orderByKey + slice(12)
             else Because-you-played (x/y/z)
                 L->>OS: ML because-you-played-* (member+site)
                 OS-->>L: ML game skins (ranked)
-                L->>OS: GAMES_V2_INDEX_ALIAS (terms on gameSkin + child sitegame)
+                L->>OS: IG_GAMES_V2_READ_ALIAS (terms on gameSkin + child sitegame)
                 OS-->>L: Game hits + inner_hits.sitegame
                 L->>L: gamesPayloadByGame + orderByKey + slice(50)
             end
@@ -136,7 +136,7 @@ Notes
 - `getLambdaExecutionEnvironment()` validates `EXECUTION_ENVIRONMENT` and defaults to `production` if missing/invalid.
 - Unauthenticated access to a personalised section yields 400 (BadWolf) via `checkAndGuardSectionType`.
 - Missing section in `ALL_SECTIONS_SHARED_READ_ALIAS` yields 404 (MissingSection).
-- No games from `GAMES_V2_INDEX_ALIAS` returns an empty array with 200 for non-personalised. For personalised, ML fallbacks may apply via `handleMissingMLRecommendations`.
+- No games from `IG_GAMES_V2_READ_ALIAS` returns an empty array with 200 for non-personalised. For personalised, ML fallbacks may apply via `handleMissingMLRecommendations`.
 - The personalised **recently played** branch honours Contentful sort choices by mapping the `sort`
   field from `igSimilarityBasedPersonalisedSection` to OpenSearch metrics via
   `ORDER_CRITERIA_TO_FIELD` (margin → `margin_rank`, `rtp`, `wager`, `rounds`). After enrichment it
@@ -257,6 +257,9 @@ sam --config-env na local start-api # NA
 
 # then call
 curl "http://127.0.0.1:3000/sites/{sitename}/platform/{platform}/view/{viewslug}/sections/{sectionid}/sitegames"
+
+# pagination example (offset + limit)
+curl "http://127.0.0.1:3000/sites/{sitename}/platform/{platform}/view/{viewslug}/sections/{sectionid}/sitegames?offset=0&limit=10"
 ```
 
 ### Containerised local run (Podman/Docker)
@@ -295,6 +298,29 @@ npx nx run get-games:format
 ## Future work
 
 ### Pagination
+
+#### Implemented endpoint pagination
+
+This lambda supports request-level pagination through query params:
+
+- `offset` (optional): zero-based starting index in the section `games` list.
+- `limit` (optional): max number of games to return after `offset` is applied.
+
+Rules:
+
+- both params are optional.
+- values must be non-negative integers.
+- invalid values (e.g. `-1`, `1.5`, `abc`) return `400 InvalidRequest`.
+
+Examples:
+
+```bash
+# first 10 games
+curl "http://127.0.0.1:3000/sites/{sitename}/platform/{platform}/view/{viewslug}/sections/{sectionid}/sitegames?offset=0&limit=10"
+
+# next 10 games
+curl "http://127.0.0.1:3000/sites/{sitename}/platform/{platform}/view/{viewslug}/sections/{sectionid}/sitegames?offset=10&limit=10"
+```
 
 #### Basic Pagination Concept
 

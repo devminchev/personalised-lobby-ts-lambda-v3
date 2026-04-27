@@ -1,0 +1,52 @@
+{
+  "body": "{\"sys\": {\"id\": \"3D1krhD5g4vHHtxpvWC7Qr\", \"version\": \"1.0\", \"space\": {\"sys\": {\"id\": \"nw2595tc1jdx\"}}, \"environment\": {\"sys\": {\"id\": \"dev\"}}, \"contentType\": {\"sys\": {\"id\": \"siteGameV2\"}}}}",
+  "resource": "/historical-game-titles-handler",
+  "path": "/historical-game-titles-handler",
+  "httpMethod": "POST",
+  "isBase64Encoded": false,
+  "pathParameters": {},
+  "queryStringParameters": {},
+  "stageVariables": {},
+  "headers": {
+    "Accept": "application/json",
+    "Content-Type": "application/json",
+    "Cache-Control": "no-cache",
+    "CloudFront-Forwarded-Proto": "https",
+    "CloudFront-Is-Desktop-Viewer": "true",
+    "CloudFront-Is-Mobile-Viewer": "false",
+    "CloudFront-Is-SmartTV-Viewer": "false",
+    "CloudFront-Is-Tablet-Viewer": "false",
+    "CloudFront-Viewer-Country": "US",
+    "Host": "https://search-lobby-opsearch-oc5o7t2piau33hcu5ej3ortis4.eu-west-1.es.amazonaws.com/",
+    "User-Agent": "Custom User Agent String",
+    "Via": "1.1 08f323deadbeefa7af34d5feb414ce27.cloudfront.net (CloudFront)",
+    "X-Amz-Cf-Id": "cDehVQoZnx43VYQb9j2-nvCh-9z396Uhbp027Y2JvkCPNLmGJHqlaA==",
+    "X-Forwarded-For": "127.0.0.1, 127.0.0.2",
+    "X-Forwarded-Port": "443",
+    "X-Forwarded-Proto": "https",
+    "X-Contentful-Signature": "<signature>",
+    "X-Contentful-Signed-Headers": "<comma-separated-headers-in-signing-order>",
+    "X-Contentful-Timestamp": "<timestamp-of-request-signing>",
+    "X-Contentful-CRN": "<crn-of-signed-request>",
+    "X-Contentful-Space-Id": "nw2595tc1jdx",
+    "X-Contentful-Environment-Id": "dev",
+    "X-Contentful-User-Id": "<user-id>"
+  },
+  "requestContext": {
+    "accountId": "123456789012",
+    "resourceId": "123456",
+    "stage": "v1",
+    "requestId": "c6af9ac6-7b61-11e6-9a41-93e8deadbeef",
+    "requestTime": "09/Apr/2015:12:34:56 +0000",
+    "requestTimeEpoch": 1428582896000,
+    "identity": {
+      "sourceIp": "127.0.0.1",
+      "userAgent": "Custom User Agent String"
+    },
+    "resource": "/historical-game-titles-handler",
+    "path": "/historical-game-titles-handler",
+    "httpMethod": "POST",
+    "apiId": "1234567890",
+    "protocol": "HTTP/1.1"
+  }
+}

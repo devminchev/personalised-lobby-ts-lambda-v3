@@ -20,9 +20,10 @@ import {
     ErrorCode,
     getErrorMessage,
     VENTURES_INDEX_ALIAS,
-    GAMES_INDEX_V2_ALIAS,
+    IG_GAMES_V2_READ_ALIAS,
     ALL_SECTIONS_SHARED_READ_ALIAS,
     VIEW_INDEX_READ_ALIAS,
+    parseCompressedBody,
 } from 'os-client';
 
 jest.mock('@opensearch-project/opensearch', () => {
@@ -54,14 +55,14 @@ describe('Integration Test for Lambda Handler', () => {
             .reply(200, MINIGAMES_SECTIONS_SUCCESS_RESP);
 
         nock('http://localhost:9200')
-            .post(`/${GAMES_INDEX_V2_ALIAS}/_search?request_cache=true`)
+            .post(`/${IG_GAMES_V2_READ_ALIAS}/_search?request_cache=true`)
             .reply(200, MINIGAMES_GAMES_SUCCESS_RESP);
 
         const event: APIGatewayProxyEvent = mockApiEvent(sitename, platform);
         const result: APIGatewayProxyResult = await lambdaHandler(event);
 
         expect(result.statusCode).toEqual(200);
-        expect(result.body).toEqual(JSON.stringify(MINIGAMES_ENDPOINT_SUCCESS_RESP));
+        expect(parseCompressedBody(result)).toEqual(MINIGAMES_ENDPOINT_SUCCESS_RESP);
     });
 
     it('should return (204) for invalid site name', async () => {
@@ -98,7 +99,7 @@ describe('Integration Test for Lambda Handler', () => {
             .reply(200, NOT_FOUND_RESPONSE);
 
         nock('http://localhost:9200')
-            .post(`/${GAMES_INDEX_V2_ALIAS}/_search?request_cache=true`)
+            .post(`/${IG_GAMES_V2_READ_ALIAS}/_search?request_cache=true`)
             .reply(200, NOT_FOUND_RESPONSE);
 
         const event: APIGatewayProxyEvent = mockApiEvent(sitename, platform);
@@ -127,7 +128,7 @@ describe('Integration Test for Lambda Handler', () => {
             .reply(200, MINIGAMES_SECTIONS_INVALID_GAMES_RESP);
 
         nock('http://localhost:9200')
-            .post(`/${GAMES_INDEX_V2_ALIAS}/_search?request_cache=true`)
+            .post(`/${IG_GAMES_V2_READ_ALIAS}/_search?request_cache=true`)
             .reply(200, NOT_FOUND_RESPONSE);
 
         const event: APIGatewayProxyEvent = mockApiEvent(sitename, platform);

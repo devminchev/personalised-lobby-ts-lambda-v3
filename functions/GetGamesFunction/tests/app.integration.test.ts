@@ -35,10 +35,11 @@ import {
     getErrorMessage,
     ML_GAMES_RECOMMENDER_INDEX_ALIAS,
     ALL_SECTIONS_SHARED_READ_ALIAS,
-    GAMES_INDEX_V2_ALIAS,
+    IG_GAMES_V2_READ_ALIAS,
     VENTURES_INDEX_ALIAS,
     ML_BECAUSE_YOU_PLAYED_X_ALIAS,
     ML_RECENTLY_PLAYED_ALIAS,
+    parseCompressedBody,
 } from 'os-client';
 
 jest.mock('@opensearch-project/opensearch', () => {
@@ -72,14 +73,41 @@ describe('Integration Test for Lambda Handler', () => {
                 .reply(200, SECTION_SUCCESS_RESP);
 
             nock('http://localhost:9200')
-                .post(`/${GAMES_INDEX_V2_ALIAS}/_search?request_cache=true`)
+                .post(`/${IG_GAMES_V2_READ_ALIAS}/_search?request_cache=true`)
                 .reply(200, GAMES_SUCCESS_RESP);
 
             const event: APIGatewayProxyEvent = mockApiEvent(SITE_NAME, PLATFORM, VIEW_SLUG, SECTION_ID);
             const result: APIGatewayProxyResult = await lambdaHandler(event);
 
             expect(result.statusCode).toEqual(200);
-            expect(result.body).toEqual(JSON.stringify(SECTION_GAMES_SUCCESS_RESPONSE));
+            expect(parseCompressedBody(result)).toEqual(SECTION_GAMES_SUCCESS_RESPONSE);
+        });
+
+        it('Should apply offset and limit query params when selecting section games', async () => {
+            nock('http://localhost:9200')
+                .post(`/${ALL_SECTIONS_SHARED_READ_ALIAS}/_search?request_cache=true`)
+                .reply(200, SECTION_SUCCESS_RESP);
+
+            nock('http://localhost:9200')
+                .post(`/${IG_GAMES_V2_READ_ALIAS}/_search?request_cache=true`, (body: any) => {
+                    const serializedBody = JSON.stringify(body);
+
+                    return (
+                        serializedBody.includes('1S6iybBG2xAbM7DEABF5KN') &&
+                        !serializedBody.includes('4aGKa5P7aeU82fdEftOxOW') &&
+                        !serializedBody.includes('4wTyWOTzvANE3QS8Xmz2O6')
+                    );
+                })
+                .reply(200, GAMES_SUCCESS_RESP);
+
+            const event: APIGatewayProxyEvent = mockApiEvent(SITE_NAME, PLATFORM, VIEW_SLUG, SECTION_ID, undefined, {
+                offset: '1',
+                limit: '1',
+            });
+            const result: APIGatewayProxyResult = await lambdaHandler(event);
+
+            expect(result.statusCode).toEqual(200);
+            expect(nock.isDone()).toBe(true);
         });
 
         it('Should return (200) for a successful mobile section games response', async () => {
@@ -88,14 +116,14 @@ describe('Integration Test for Lambda Handler', () => {
                 .reply(200, SECTION_SUCCESS_RESP);
 
             nock('http://localhost:9200')
-                .post(`/${GAMES_INDEX_V2_ALIAS}/_search?request_cache=true`)
+                .post(`/${IG_GAMES_V2_READ_ALIAS}/_search?request_cache=true`)
                 .reply(200, GAMES_SUCCESS_RESP);
 
             const event: APIGatewayProxyEvent = mockApiEvent(SITE_NAME, PLATFORM_MOBILE, VIEW_SLUG, SECTION_ID);
             const result: APIGatewayProxyResult = await lambdaHandler(event);
 
             expect(result.statusCode).toEqual(200);
-            expect(result.body).toEqual(JSON.stringify(MOBILE_SECTION_GAMES_SUCCESS_RESPONSE));
+            expect(parseCompressedBody(result)).toEqual(MOBILE_SECTION_GAMES_SUCCESS_RESPONSE);
         });
 
         it('Should return (200) for ML Suggested section games response', async () => {
@@ -112,17 +140,17 @@ describe('Integration Test for Lambda Handler', () => {
                 .reply(200, ML_SUGGESTED_INDEX_RESP);
 
             nock('http://localhost:9200')
-                .post(`/${GAMES_INDEX_V2_ALIAS}/_search?request_cache=true`)
+                .post(`/${IG_GAMES_V2_READ_ALIAS}/_search?request_cache=true`)
                 .reply(200, SUGGESTED_GAME_SUCCESS_RESPONSE);
 
             nock('http://localhost:9200')
-                .post(`/${GAMES_INDEX_V2_ALIAS}/_search?request_cache=true`)
+                .post(`/${IG_GAMES_V2_READ_ALIAS}/_search?request_cache=true`)
                 .reply(200, SUGGESTED_GAME_SUCCESS_RESPONSE);
             const event = mockApiEvent(SITE_NAME, PLATFORM, VIEW_SLUG, SECTION_SUGGESTED_FOR_YOU_ID, MEMBER_ID);
             const result = await lambdaHandler(event);
 
             expect(result.statusCode).toEqual(200);
-            expect(result.body).toEqual(JSON.stringify(EXPECTED_ML_SUGGESTED_RESPONSE));
+            expect(parseCompressedBody(result)).toEqual(EXPECTED_ML_SUGGESTED_RESPONSE);
         });
 
         it('Should return (200) for a ML Because you played section games response', async () => {
@@ -139,12 +167,12 @@ describe('Integration Test for Lambda Handler', () => {
                 .reply(200, ML_BECAUSE_YOU_PLAYED_INDEX_RESP_V2);
 
             nock('http://localhost:9200')
-                .post(`/${GAMES_INDEX_V2_ALIAS}/_search?request_cache=true`)
+                .post(`/${IG_GAMES_V2_READ_ALIAS}/_search?request_cache=true`)
                 .reply(200, BECAUSE_YOU_PLAYED_GAME_SUCCESS_RESPONSE_V2);
 
             const event = mockApiEvent(SITE_NAME, PLATFORM, VIEW_SLUG, SECTION_BECAUSE_YOU_PLAYED_ID, MEMBER_ID);
             const result = await lambdaHandler(event);
-            const body = JSON.parse(result.body);
+            const body = parseCompressedBody(result);
 
             expect(result.statusCode).toEqual(200);
             expect(Array.isArray(body)).toBe(true);
@@ -168,13 +196,13 @@ describe('Integration Test for Lambda Handler', () => {
                 .reply(200, ML_RECENTLY_PLAYED_INDEX_RESP);
 
             nock('http://localhost:9200')
-                .post(`/${GAMES_INDEX_V2_ALIAS}/_search?request_cache=true`)
+                .post(`/${IG_GAMES_V2_READ_ALIAS}/_search?request_cache=true`)
                 .reply(200, RECENTLY_PLAYED_GAME_SUCCESS_RESPONSE);
 
             const event = mockApiEvent(SITE_NAME, PLATFORM, VIEW_SLUG, SECTION_RECENTLY_PLAYED_ID, MEMBER_ID);
             const result = await lambdaHandler(event);
             expect(result.statusCode).toEqual(200);
-            const body = JSON.parse(result.body);
+            const body = parseCompressedBody(result);
             expect(Array.isArray(body)).toBe(true);
             expect(body.some((game) => game.gameId === 'excluded-game-id')).toBe(false);
             expect(body.some((game) => game.gameId === 'allowed-game-id')).toBe(true);
@@ -194,14 +222,14 @@ describe('Integration Test for Lambda Handler', () => {
                 .reply(200, ML_RECENTLY_PLAYED_INDEX_RESP);
 
             nock('http://localhost:9200')
-                .post(`/${GAMES_INDEX_V2_ALIAS}/_search?request_cache=true`)
+                .post(`/${IG_GAMES_V2_READ_ALIAS}/_search?request_cache=true`)
                 .reply(200, RECENTLY_PLAYED_GAME_SUCCESS_RESPONSE);
 
             const event = mockApiEvent(SITE_NAME, PLATFORM, VIEW_SLUG, SECTION_RECENTLY_PLAYED_ID, MEMBER_ID);
             const result = await lambdaHandler(event);
 
             expect(result.statusCode).toEqual(200);
-            const body = JSON.parse(result.body);
+            const body = parseCompressedBody(result);
 
             const orderedGameIds = body.map((game: { gameId: string }) => game.gameId);
             expect(orderedGameIds).toEqual([
@@ -222,12 +250,12 @@ describe('Integration Test for Lambda Handler', () => {
                 .reply(200, SECTION_SUCCESS_RESP);
 
             nock('http://localhost:9200')
-                .post(`/${GAMES_INDEX_V2_ALIAS}/_search?request_cache=true`)
+                .post(`/${IG_GAMES_V2_READ_ALIAS}/_search?request_cache=true`)
                 .reply(200, NOT_FOUND_RESPONSE);
 
             const event: APIGatewayProxyEvent = mockApiEvent(SITE_NAME, PLATFORM, VIEW_SLUG, SECTION_ID);
             const result: APIGatewayProxyResult = await lambdaHandler(event);
-            const body = JSON.parse(result.body);
+            const body = parseCompressedBody(result);
 
             expect(result.statusCode).toEqual(200);
             expect(body).toEqual([]);
@@ -239,7 +267,7 @@ describe('Integration Test for Lambda Handler', () => {
                 .reply(200, SECTION_SUCCESS_RESP);
 
             nock('http://localhost:9200')
-                .post(`/${GAMES_INDEX_V2_ALIAS}/_search?request_cache=true`)
+                .post(`/${IG_GAMES_V2_READ_ALIAS}/_search?request_cache=true`)
                 .reply(200, GAMES_NO_INNER_HITS_RESP);
 
             const event: APIGatewayProxyEvent = mockApiEvent(SITE_NAME, PLATFORM, VIEW_SLUG, SECTION_ID);
@@ -266,7 +294,7 @@ describe('Integration Test for Lambda Handler', () => {
         it('Should return (400) to the client if sitename is missing', async () => {
             const event: APIGatewayProxyEvent = mockApiEvent(undefined, PLATFORM, VIEW_SLUG, SECTION_ID);
             const result: APIGatewayProxyResult = await lambdaHandler(event);
-            const body = JSON.parse(result.body);
+            const body = parseCompressedBody<{ code: string; message: string }>(result);
 
             expect(result.statusCode).toEqual(400);
             expect(body.code).toBe(ErrorCode.InvalidRequest);
@@ -276,7 +304,7 @@ describe('Integration Test for Lambda Handler', () => {
         it('Should return (400) to the client if platform is missing', async () => {
             const event: APIGatewayProxyEvent = mockApiEvent(SITE_NAME, undefined, VIEW_SLUG, SECTION_ID);
             const result: APIGatewayProxyResult = await lambdaHandler(event);
-            const body = JSON.parse(result.body);
+            const body = parseCompressedBody<{ code: string; message: string }>(result);
 
             expect(result.statusCode).toEqual(400);
             expect(body.code).toBe(ErrorCode.InvalidRequest);
@@ -286,7 +314,19 @@ describe('Integration Test for Lambda Handler', () => {
         it('Should return (400) to the client if viewslug is missing', async () => {
             const event: APIGatewayProxyEvent = mockApiEvent(SITE_NAME, PLATFORM, undefined, SECTION_ID);
             const result: APIGatewayProxyResult = await lambdaHandler(event);
-            const body = JSON.parse(result.body);
+            const body = parseCompressedBody<{ code: string; message: string }>(result);
+
+            expect(result.statusCode).toEqual(400);
+            expect(body.code).toBe(ErrorCode.InvalidRequest);
+            expect(body.message).toBe(getErrorMessage(ErrorCode.InvalidRequest));
+        });
+
+        it('Should return (400) when offset query param is invalid', async () => {
+            const event: APIGatewayProxyEvent = mockApiEvent(SITE_NAME, PLATFORM, VIEW_SLUG, SECTION_ID, undefined, {
+                offset: '-1',
+            });
+            const result: APIGatewayProxyResult = await lambdaHandler(event);
+            const body = parseCompressedBody<{ code: string; message: string }>(result);
 
             expect(result.statusCode).toEqual(400);
             expect(body.code).toBe(ErrorCode.InvalidRequest);
@@ -308,7 +348,7 @@ describe('Integration Test for Lambda Handler', () => {
 
             const event = mockApiEvent(SITE_NAME, PLATFORM, VIEW_SLUG, SECTION_SUGGESTED_FOR_YOU_ID, '');
             const result = await lambdaHandler(event);
-            const body = JSON.parse(result.body);
+            const body = parseCompressedBody<{ code: string; message: string }>(result);
 
             expect(result.statusCode).toEqual(400);
             expect(body.code).toBe(ErrorCode.InvalidRequest);

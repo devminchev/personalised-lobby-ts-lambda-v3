@@ -31,7 +31,7 @@ sequenceDiagram
     L->>OS: ML_RECENTLY_PLAYED_ALIAS (member/site)
     OS-->>L: recently_played_games[]
     L->>L: top30Desc + min threshold
-    L->>OS: GAMES_V2_INDEX_ALIAS (game skins)
+    L->>OS: IG_GAMES_V2_READ_ALIAS (game skins)
     OS-->>L: Game + sitegame hits
     L->>L: Filter metadata tag exclude_recently_played
     L->>L: gamesPayloadByGame(recentlyPlayedMapper)
@@ -52,7 +52,7 @@ sequenceDiagram
     - Enforce `NUMBER_OF_MIN_GAMES` (3), cap consideration at `MAX_NUMBER_OF_GAMES` (30) and seed the
       first skin with a default fallback.
 3. **Game enrichment & filtering**
-    - Fetch game + sitegame documents from `GAMES_V2_INDEX_ALIAS` using
+    - Fetch game + sitegame documents from `IG_GAMES_V2_READ_ALIAS` using
       `getMLRecommendedGamesFromGamesIndexBySkin`.
     - Drop any result whose metadata tags include the exclusion tag `exclude_recently_played`.
 4. **Payload construction**

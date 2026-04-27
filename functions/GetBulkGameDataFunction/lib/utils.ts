@@ -5,6 +5,7 @@ import {
     overrideGameLocaleValues,
     replaceEmptyStringsWithNull,
     tryGetValueFromLocalised,
+    resolveGameProp,
 } from 'os-client';
 import { FreshGameResponse } from './interface';
 
@@ -12,10 +13,11 @@ export const createResponseObject = (
     gameHits: FullApiResponse[],
     userLocale: string,
     spaceLocale: string,
+    gameSectionsMap: Record<string, string[]>,
 ): FreshGameResponse[] => {
     const gamePayload = gameHits.map((item: FullApiResponse) => {
         const gameData = item.innerHit?.game;
-        const rawConfig = replaceEmptyStringsWithNull(gameData?.gamePlatformConfig[spaceLocale]);
+        const rawConfig = replaceEmptyStringsWithNull(gameData?.gamePlatformConfig);
         const gamePlatformConfig: GamePlatformConfig = rawConfig as GamePlatformConfig;
         const localizedGameTitle = tryGetValueFromLocalised(userLocale, spaceLocale, gameData?.title, null);
         const launchCode = gameData?.launchCode?.[spaceLocale];
@@ -31,6 +33,7 @@ export const createResponseObject = (
         );
         const localizedMaxBet = tryGetValueFromLocalised(userLocale, spaceLocale, overrideMaxBet, null);
         const localizedMinBet = tryGetValueFromLocalised(userLocale, spaceLocale, overrideMinBet, null);
+        const siteGameId = item.hit?.siteGame?.id;
 
         return {
             id: gameData?.id,
@@ -38,26 +41,28 @@ export const createResponseObject = (
             launchCode: launchCode,
             maxBet: localizedMaxBet || null,
             minBet: localizedMinBet || null,
-            gameSkin: gamePlatformConfig?.gameSkin,
+            gameSkin: gameData?.gameSkin || '',
             gameStudio: gamePlatformConfig?.gameStudio,
             gameProvider: gamePlatformConfig?.gameProvider,
+            gameAggregator: gamePlatformConfig?.gameAggregator,
             subGameType: gamePlatformConfig?.subGameType,
             federalGameType: gamePlatformConfig?.federalGameType,
             mobileDemoUrl: gamePlatformConfig?.mobileDemoUrl,
-            rtp: gamePlatformConfig?.rtp,
+            rtp: gameData?.rtp,
             demoUrl: gamePlatformConfig?.demoUrl,
             mobileGameLoaderFileName: gamePlatformConfig?.mobileGameLoaderFileName,
             gameLoaderFileName: gamePlatformConfig?.gameLoaderFileName || null,
             realUrl: gamePlatformConfig?.realUrl,
             mobileRealUrl: gamePlatformConfig?.mobileRealUrl,
-            name: gamePlatformConfig?.name,
-            mobileGameSkin: gamePlatformConfig?.mobileGameSkin,
-            mobileName: gamePlatformConfig?.mobileName,
+            name: gameData?.gameName || '',
+            mobileGameSkin: gameData?.mobileGameSkin?.trim() ? gameData.mobileGameSkin : null,
+            mobileName: gameData?.mobileGameName?.trim() ? gameData.mobileGameName : null,
             gameType: gamePlatformConfig?.gameType,
             contentType: gameData?.contentType,
-            entryTitle: gameData?.entryTitle?.[spaceLocale],
-            vendor: gameData?.vendor?.[spaceLocale],
-            platform: gameData?.platformVisibility?.[spaceLocale] ?? [],
+            entryTitle: resolveGameProp(gameData?.entryTitle, spaceLocale, ''),
+            vendor: resolveGameProp(gameData?.vendor, spaceLocale, ''),
+            platform: resolveGameProp(gameData?.platformVisibility, spaceLocale, []),
+            sections: siteGameId ? (gameSectionsMap[siteGameId] ?? []) : [],
         };
     });
 

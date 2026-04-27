@@ -25,8 +25,9 @@ import {
     THEME_INDEX_READ_ALIAS,
     extendedViewSlugProp,
     getClient,
+    parseCompressedBody,
 } from 'os-client';
-import { buildSectionsQuery, getSections } from '../lib/processSections';
+import { buildSectionsQuery, getSections } from '../control/lib/processSections';
 import {
     buildBannerSection,
     buildBrazePromosSection,
@@ -38,7 +39,7 @@ import {
     buildPersonalisedSection,
     buildQuickLinksSection,
     buildSearchResultsSection,
-} from '../lib/sectionBuilders';
+} from '../control/lib/sectionBuilders';
 import {
     IBannerSectionOS,
     IDFGSectionOS,
@@ -49,9 +50,9 @@ import {
     IPersonalisedSectionOS,
     IQuickLinksSectionOS,
     ISearchPlaceholderSectionOS,
-} from '../lib/types';
-import { getView, GetViewParams } from '../lib/processViews';
-import { getTheme } from '../lib/processTheme';
+} from '../control/lib/types';
+import { getView, GetViewParams } from '../control/lib/processViews';
+import { getTheme } from '../control/lib/processTheme';
 
 const EMPTY_BODY_RESP = {
     name: '',
@@ -897,7 +898,7 @@ describe('Integration Test for Lambda Handler', () => {
         const result: APIGatewayProxyResult = await lambdaHandler(event);
 
         expect(result.statusCode).toEqual(200);
-        expect(result.body).toEqual(JSON.stringify(GET_SECTIONS_SUCCESS_RESPONSE));
+        expect(parseCompressedBody(result)).toEqual(GET_SECTIONS_SUCCESS_RESPONSE);
     });
 
     it('should return (204) for non existing site name', async () => {

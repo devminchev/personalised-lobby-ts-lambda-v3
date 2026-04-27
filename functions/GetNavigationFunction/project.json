@@ -45,5 +45,5 @@
   "dependencies": [
     "os-client"
   ],
-  "version": "0.10.7"
+  "version": "0.15.5"
 }

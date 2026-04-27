@@ -39,6 +39,21 @@ export enum ErrorCode {
     MissingClassification = 'MISSING_CLASSIFICATION',
     InvalidSectionSlug = 'INVALID_SECTION_SLUG',
     NoGameShuffleData = 'NO_GAME_SHUFFLE_DATA',
+    MissingVariant = 'MISSING_VARIANT',
+    VariantMemberVentureMismatch = 'VARIANT_MEMBER_VENTURE_MISMATCH',
+    // PostGamesPayloadFunction error codes
+    MissingRequestBody = 'MISSING_REQUEST_BODY',
+    UnsupportedBodyEncoding = 'UNSUPPORTED_BODY_ENCODING',
+    UnauthorizedWebhook = 'UNAUTHORIZED_WEBHOOK',
+    InvalidWebhookPayload = 'INVALID_WEBHOOK_PAYLOAD',
+    MissingGamePayload = 'MISSING_GAME_PAYLOAD',
+    MissingGameRequiredFields = 'MISSING_GAME_REQUIRED_FIELDS',
+    MissingVersionTimestamp = 'MISSING_VERSION_TIMESTAMP',
+    InvalidVersionTimestamp = 'INVALID_VERSION_TIMESTAMP',
+    InvalidVersionValue = 'INVALID_VERSION_VALUE',
+    OpenSearchThrottled = 'OPENSEARCH_THROTTLED',
+    OpenSearchTemporaryFailure = 'OPENSEARCH_TEMPORARY_FAILURE',
+    OpenSearchIndexingError = 'OPENSEARCH_INDEXING_ERROR',
 }
 
 export const errorMessages: Record<ErrorCode, string> = {
@@ -82,6 +97,22 @@ export const errorMessages: Record<ErrorCode, string> = {
     [ErrorCode.InvalidClassification]: 'Invalid classification was given for section view, returning base response',
     [ErrorCode.MissingClassification]: 'undefined classification was given for section view',
     [ErrorCode.InvalidSectionSlug]: 'Invalid section slug',
+    [ErrorCode.MissingVariant]: 'No variant record found for user',
+    [ErrorCode.VariantMemberVentureMismatch]:
+        'There is a mismatch between the passed-in venture and the variant record memberid',
+    // PostGamesPayloadFunction messages
+    [ErrorCode.MissingRequestBody]: 'Missing request body',
+    [ErrorCode.UnsupportedBodyEncoding]: 'Base64-encoded request bodies are not supported for this endpoint',
+    [ErrorCode.UnauthorizedWebhook]: 'Unauthorized',
+    [ErrorCode.InvalidWebhookPayload]: 'Webhook payload is invalid',
+    [ErrorCode.MissingGamePayload]: 'Missing game payload',
+    [ErrorCode.MissingGameRequiredFields]: 'Missing required fields',
+    [ErrorCode.MissingVersionTimestamp]: 'Missing modifiedPayload.updatedAt (required to compute external version).',
+    [ErrorCode.InvalidVersionTimestamp]: 'Invalid updatedAt ISO date',
+    [ErrorCode.InvalidVersionValue]: 'Computed externalVersion is not a safe positive integer',
+    [ErrorCode.OpenSearchThrottled]: 'OpenSearch throttling (429). Let Contentful retry with backoff.',
+    [ErrorCode.OpenSearchTemporaryFailure]: 'OpenSearch temporary failure',
+    [ErrorCode.OpenSearchIndexingError]: 'Error indexing data to OpenSearch',
 };
 
 export interface clientError extends Error {

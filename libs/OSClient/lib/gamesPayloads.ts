@@ -7,7 +7,7 @@ import {
     FullApiResponseByGame,
 } from './sharedInterfaces/interfaces';
 import { tryGetValueFromLocalised } from './localization';
-import { extractBynderObject, pickGameOrSiteGameValue } from './utils';
+import { extractBynderObject, pickGameOrSiteGameValue, resolveGameProp } from './utils';
 
 /**
  * Module overview
@@ -144,11 +144,13 @@ export const computeDerivedPayload = (
         null,
     );
 
+    const shouldConsiderMobile = platform.toLowerCase() !== 'web' && gameData?.mobileOverride;
+
     const gameType = gamePlatformObject?.gameType?.type ?? null;
-    const shouldConsiderMobile = platform.toLowerCase() !== 'web' && gamePlatformObject?.mobileOverride;
-    const gameName = shouldConsiderMobile ? gamePlatformObject?.mobileName : gamePlatformObject?.name;
+
+    const gameName = shouldConsiderMobile ? gameData?.mobileGameName : gameData?.gameName;
     const gameDemoUrl = shouldConsiderMobile ? gamePlatformObject?.mobileDemoUrl : gamePlatformObject?.demoUrl;
-    const gameSkin = shouldConsiderMobile ? gamePlatformObject?.mobileGameSkin : gamePlatformObject?.gameSkin;
+    const gameSkin = shouldConsiderMobile ? gameData?.mobileGameSkin : gameData?.gameSkin;
     const gameRealUrl = shouldConsiderMobile ? gamePlatformObject?.mobileRealUrl : gamePlatformObject?.realUrl;
     const headlessJackpot = siteGameData?.headlessJackpot?.[spaceLocale] as unknown as object | undefined;
     const liveHidden = siteGameData?.liveHidden?.[spaceLocale] as unknown as boolean | undefined;
@@ -158,7 +160,7 @@ export const computeDerivedPayload = (
         (extractBynderObject(loggedOutForegroundLogoMedia) as object | null) ?? null;
     const backgroundMedia = (extractBynderObject(loggedInBackgroundMedia) as object | null) ?? null;
     const loggedOutBackgroundMediaObj = (extractBynderObject(loggedOutBackgroundMedia) as object | null) ?? null;
-    const tagsVal = pickGameOrSiteGameValue(siteGameData?.tags?.[spaceLocale], gameData?.tags?.[spaceLocale], null);
+    const tagsVal = pickGameOrSiteGameValue(siteGameData?.tags?.[spaceLocale], gameData?.tags, null);
     const tags = Array.isArray(tagsVal) ? (tagsVal as string[]) : undefined;
     const localizedTitle = tryGetValueFromLocalised(localeOverride, spaceLocale, gameData?.title, '');
 
@@ -257,7 +259,7 @@ const constructGamesPayload = <T>(
     return gameHits.map((item: GameHitType) => {
         const gameData = getGameData(item);
         const siteGameData = getSiteGameData(item);
-        const gamePlatformObject = gameData?.gamePlatformConfig[spaceLocale] || ({} as GamePlatformConfig);
+        const gamePlatformObject = gameData?.gamePlatformConfig || ({} as GamePlatformConfig);
 
         const derived = computeDerivedPayload(
             siteGameData,
@@ -349,8 +351,8 @@ export const payloadBuilder = (
         gameSkin: computed.gameSkin, // mobileGameSkin
         ...(computed.imagePattern ? { imgUrlPattern: computed.imagePattern } : {}),
         ...(computed.loggedOutImgUrlPattern ? { loggedOutImgUrlPattern: computed.loggedOutImgUrlPattern } : {}),
-        ...(gameData?.progressiveJackpot?.[spaceLocale]
-            ? { isProgressiveJackpot: gameData.progressiveJackpot[spaceLocale] }
+        ...(resolveGameProp(gameData?.progressiveJackpot, spaceLocale, false)
+            ? { isProgressiveJackpot: resolveGameProp(gameData?.progressiveJackpot, spaceLocale, false) }
             : {}),
         realUrl: computed.gameRealUrl, // mobileRealUrl
         ...(computed.representativeColor ? { representativeColor: computed.representativeColor } : {}),
@@ -365,8 +367,8 @@ export const payloadBuilder = (
         ...(computed.backgroundMedia ? { backgroundMedia: computed.backgroundMedia } : {}),
         ...(computed.loggedOutBackgroundMedia ? { loggedOutBackgroundMedia: computed.loggedOutBackgroundMedia } : {}),
         ...(computed.tags ? { tags: computed.tags } : {}),
-        ...(showWebComponent && gameData?.webComponentData
-            ? { webComponentData: gameData.webComponentData[spaceLocale] }
+        ...(showWebComponent && resolveGameProp(gameData?.webComponentData, spaceLocale, undefined)
+            ? { webComponentData: resolveGameProp(gameData?.webComponentData, spaceLocale, undefined) }
             : {}),
         ...(computed.headlessJackpot ? { headlessJackpot: computed.headlessJackpot } : {}),
         ...(computed.liveHidden ? { liveHidden: computed.liveHidden } : {}),

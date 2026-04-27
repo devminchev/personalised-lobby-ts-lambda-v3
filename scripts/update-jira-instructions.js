@@ -1,16 +1,14 @@
 #!/usr/bin/env node
 
-const axios = require('axios');
+const { execFileSync } = require('child_process');
 const fs = require('fs').promises;
 const path = require('path');
 
-// Configuration - using same base URL as other scripts
-const JIRA_INSTRUCTIONS_ENDPOINT = 'http://nja.psnative.pgt.gaia/ticket';
-
 // Environment mapping - maps CI environment names to target deployment environments
 const ENVIRONMENT_CONFIG = {
-    stg_eu00: { targetDeployEnv: 'prod_eu00', region: 'eu' },
-    stg_na03: { targetDeployEnv: 'prod_na03', region: 'na' },
+    stg_eu00: { targetDeployEnv: 'prod_eu00' },
+    stg_eu03: { targetDeployEnv: 'prod_eu03' },
+    stg_na03: { targetDeployEnv: 'prod_na03' },
 };
 
 // GitLab pipeline URL (standard for all lambdas)
@@ -26,7 +24,7 @@ const envArg = args.find((arg) => arg.startsWith('--environment='));
 
 if (!envArg) {
     console.error('Error: --environment parameter is required');
-    console.error('Usage: ./update-jira-instructions.js --environment=stg_eu00|stg_na03');
+    console.error('Usage: ./update-jira-instructions.js --environment=stg_eu00|stg_eu03|stg_na03');
     process.exit(1);
 }
 
@@ -69,9 +67,8 @@ async function getRelComponent(folder) {
             );
         }
 
-        // Warn if both relComponent and skipRelTicket are present
         if (packageJson.skipRelTicket === true) {
-            console.warn(`⚠️  Warning: ${folder} has both relComponent and skipRelTicket=true. Using relComponent.`);
+            console.warn(`Warning: ${folder} has both relComponent and skipRelTicket=true. Using relComponent.`);
         }
 
         return packageJson.relComponent;
@@ -84,6 +81,7 @@ async function getRelComponent(folder) {
 function getAwsDeploymentEnv(environment) {
     const mapping = {
         stg_eu00: 'aws-prod-eu00',
+        stg_eu03: 'aws-prod-eu03',
         stg_na03: 'aws-prod-na03',
     };
     return mapping[environment];
@@ -135,48 +133,34 @@ function generateRollbackInstructions(packageKey, rollbackVersion, folder, targe
     return `Run rollback pipeline for ${packageKey}:\n${link}`;
 }
 
-// Function to update instructions for a Jira ticket
-async function updateJiraInstructions(
-    ticketId,
-    deploymentInstructions,
-    rollbackInstructions,
-    relComponent,
-    deploymentEnv,
-) {
-    const url = `${JIRA_INSTRUCTIONS_ENDPOINT}/${ticketId}/instructions`;
-    const payload = {
-        deployment_instructions: deploymentInstructions,
-        rollback_instructions: rollbackInstructions,
-        rel_component: relComponent, // Used to lookup current live version for rollback
-        deployment_env: deploymentEnv, // Pass deployment environment to automation service
-    };
+// Function to update instructions for a Jira ticket via NJA CLI
+function updateJiraInstructions(ticketId, deploymentInstructions, rollbackInstructions, relComponent, deploymentEnv) {
+    const cliArgs = [
+        'ticket',
+        'instructions',
+        ticketId,
+        '--deployment-instructions',
+        deploymentInstructions,
+        '--rollback-instructions',
+        rollbackInstructions,
+        '--rel-component',
+        relComponent,
+        '--deployment-env',
+        deploymentEnv,
+    ];
 
     console.log(`Updating instructions for ticket ${ticketId}`);
 
     try {
-        const response = await axios.post(url, payload, {
-            headers: {
-                'Content-Type': 'application/json',
-                apikey: 'secret',
-            },
-        });
-
-        console.log(`✓ Successfully updated instructions for ${ticketId}`);
-
-        return {
-            success: true,
-            ticketId: ticketId,
-            response: response.data,
-        };
+        execFileSync('nja', cliArgs, { encoding: 'utf-8' });
+        console.log(`Successfully updated instructions for ${ticketId}`);
+        return { success: true, ticketId };
     } catch (error) {
-        const errorMessage = error.response?.data || error.message;
-        const statusCode = error.response?.status || 'Unknown';
-        console.error(`✗ Failed to update instructions for ticket ${ticketId}: HTTP ${statusCode}: ${errorMessage}`);
-        return {
-            success: false,
-            ticketId: ticketId,
-            error: `HTTP ${statusCode}: ${errorMessage}`,
-        };
+        const stdout = error.stdout || '';
+        const stderr = error.stderr || '';
+        const errorDetail = stdout || stderr || error.message;
+        console.error(`Failed to update instructions for ticket ${ticketId}: ${errorDetail}`);
+        return { success: false, ticketId, error: errorDetail };
     }
 }
 
@@ -209,10 +193,11 @@ function validateInput(versions) {
     );
 
     if (ticketsWithData.length === 0) {
-        throw new Error('No tickets with relTicket IDs, versions, and folders found in versions.json');
+        return false;
     }
 
     console.log(`Found ${ticketsWithData.length} tickets to update instructions for`);
+    return true;
 }
 
 // Main execution
@@ -227,7 +212,15 @@ async function main() {
     try {
         // Parse and validate the JSON input
         const versions = JSON.parse(inputData);
-        validateInput(versions);
+        const hasTickets = validateInput(versions);
+
+        if (!hasTickets) {
+            console.log('No tickets with relTicket IDs found in versions.json - nothing to update, skipping.');
+            console.log(
+                '\nNo tickets to update instructions for - skipping (this is expected when all functions use skipRelTicket)',
+            );
+            return;
+        }
 
         // Extract ticket data
         const ticketsToUpdate = extractTicketData(versions);
@@ -244,7 +237,7 @@ async function main() {
                 const shouldSkip = await shouldSkipRelTicket(ticket.folder);
                 if (shouldSkip) {
                     console.log(
-                        `⏭️  Skipping ${ticket.packageKey} - marked as skipRelTicket=true (no JIRA instruction update needed)`,
+                        `Skipping ${ticket.packageKey} - marked as skipRelTicket=true (no JIRA instruction update needed)`,
                     );
                     results.push({
                         packageKey: ticket.packageKey,
@@ -279,7 +272,7 @@ async function main() {
                     ticket.ticketId,
                 );
 
-                const result = await updateJiraInstructions(
+                const result = updateJiraInstructions(
                     ticket.ticketId,
                     deploymentInstructions,
                     rollbackInstructions,
@@ -330,10 +323,10 @@ async function main() {
             console.log(`\nSuccessful instruction updates:`);
             for (const result of successful) {
                 if (result.skipped) {
-                    console.log(`  ⏭️  ${result.packageKey} (skipped - no REL ticket needed)`);
+                    console.log(`  ${result.packageKey} (skipped - no REL ticket needed)`);
                 } else {
                     console.log(
-                        `  ✓ ${result.packageKey} → ${result.ticketId} (${result.relComponent} v${result.version})`,
+                        `  ${result.packageKey} -> ${result.ticketId} (${result.relComponent} v${result.version})`,
                     );
                 }
             }
@@ -343,21 +336,17 @@ async function main() {
             console.log(`\nFailed instruction updates:`);
             for (const result of failed) {
                 const error = errors.find((e) => e.ticketId === result.ticketId);
-                console.log(`  ✗ ${result.packageKey} → ${result.ticketId}${error ? `: ${error.error}` : ''}`);
+                console.log(`  ${result.packageKey} -> ${result.ticketId}${error ? `: ${error.error}` : ''}`);
             }
         }
 
-        // Instruction update failures should not fail the pipeline (allow_failure: true)
+        // Instruction update failures exit with error but pipeline uses allow_failure: true
         if (failed.length > 0) {
-            console.log(
-                `\n⚠️  ${failed.length} instruction update(s) failed but pipeline continues (allow_failure: true)`,
-            );
-            console.log('This job will show as yellow/warning in GitLab CI but will not block the pipeline');
-            // Exit with error code to make job show as failed/warning, but pipeline continues due to allow_failure
+            console.log(`\n${failed.length} instruction update(s) failed but pipeline continues (allow_failure: true)`);
             process.exit(1);
         }
 
-        console.log('\n✅ All instruction updates completed successfully');
+        console.log('\nAll instruction updates completed successfully');
     } catch (error) {
         console.error('Error:', error.message);
         process.exit(1);

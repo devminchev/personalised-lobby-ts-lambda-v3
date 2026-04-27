@@ -1,9 +1,9 @@
-import { createError, logError, ErrorCode } from './errors';
+import { createError, ErrorCode } from './errors';
 import { logMessage } from './logger';
 import { IClient, IBucket } from './osClient';
 import { IGamesSource, ISiteGameToLayout } from './sharedInterfaces/search';
 
-export const validateGameHits = <T>(data: T[], siteName: string, platform: string): T => {
+export const validateGameHits = <T>(data: T[], siteName?: string, platform?: string): T => {
     if (data.length <= 0) {
         logMessage(
             'warn',

@@ -1,9 +1,49 @@
 import { DEFAULT_ENVIRONMENT, VALID_ENVIRONMENTS } from './constants';
 import { logError, createError, ErrorCode } from './errors';
 import { IOpenSearchQuery, LocalizedField } from './sharedInterfaces/common';
-import { IBynderAsset } from './sharedInterfaces/interfaces';
+import { IBynderAsset, SanitizedBynder } from './sharedInterfaces/interfaces';
 
 export const GAME_SEARCH_QUERY_LIMIT = 5000;
+
+/**
+ * Resolves a game property that may be either flat (new index format)
+ * or nested under a locale key (old index format).
+ *
+ * Tries the flat value first; falls back to value[spaceLocale] for
+ * backward compatibility during the index migration.
+ *
+ * - Primitives (string, boolean, number) → returned as-is (new format).
+ * - Arrays → returned as-is (new format, e.g. tags, platformVisibility).
+ * - Objects → if the object contains a `spaceLocale` key it is treated
+ *   as the old `LocalizedField<T>` wrapper and `value[spaceLocale]` is
+ *   returned; otherwise the object itself is the flat value (new format,
+ *   e.g. gamePlatformConfig, webComponentData).
+ */
+// This will be needed if we ever go back to having localisation for the non-localised properties on the game.
+// This function will be needed if we ever go back to having localisation for the non-localised properties on the game.
+// MR carrying fallback cleanup changes - GTECH-1320067-remove-fallback
+export function resolveGameProp<T>(
+    value: T | LocalizedField<T> | null | undefined,
+    spaceLocale: string,
+    defaultValue: T,
+): T {
+    if (value == null) return defaultValue;
+
+    // Primitives are always flat (new format)
+    if (typeof value !== 'object') return value as T;
+
+    // Arrays are always flat (new format)
+    if (Array.isArray(value)) return value as T;
+
+    // Object: if it contains the spaceLocale key, it's the old localized format
+    const obj = value as Record<string, unknown>;
+    if (spaceLocale in obj) {
+        return (obj[spaceLocale] as T) ?? defaultValue;
+    }
+
+    // Otherwise it's a flat object (new format: gamePlatformConfig, webComponentData, etc.)
+    return value as T;
+}
 
 /* This has to go away after RRC venture name is updated correctly in Contentful*/
 type VentureNameKey = 'rainbowrichescasino';
@@ -18,7 +58,8 @@ export const patchVentureName = (siteName: string): string => {
 };
 /* ----------------------------------------------------------------------------- */
 export const validators = {
-    siteName: (v: string): boolean => typeof v === 'string' && /^[a-z]+$/.test(v),
+    siteName: (v: string): boolean => typeof v === 'string' && /^(?!all$)[a-z]+$/.test(v),
+    allSiteName: (v: string): boolean => v === 'all',
     platform: (v: string): boolean => typeof v === 'string' && ['ios', 'android', 'web'].includes(v.toLowerCase()),
     viewSlug: (v: string): boolean => typeof v === 'string' && /^[a-z0-9][a-z0-9-]*$/.test(v),
     slug: (v: string): boolean => typeof v === 'string' && /^[a-z0-9][a-z0-9-]*$/.test(v),
@@ -72,6 +113,25 @@ export function pickGameOrSiteGameValue<T>(siteGame: T | undefined, game: T | un
     return defaultsTo;
 }
 
+/**
+ * Resolves a game-level property with a fallback to its gamePlatformConfig
+ * equivalent.  Used for properties (gameName, gameSkin, mobileGameName,
+ * mobileGameSkin, mobileOverride, rtp) that may exist both on the game
+ * object and inside the resolved gamePlatformConfig.
+ *
+ * Tries the game value first; falls back to the config value; returns
+ * defaultValue if neither is truthy.
+ */
+export function pickGameOrConfigValue<T>(
+    gameValue: T | null | undefined,
+    configValue: T | null | undefined,
+    defaultValue: T,
+): T {
+    if (gameValue) return gameValue;
+    if (configValue) return configValue;
+    return defaultValue;
+}
+
 export const createGamesQuery = (siteGameIds: string[], spaceLocale: string, platform: string): IOpenSearchQuery => {
     const environmentField = `siteGame.environmentVisibility.${spaceLocale}.keyword`;
     const platformField = `siteGame.platformVisibility.${spaceLocale}.keyword`;
@@ -115,15 +175,15 @@ export const createGamesQuery = (siteGameIds: string[], spaceLocale: string, pla
                                             'game.videoUrlPattern',
                                             'game.tags',
                                             'game.webComponentData',
-                                            `game.gamePlatformConfig.${spaceLocale}.name`,
-                                            `game.gamePlatformConfig.${spaceLocale}.demoUrl`,
-                                            `game.gamePlatformConfig.${spaceLocale}.gameSkin`,
-                                            `game.gamePlatformConfig.${spaceLocale}.realUrl`,
-                                            `game.gamePlatformConfig.${spaceLocale}.mobileOverride`,
-                                            `game.gamePlatformConfig.${spaceLocale}.mobileName`,
-                                            `game.gamePlatformConfig.${spaceLocale}.mobileDemoUrl`,
-                                            `game.gamePlatformConfig.${spaceLocale}.mobileGameSkin`,
-                                            `game.gamePlatformConfig.${spaceLocale}.mobileRealUrl`,
+                                            'game.gameName',
+                                            'game.gameSkin',
+                                            'game.mobileGameName',
+                                            'game.mobileGameSkin',
+                                            'game.mobileOverride',
+                                            `game.gamePlatformConfig.demoUrl`,
+                                            `game.gamePlatformConfig.realUrl`,
+                                            `game.gamePlatformConfig.mobileDemoUrl`,
+                                            `game.gamePlatformConfig.mobileRealUrl`,
                                         ],
                                     },
                                 },
@@ -246,8 +306,8 @@ export const createQueryKeysForInfoAndConfig = (
         match: {},
     };
     ventureMatchExpression.match[ventureKey] = ventureId;
-    const nameKey = `game.gamePlatformConfig.${spaceLocale}.name.keyword`;
-    const mobileNameKey = `game.gamePlatformConfig.${spaceLocale}.mobileName.keyword`;
+    const nameKey = `game.gameName`;
+    const mobileNameKey = `game.mobileGameName`;
     const nameTerm: Record<string, Record<string, string>> = {
         term: {},
     };
@@ -363,8 +423,8 @@ export const replaceEmptyStringsWithNull = (item: string | object | string[]): s
 
 // For prop overrides where the same prop is used in the base and wrapped models (like GameV2 and SiteGameV2 models)
 export interface coalescePropValueOptions<T> {
-    overrideField?: LocalizedField<T>;
-    baseField?: LocalizedField<T>;
+    overrideField?: LocalizedField<T> | T;
+    baseField?: LocalizedField<T> | T;
     spaceLocale: string;
     defaultFallback: T;
 }
@@ -391,11 +451,39 @@ export const coalescePropValue = <T>({
     spaceLocale,
     defaultFallback,
 }: coalescePropValueOptions<T>): T => {
-    return overrideField?.[spaceLocale] ?? baseField?.[spaceLocale] ?? defaultFallback;
+    const resolve = (field: LocalizedField<T> | T | undefined): T | null | undefined => {
+        if (field == null) return field;
+        if (typeof field !== 'object') return field as T;
+        if (Array.isArray(field)) return field as T;
+        const obj = field as Record<string, unknown>;
+        if (spaceLocale in obj) return obj[spaceLocale] as T;
+        return field as T;
+    };
+    return resolve(overrideField) ?? resolve(baseField) ?? defaultFallback;
 };
 
-export const extractBynderObject = (bynderObject: IBynderAsset[] | null): IBynderAsset | null => {
-    return bynderObject?.[0] ?? null;
+const bynderAssetProps = (asset: IBynderAsset): SanitizedBynder => ({
+    name: asset?.name,
+    type: asset?.type,
+    width: asset?.width,
+    height: asset?.height,
+    orientation: asset?.orientation,
+    original: asset?.original,
+    ...(asset?.tags?.length ? { tags: asset?.tags } : {}),
+    thumbnails: {
+        transformBaseUrl: asset?.thumbnails?.transformBaseUrl,
+        original: asset?.thumbnails?.original,
+    },
+});
+
+export const extractBynderObject = (bynderObject: IBynderAsset[] | null): SanitizedBynder | null => {
+    const bynderObj = bynderObject?.[0];
+    return bynderObj ? bynderAssetProps(bynderObj) : null;
+};
+
+export const sanitiseBynderAssets = (bynderAssets: IBynderAsset[] | null): SanitizedBynder[] | null => {
+    if (!bynderAssets?.length) return null;
+    return bynderAssets.map(bynderAssetProps);
 };
 
 /**
@@ -412,3 +500,13 @@ export function sortByRanking<T>(arr: T[], field: keyof T, direction: 'asc' | 'd
         return direction === 'asc' ? aVal - bVal : bVal - aVal;
     });
 }
+
+/**
+ * Returns the size of a JSON payload in megabytes.
+ * If a string is provided, it is assumed to be already stringified JSON and is measured directly.
+ * Otherwise, the value is stringified before measuring.
+ */
+export const jsonSizeInMb = (data: unknown): number => {
+    const asString = typeof data === 'string' ? data : JSON.stringify(data);
+    return Buffer.byteLength(asString, 'utf8') / (1024 * 1024);
+};

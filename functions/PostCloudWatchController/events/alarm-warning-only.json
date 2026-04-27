@@ -1,0 +1,28 @@
+{
+    "version": "0",
+    "id": "abc12345-0000-1111-2222-def678901240",
+    "source": "aws.cloudwatch",
+    "account": "123456789012",
+    "time": "2026-04-01T17:58:00Z",
+    "region": "eu-west-1",
+    "resources": [
+        "arn:aws:cloudwatch:eu-west-1:123456789012:alarm:breaker:GLOBAL:lobby-v2:api-p99"
+    ],
+    "detail-type": "CloudWatch Alarm State Change",
+    "detail": {
+        "alarmName": "breaker:GLOBAL:lobby-v2:api-p99",
+        "previousState": {
+            "value": "OK",
+            "timestamp": "2026-04-01T17:58:00Z",
+            "reason": "Below threshold."
+        },
+        "state": {
+            "value": "ALARM",
+            "timestamp": "2026-04-01T17:58:00Z",
+            "reason": "p99 latency 2800ms exceeded threshold 2000ms for 3 consecutive periods."
+        },
+        "configuration": {
+            "metrics": []
+        }
+    }
+}

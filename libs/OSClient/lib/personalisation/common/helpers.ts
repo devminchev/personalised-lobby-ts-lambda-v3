@@ -12,12 +12,12 @@ export const isMlPersonalizedSection = (sectionType: string): sectionType is IMl
 export const shouldTerminateRequest = (isLoggedIn: boolean, sectionType: IMlPersonalizedSection): boolean =>
     !isLoggedIn && isMlPersonalizedSection(sectionType);
 
-export const checkAndGuardSectionType = async (
+export const checkAndGuardSectionType = (
     isLoggedIn: boolean,
     sectionType: IMlPersonalizedSection | string,
     siteName: string,
     platform: string,
-): Promise<boolean> => {
+): boolean => {
     const isSectionPersonalised = isMlPersonalizedSection(sectionType);
 
     // If the section is personalized but there is no authentication we should terminate the request, and throw an error

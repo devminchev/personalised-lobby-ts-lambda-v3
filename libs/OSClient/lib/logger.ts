@@ -14,8 +14,11 @@ export enum LogCode {
     MissingNavigation = 'MISSING_NAVIGATION',
     MissingTheme = 'MISSING_THEME',
     info = 'INFO',
+    GameWebhookSuccess = '200',
     NoGameShuffleData = 'NO_GAME_SHUFFLE_DATA',
     RpGamesLimitNotMet = 'RP_GAMES_LIMIT_NOT_MET',
+    VariantUsed = 'AB_TEST_VARIANT',
+    VariantDefaulting = 'AB_TEST_VARIANT_DEFAULT',
 }
 
 const logMessages: Record<LogCode, string> = {
@@ -33,8 +36,11 @@ const logMessages: Record<LogCode, string> = {
     [LogCode.MissingNavigation]: 'NO NAVIGATION RECORD WAS FOUND IN OPEN_SEARCH',
     [LogCode.MissingTheme]: 'THEME WAS LINKED BUT THE RECORD CAN NOT BE FOUND',
     [LogCode.info]: 'REQUEST_DEBUG_INFO',
+    [LogCode.GameWebhookSuccess]: '200',
     [LogCode.NoGameShuffleData]: 'No records found in game shuffle index',
     [LogCode.RpGamesLimitNotMet]: 'RECENTLY PLAYED GAMES SIZE IS BELOW THE LIMIT OF 3 ',
+    [LogCode.VariantUsed]: 'Lambda received header using variant: ',
+    [LogCode.VariantDefaulting]: 'No header passed default to unaffected variant',
 };
 
 export const getLogMessage = (code: LogCode | ErrorCode): string => {

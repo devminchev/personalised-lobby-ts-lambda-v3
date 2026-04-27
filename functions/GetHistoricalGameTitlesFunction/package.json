@@ -1,6 +1,6 @@
 {
   "name": "get-historical-game-titles",
-  "version": "0.11.7",
+  "version": "0.13.12",
   "description": "format list of game titles and server it back to client via Lambda",
   "main": "app.js",
   "repository": "https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda",

@@ -4,38 +4,52 @@
   "sourceRoot": "scripts",
   "projectType": "library",
   "targets": {
-    "update-version-dashboard-eu-stg": {
+    "update-version-dashboard-uk-es-stg": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cat versions.json | ./scripts/push-version-dashboard.js --environment=aws-stg-eu00",
+        "command": "cat versions.json | ./scripts/version_bulk_update.sh --environment=aws-stg-eu00",
         "cwd": "."
       }
     },
-    "update-version-dashboard-eu-prod": {
+    "update-version-dashboard-uk-es-prod": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cat versions.json | ./scripts/push-version-dashboard.js --environment=aws-prod-eu00",
+        "command": "cat versions.json | ./scripts/version_bulk_update.sh --environment=aws-prod-eu00",
         "cwd": "."
       }
     },
     "update-version-dashboard-na-stg": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cat versions.json | ./scripts/push-version-dashboard.js --environment=aws-stg-na03",
+        "command": "cat versions.json | ./scripts/version_bulk_update.sh --environment=aws-stg-na03",
         "cwd": "."
       }
     },
     "update-version-dashboard-na-prod": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cat versions.json | ./scripts/push-version-dashboard.js --environment=aws-prod-na03",
+        "command": "cat versions.json | ./scripts/version_bulk_update.sh --environment=aws-prod-na03",
         "cwd": "."
       }
     },
-    "create-jira-tickets-eu": {
+    "update-version-dashboard-eu03-stg": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cat versions.json | ./scripts/create-jira-tickets.js --environment=eu",
+        "command": "cat versions.json | ./scripts/version_bulk_update.sh --environment=aws-stg-eu03",
+        "cwd": "."
+      }
+    },
+    "update-version-dashboard-eu03-prod": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cat versions.json | ./scripts/version_bulk_update.sh --environment=aws-prod-eu03",
+        "cwd": "."
+      }
+    },
+    "create-jira-tickets-uk-es": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cat versions.json | ./scripts/create-jira-tickets.js --environment=uk_es",
         "cwd": "."
       }
     },
@@ -46,7 +60,14 @@
         "cwd": "."
       }
     },
-    "transition-jira-tickets-deploy-pp-eu": {
+    "create-jira-tickets-eu03": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cat versions.json | ./scripts/create-jira-tickets.js --environment=eu03",
+        "cwd": "."
+      }
+    },
+    "transition-jira-tickets-deploy-pp-uk-es": {
       "executor": "nx:run-commands",
       "options": {
         "command": "cat versions.json | ./scripts/transition-jira-tickets.js --state=deploy-pp",
@@ -60,7 +81,7 @@
         "cwd": "."
       }
     },
-    "transition-jira-tickets-pp-testing-eu": {
+    "transition-jira-tickets-pp-testing-uk-es": {
       "executor": "nx:run-commands",
       "options": {
         "command": "cat versions.json | ./scripts/transition-jira-tickets.js --state=pp-testing",
@@ -74,7 +95,7 @@
         "cwd": "."
       }
     },
-    "transition-jira-tickets-deploying-eu": {
+    "transition-jira-tickets-deploying-uk-es": {
       "executor": "nx:run-commands",
       "options": {
         "command": "cat versions.json | ./scripts/transition-jira-tickets.js --state=deploying",
@@ -88,7 +109,7 @@
         "cwd": "."
       }
     },
-    "transition-jira-tickets-resolved-eu": {
+    "transition-jira-tickets-resolved-uk-es": {
       "executor": "nx:run-commands",
       "options": {
         "command": "cat versions.json | ./scripts/transition-jira-tickets.js --state=resolved",
@@ -102,7 +123,7 @@
         "cwd": "."
       }
     },
-    "transition-jira-tickets-closed-eu": {
+    "transition-jira-tickets-closed-uk-es": {
       "executor": "nx:run-commands",
       "options": {
         "command": "cat versions.json | ./scripts/transition-jira-tickets.js --state=closed",
@@ -116,7 +137,42 @@
         "cwd": "."
       }
     },
-    "comment-jira-tickets-staging-eu": {
+    "transition-jira-tickets-deploying-eu03": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cat versions.json | ./scripts/transition-jira-tickets.js --state=deploying",
+        "cwd": "."
+      }
+    },
+    "transition-jira-tickets-deploy-pp-eu03": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cat versions.json | ./scripts/transition-jira-tickets.js --state=deploy-pp",
+        "cwd": "."
+      }
+    },
+    "transition-jira-tickets-pp-testing-eu03": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cat versions.json | ./scripts/transition-jira-tickets.js --state=pp-testing",
+        "cwd": "."
+      }
+    },
+    "transition-jira-tickets-resolved-eu03": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cat versions.json | ./scripts/transition-jira-tickets.js --state=resolved",
+        "cwd": "."
+      }
+    },
+    "transition-jira-tickets-closed-eu03": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cat versions.json | ./scripts/transition-jira-tickets.js --state=closed",
+        "cwd": "."
+      }
+    },
+    "comment-jira-tickets-staging-uk-es": {
       "executor": "nx:run-commands",
       "options": {
         "command": "cat versions.json | ./scripts/comment-jira-tickets.js --environment=stg_eu00",
@@ -130,7 +186,7 @@
         "cwd": "."
       }
     },
-    "comment-jira-tickets-production-eu": {
+    "comment-jira-tickets-production-uk-es": {
       "executor": "nx:run-commands",
       "options": {
         "command": "cat versions.json | ./scripts/comment-jira-tickets.js --environment=prod_eu00",
@@ -144,10 +200,31 @@
         "cwd": "."
       }
     },
-    "update-jira-instructions-eu": {
+    "comment-jira-tickets-staging-eu03": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cat versions.json | ./scripts/comment-jira-tickets.js --environment=stg_eu03",
+        "cwd": "."
+      }
+    },
+    "comment-jira-tickets-production-eu03": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cat versions.json | ./scripts/comment-jira-tickets.js --environment=prod_eu03",
+        "cwd": "."
+      }
+    },
+    "update-jira-instructions-uk-es": {
       "executor": "nx:run-commands",
       "options": {
         "command": "cat versions.json | ./scripts/update-jira-instructions.js --environment=stg_eu00",
+        "cwd": "."
+      }
+    },
+    "update-jira-instructions-eu03": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cat versions.json | ./scripts/update-jira-instructions.js --environment=stg_eu03",
         "cwd": "."
       }
     },

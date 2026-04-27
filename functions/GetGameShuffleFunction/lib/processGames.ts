@@ -2,7 +2,7 @@ import {
     createError,
     ErrorCode,
     FullApiResponse,
-    GAMES_INDEX_V2_ALIAS,
+    IG_GAMES_V2_READ_ALIAS,
     getGamesSiteGames,
     getHitsWithIndex,
     getLambdaExecutionEnvironment,
@@ -12,6 +12,7 @@ import {
     ML_GAME_SHUFFLE_ALIAS,
 } from 'os-client';
 import { GameShuffle } from './interface';
+import { timed } from './utils';
 
 export const getGameShuffleData = async (
     client: IClient,
@@ -51,24 +52,40 @@ export const getGameShuffleData = async (
         },
     };
 
-    const getFirstBucketHit = await getHitsWithIndex<GameShuffle>(client, queryFirstBucketList, ML_GAME_SHUFFLE_ALIAS);
-    const getSecondThirdBucketHit = await getHitsWithIndex<GameShuffle>(
-        client,
-        querySecondThirdBucketList,
-        ML_GAME_SHUFFLE_ALIAS,
+    const [firstBucketResult, secondBucketResult] = await timed('game-shuffle-queries', { siteName, platform }, () =>
+        Promise.allSettled([
+            getHitsWithIndex<GameShuffle>(client, queryFirstBucketList, ML_GAME_SHUFFLE_ALIAS),
+            getHitsWithIndex<GameShuffle>(client, querySecondThirdBucketList, ML_GAME_SHUFFLE_ALIAS),
+        ]),
     );
 
-    if (getFirstBucketHit.length === 0 || getFirstBucketHit.length === 0) {
+    if (firstBucketResult.status !== 'fulfilled' || secondBucketResult.status !== 'fulfilled') {
+        logMessage('warn', LogCode.NoGameShuffleData, {
+            siteName,
+            platform,
+            firstBucketStatus: firstBucketResult.status,
+            secondBucketStatus: secondBucketResult.status,
+        });
+        throw createError(ErrorCode.NoGameShuffleData, 404);
+    }
+
+    const firstBucketHits = firstBucketResult.value;
+    const secondThirdBucketHits = secondBucketResult.value;
+
+    if (firstBucketHits.length === 0 || secondThirdBucketHits.length === 0) {
         logMessage('warn', LogCode.NoGameShuffleData, { siteName, platform });
         throw createError(ErrorCode.NoGameShuffleData, 404);
     }
 
-    const firstBucketRtp = getFirstBucketHit.map((item) => item.source);
-    const secondThirdBucketRtp = getSecondThirdBucketHit.map((item) => item.source);
+    const firstBucketRtp = firstBucketHits.map((item) => item.source);
+    const secondThirdBucketRtp = secondThirdBucketHits.map((item) => item.source);
+
+    const firstBucketSkins = new Set(firstBucketRtp.map((item) => item.game_skin));
+    const uniqueSecondThirdBucketRtp = secondThirdBucketRtp.filter((item) => !firstBucketSkins.has(item.game_skin));
 
     return {
         firstBucket: firstBucketRtp,
-        secondThirdBucket: secondThirdBucketRtp,
+        secondThirdBucket: uniqueSecondThirdBucketRtp,
     };
 };
 
@@ -80,14 +97,15 @@ export const getGamesSiteGamesOnGameSkin = async (
     spaceLocale: string,
     gameShuffleList: GameShuffle[],
 ): Promise<FullApiResponse[]> => {
-    const gameSkinKey = `game.gamePlatformConfig.${spaceLocale}.gameSkin.keyword`;
+    const gameSkinKey = `game.gameSkin`;
     const platformKey = `siteGame.platformVisibility.${spaceLocale}.keyword`;
     const environmentKey = `siteGame.environmentVisibility.${spaceLocale}.keyword`;
     const ventureKey = `siteGame.venture.${spaceLocale}.sys.id.keyword`;
 
     const gameSkins = gameShuffleList.map((game) => game.game_skin);
     const gameOnGameSkinQuery = {
-        size: 3000,
+        size: Math.min(gameSkins.length, 3000),
+        track_total_hits: false,
         _source: ['siteGame.id', 'siteGame.entryTitle'],
         query: {
             constant_score: {
@@ -104,10 +122,10 @@ export const getGamesSiteGamesOnGameSkin = async (
                                         _source: {
                                             includes: [
                                                 `game.id`,
-                                                `game.gamePlatformConfig.${spaceLocale}.demoUrl`,
-                                                `game.gamePlatformConfig.${spaceLocale}.realUrl`,
-                                                `game.gamePlatformConfig.${spaceLocale}.gameSkin`,
-                                                `game.gamePlatformConfig.${spaceLocale}.name`,
+                                                `game.gamePlatformConfig.demoUrl`,
+                                                `game.gamePlatformConfig.realUrl`,
+                                                `game.gameSkin`,
+                                                `game.gameName`,
                                                 `game.imgUrlPattern`,
                                                 `game.loggedOutImgUrlPattern`,
                                                 `game.representativeColor`,
@@ -146,13 +164,10 @@ export const getGamesSiteGamesOnGameSkin = async (
         },
     };
 
-    const gameSiteGameResponse = await getGamesSiteGames(
-        client,
-        gameOnGameSkinQuery,
-        GAMES_INDEX_V2_ALIAS,
-        ventureId,
-        siteName,
-        platform,
+    const gameSiteGameResponse = await timed(
+        'site-games-query-gamesV2-index',
+        { siteName, platform, requestedGameSkins: gameSkins.length },
+        () => getGamesSiteGames(client, gameOnGameSkinQuery, IG_GAMES_V2_READ_ALIAS, ventureId, siteName, platform),
     );
 
     return gameSiteGameResponse;

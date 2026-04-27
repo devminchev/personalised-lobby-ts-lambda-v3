@@ -23,7 +23,7 @@ export type IGLinkItem = {
     externalUrl?: string;
     internalUrl?: string;
     image?: string;
-    bynderImage?: Record<string, unknown>;
+    bynderImage?: SanitizedBynder | null;
     liveHidden?: boolean;
 };
 
@@ -34,7 +34,7 @@ export type IGLinkItemOS = {
     externalUrl?: LocalizedField<string>;
     internalUrl?: LocalizedField<string>;
     image?: LocalizedField<string>;
-    bynderImage?: LocalizedField<Record<string, unknown>>;
+    bynderImage?: IBynderAssets;
     liveHidden?: LocalizedField<boolean>;
 };
 
@@ -54,6 +54,10 @@ export interface IViewAll {
     viewAllActionSlug: string;
     viewAllActionType: string;
     viewAllActionText: string;
+}
+
+export interface IBynderAssets {
+    [locale: string]: IBynderAsset[];
 }
 
 /* ----------------------------- Bynder Interfaces --------------------------------- */
@@ -78,6 +82,16 @@ export interface IBynderAsset {
     textMetaproperties?: string[];
     src?: string;
 }
+
+export type SanitizedBynder = Pick<
+    IBynderAsset,
+    'name' | 'type' | 'width' | 'height' | 'orientation' | 'original' | 'tags'
+> & {
+    thumbnails: {
+        transformBaseUrl?: string;
+        original?: string;
+    };
+};
 
 /* ----------------------------- View Type Interfaces --------------------------------- */
 interface linkedModelItem {
@@ -173,49 +187,58 @@ export type ISiteGameInfo = Pick<
 
 // GameV2 Model Type
 export interface Game {
-    entryTitle: LocalizedField<string>;
-    metadataTags?: linkedModelItem[];
-    launchCode?: LocalizedField<string>;
-    dfgWeeklyImgUrlPattern?: LocalizedField<string>;
-    bynderDFGWeeklyImage?: LocalizedField<IBynderAsset[]>;
-    howToPlayContent?: LocalizedField<string>;
-    infoImgUrlPattern: LocalizedField<string>;
-    imgUrlPattern?: LocalizedField<string>;
-    infoDetails?: LocalizedField<string>;
-    introductionContent?: LocalizedField<string>;
-    loggedOutImgUrlPattern?: LocalizedField<string>;
-    maxBet: LocalizedField<string>;
-    minBet: LocalizedField<string>;
-    progressiveBackgroundColor?: LocalizedField<string>;
-    progressiveJackpot: LocalizedField<boolean>;
-    representativeColor?: LocalizedField<string>;
-    title: LocalizedField<string>;
-    videoUrlPattern?: LocalizedField<string>;
-    gamePlatformConfig: LocalizedField<GamePlatformConfig>;
-    funPanelDefaultCategory?: LocalizedField<string>;
-    funPanelEnabled: LocalizedField<boolean>;
-    funPanelBackgroundImage: LocalizedField<string>;
-    operatorBarDisabled: LocalizedField<boolean>;
-    rgpEnabled: LocalizedField<boolean>;
-    vendor: LocalizedField<string>;
-    platform: string[];
-    platformVisibility?: LocalizedField<string[]>;
-    meta?: LocalizedField<string>;
-    nativeRequirement?: LocalizedField<any>;
-    webComponentData?: LocalizedField<IWebComponentData>;
-    tags?: LocalizedField<string[]>;
-    contentType: string;
     id: string;
+    contentType: string;
     environment?: string;
     updatedAt: string;
-    showNetPosition: LocalizedField<boolean>;
-    headlessJackpot?: LocalizedField<IHeadlessJackpot>;
+    metadataTags?: linkedModelItem[] | string[];
+    platformVisibility?: string[];
+    entryTitle: string;
+    // Fields pulled up from gamePlatformConfig
+    mobileOverride?: false;
+    gameName: string;
+    mobileGameName?: string;
+    gameSkin: string;
+    mobileGameSkin?: string;
+    rtp?: number;
+    // Non-localized fields with removed default space locale
+    tags?: string[];
+    vendor: string;
+    progressiveJackpot: boolean;
+    showNetPosition: boolean;
+    operatorBarDisabled: boolean;
+    funPanelEnabled: boolean;
+    rgpEnabled: boolean;
+    webComponentData?: IWebComponentData;
+    progressiveBackgroundColor?: string;
+    gamePlatformConfig: GamePlatformConfig;
+    funPanelDefaultCategory?: string;
+    funPanelBackgroundImage: string;
+    nativeRequirement?: any;
+    // Localized fields for which locale is kept
+    title: LocalizedField<string>;
+    maxBet: LocalizedField<string>;
+    minBet: LocalizedField<string>;
+    howToPlayContent?: LocalizedField<string>;
+    introductionContent?: LocalizedField<string>;
+    infoDetails?: LocalizedField<string>;
+
+    dfgWeeklyImgUrlPattern?: LocalizedField<string>;
+    bynderDFGWeeklyImage?: LocalizedField<IBynderAsset[]>;
+    infoImgUrlPattern: LocalizedField<string>;
+    imgUrlPattern?: LocalizedField<string>;
+    loggedOutImgUrlPattern?: LocalizedField<string>;
+    representativeColor?: LocalizedField<string>;
+    videoUrlPattern?: LocalizedField<string>;
     animationMedia?: LocalizedField<string>;
     loggedOutAnimationMedia?: LocalizedField<string>;
     foregroundLogoMedia?: LocalizedField<IBynderAsset[]>;
     loggedOutForegroundLogoMedia?: LocalizedField<IBynderAsset[]>;
     backgroundMedia?: LocalizedField<IBynderAsset[]>;
     loggedOutBackgroundMedia?: LocalizedField<IBynderAsset[]>;
+    // Possibly legacy
+    launchCode?: LocalizedField<string>;
+    headlessJackpot?: LocalizedField<IHeadlessJackpot>;
 }
 
 // Game Platform Config
@@ -277,9 +300,9 @@ interface GameType_Slots {
 export type GameType = GameType_InstantWin_Slingo | GameType_Poker_Bingo_LiveDealer | GameType_Casino | GameType_Slots;
 
 export interface GamePlatformConfig {
-    mobileOverride: boolean;
-    gameSkin: string;
-    name: string;
+    mobileOverride?: boolean;
+    gameSkin?: string;
+    name?: string;
     demoUrl: string;
     realUrl: string;
     gameLoaderFileName: string;
@@ -290,16 +313,31 @@ export interface GamePlatformConfig {
     mobileGameLoaderFileName?: string;
     gameStudio?: string;
     gameProvider: string;
+    gameAggregator?: string;
     gameType: GameType;
-    rtp: number;
+    rtp?: number;
     subGameType: string;
     federalGameType: string;
 }
 
 export type IGameConfig = Pick<
     Game,
-    'id' | 'funPanelEnabled' | 'minBet' | 'maxBet' | 'vendor' | 'gamePlatformConfig' | 'showNetPosition' | 'launchCode'
+    | 'id'
+    | 'funPanelEnabled'
+    | 'minBet'
+    | 'maxBet'
+    | 'vendor'
+    | 'gamePlatformConfig'
+    | 'showNetPosition'
+    | 'launchCode'
+    | 'gameName'
+    | 'gameSkin'
+    | 'mobileGameName'
+    | 'mobileGameSkin'
+    | 'mobileOverride'
 >;
+
+export type GameSkinConfigResponse = { game: Pick<IGameConfig, 'gamePlatformConfig'> };
 
 export type IGameInfo = Pick<
     Game,
@@ -307,6 +345,11 @@ export type IGameInfo = Pick<
     | 'minBet'
     | 'maxBet'
     | 'gamePlatformConfig'
+    | 'gameName'
+    | 'gameSkin'
+    | 'mobileGameName'
+    | 'mobileGameSkin'
+    | 'mobileOverride'
     | 'howToPlayContent'
     | 'infoImgUrlPattern'
     | 'infoDetails'
@@ -404,7 +447,7 @@ interface InnerHit<TGame> {
 }
 
 //
-interface Game_Hit<TGame> {
+export interface Game_Hit<TGame> {
     game_to_sitegame?: GameToSiteGame;
     game: TGame;
 }
@@ -473,17 +516,17 @@ export interface IIGSectionView extends ISection {
     jackpotType: LocalizedField<JackpotType>;
     headlessJackpot?: LocalizedField<IHeadlessJackpot>;
     headerImage?: LocalizedField<string>;
-    headerImageBynder?: LocalizedField<IBynderAsset>;
+    headerImageBynder?: IBynderAssets;
     backgroundImage?: LocalizedField<string>;
-    backgroundImageBynder?: LocalizedField<IBynderAsset>;
+    backgroundImageBynder?: IBynderAssets;
     pot1Image?: LocalizedField<string>;
-    pot1ImageBynder?: LocalizedField<IBynderAsset>;
+    pot1ImageBynder?: IBynderAssets;
     pot2Image?: LocalizedField<string>;
-    pot2ImageBynder?: LocalizedField<IBynderAsset>;
+    pot2ImageBynder?: IBynderAssets;
     pot3Image?: LocalizedField<string>;
-    pot3ImageBynder?: LocalizedField<IBynderAsset>;
+    pot3ImageBynder?: IBynderAssets;
     pot4Image?: LocalizedField<string>;
-    pot4ImageBynder?: LocalizedField<IBynderAsset>;
+    pot4ImageBynder?: IBynderAssets;
 }
 
 export type JackpotType =
@@ -568,6 +611,11 @@ export interface IGameConfigResponse {
     liveHidden?: boolean;
 }
 
+export interface IGameSkinConfigResponse {
+    gameName: string;
+    gameType: string;
+}
+
 export interface IGameInfoResponse {
     entryId: string;
     gameSkin: string;
@@ -586,10 +634,10 @@ export interface IGameInfoResponse {
     animationMedia?: string;
     backgroundImage?: string;
     loggedOutAnimationMedia?: string;
-    foregroundLogoMedia?: IBynderAsset;
-    loggedOutForegroundLogoMedia?: IBynderAsset;
-    backgroundMedia?: IBynderAsset;
-    loggedOutBackgroundMedia?: IBynderAsset;
+    foregroundLogoMedia?: SanitizedBynder;
+    loggedOutForegroundLogoMedia?: SanitizedBynder;
+    backgroundMedia?: SanitizedBynder;
+    loggedOutBackgroundMedia?: SanitizedBynder;
     funPanelGame: FunPanelGame | boolean;
     showNetPosition: boolean;
     liveHidden?: boolean;

@@ -1,0 +1,35 @@
+---
+title: URL Structure
+description: Hierarchical resource pattern used by all Personalised Lobby endpoints
+---
+
+# URL Structure
+
+All GET endpoints are served from `LobbyApi` and follow a hierarchical resource pattern:
+
+```
+/sites/{sitename}/platform/{platform}/...
+```
+
+Each path segment names a resource or sub-resource — `sites`, `platform`, and any further nesting (e.g. `view`, `sections`, `sitegames`) — so the URL describes what is being requested, not who is requesting it.
+
+## Two gateways
+
+| Gateway        | Methods | Purpose                                                                                  |
+| -------------- | ------- | ---------------------------------------------------------------------------------------- |
+| `LobbyApi`     | `GET`   | All read endpoints consumed by the frontend                                              |
+| `LobbyPostApi` | `POST`  | Internal backoffice writes driven by Contentful (deployed as the `backoffice-v2` API)    |
+
+POST endpoints live on their own gateway to avoid binary media encoding conflicts with the GET surface. There are currently two POST endpoints, both consumed internally rather than by the frontend:
+
+| Endpoint                          | Lambda                                  | Trigger                                                                              |
+| --------------------------------- | --------------------------------------- | ------------------------------------------------------------------------------------ |
+| `POST /sync-games-payload`        | `PostGamesPayloadFunction`              | Contentful webhook for `gameV2` entries — verifies signature and indexes to OpenSearch (`games-v3` alias) |
+| `POST /historical-game-titles-handler` | `PostHistoricalGameTitlesHandlerFunction` | Maintains historical/archived game title data by reading from Contentful and writing to the archived games alias |
+
+## Path conventions
+
+- Resource names are lowercase and plural (`sites`, `sections`, `sitegames`).
+- Path parameters identify or own the resource (`{sitename}`, `{platform}`, `{viewslug}`, `{sectionid}`).
+- Inputs that merely scope or filter a response (such as `memberid`) belong in the query string — see [Member identification](./member-identification).
+- Personalised variants of a collection are modelled as sub-resources — see [Personalised sub-resources](./personalised-resources).

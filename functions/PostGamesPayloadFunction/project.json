@@ -1,0 +1,34 @@
+{
+  "$schema": "https://nx.dev/reference/project-configuration",
+  "name": "post-games-payload-handler",
+  "sourceRoot": "functions/PostGamesPayloadFunction",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "options": {
+        "outputPath": "dist/functions/PostGamesPayloadFunction"
+      },
+      "configurations": {
+        "production": {
+          "configuration": "application"
+        }
+      }
+    },
+    "test": {},
+    "lint": {},
+    "format": {},
+    "version": {},
+    "changelog": {},
+    "docker": {},
+    "docker-push": {},
+    "run-docker": {}
+  },
+  "tags": [
+    "type:app",
+    "scope:pl"
+  ],
+  "dependencies": [
+    "os-client"
+  ],
+  "version": "0.3.3"
+}

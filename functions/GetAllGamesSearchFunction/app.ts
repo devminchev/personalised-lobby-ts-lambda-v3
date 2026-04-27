@@ -15,10 +15,13 @@ import {
     LogCode,
     logMessage,
     ALL_SECTIONS_SHARED_READ_ALIAS,
-    GAMES_V2_INDEX_ALIAS,
+    IG_GAMES_V2_READ_ALIAS,
     IHeadlessJackpot,
     pickGameOrSiteGameValue,
     errorResponseHandler,
+    gzipResponse,
+    jsonSizeInMb,
+    getPreferredOrFallbackLocalised,
 } from 'os-client';
 import { getLinks, getNavigation } from 'os-client/lib/commonOsRequests';
 import { IOpenSearchQuery, LocalizedField, Sys } from 'os-client/lib/sharedInterfaces/common';
@@ -47,6 +50,7 @@ interface IGameSearchRecord {
     name?: string;
     title: string;
     gameSkin?: string;
+    mobileGameName?: string;
     demoUrl?: string;
     realUrl?: string;
     imgUrlPattern?: string;
@@ -121,67 +125,71 @@ export const constructGameSearchResponse = (
         const siteGameData = item.hit?.siteGame;
         const navigation = Array.from(gameIdToNavName.get(siteGameData?.id) || []);
         const gameData = item.innerHit?.game;
-        const gamePlatformObject = gameData?.gamePlatformConfig[spaceLocale] || {};
+        const gamePlatformConfig = gameData?.gamePlatformConfig || {};
         const liveHidden = siteGameData?.liveHidden?.[spaceLocale];
 
-        const tags = pickGameOrSiteGameValue(siteGameData?.tags?.[spaceLocale], gameData?.tags?.[spaceLocale], null);
+        const tags = pickGameOrSiteGameValue(siteGameData?.tags?.[spaceLocale], gameData?.tags, null);
 
         const localizedGameTitle = tryGetValueFromLocalised(localeOverride, spaceLocale, gameData?.title, '');
-        const gamePlatformConfig = tryGetValueFromLocalised(
-            localeOverride,
-            spaceLocale,
-            gameData?.gamePlatformConfig,
-            null,
-        );
-        const sash = tryGetValueFromLocalised(localeOverride, spaceLocale, siteGameData?.sash, '');
+
+        const mobileOverride = gameData?.mobileOverride || false;
+        const gameNameValue = gameData?.gameName;
+        const mobileGameName = gameData?.mobileGameName || null;
+        const gameSkin = gameData?.gameSkin;
+        const mobileGameSkin = gameData?.mobileGameSkin || null;
+        const rtp = gameData?.rtp;
+        const sash = tryGetValueFromLocalised(localeOverride, spaceLocale, siteGameData?.sash, null);
         const representativeColor = tryGetValueFromLocalised(
             localeOverride,
             spaceLocale,
             gameData?.representativeColor,
             null,
         );
-        const imgUrlPattern = tryGetValueFromLocalised(localeOverride, spaceLocale, gameData?.imgUrlPattern, '');
-        const loggedOutImgUrlPattern = tryGetValueFromLocalised(
+        const headlessJackpot = siteGameData?.headlessJackpot?.[spaceLocale] || null;
+        const finalImageUrl = getPreferredOrFallbackLocalised(
             localeOverride,
             spaceLocale,
+            showOnlyLoggedIn,
+            gameData?.imgUrlPattern,
             gameData?.loggedOutImgUrlPattern,
-            null,
         );
-        const headlessJackpot = siteGameData?.headlessJackpot?.[spaceLocale] || null;
-        const imgUrl = showOnlyLoggedIn ? imgUrlPattern : loggedOutImgUrlPattern;
-        const gameName =
-            platform.toLowerCase() !== 'web' && gamePlatformObject?.mobileOverride
-                ? gamePlatformObject?.mobileName
-                : gamePlatformObject?.name;
+        const gameName = platform.toLowerCase() !== 'web' && mobileOverride ? mobileGameName : gameNameValue;
 
         const animationMedia = showOnlyLoggedIn
             ? tryGetValueFromLocalised(localeOverride, spaceLocale, gameData?.animationMedia, null)
             : tryGetValueFromLocalised(localeOverride, spaceLocale, gameData?.loggedOutAnimationMedia, null);
 
-        const foregroundLogoMedia = showOnlyLoggedIn
-            ? tryGetValueFromLocalised(localeOverride, spaceLocale, gameData?.foregroundLogoMedia, null)
-            : tryGetValueFromLocalised(localeOverride, spaceLocale, gameData?.loggedOutForegroundLogoMedia, null);
-
-        const backgroundMedia = showOnlyLoggedIn
-            ? tryGetValueFromLocalised(localeOverride, spaceLocale, gameData?.backgroundMedia, null)
-            : tryGetValueFromLocalised(localeOverride, spaceLocale, gameData?.loggedOutBackgroundMedia, null);
-
+        const foregroundLogoMedia = getPreferredOrFallbackLocalised(
+            localeOverride,
+            spaceLocale,
+            showOnlyLoggedIn,
+            gameData?.foregroundLogoMedia,
+            gameData?.loggedOutForegroundLogoMedia,
+        );
+        const backgroundMedia = getPreferredOrFallbackLocalised(
+            localeOverride,
+            spaceLocale,
+            showOnlyLoggedIn,
+            gameData?.backgroundMedia,
+            gameData?.loggedOutBackgroundMedia,
+        );
         const foregroundLogoMediaObj = extractBynderObject(foregroundLogoMedia);
+
         const backgroundMediaObj = extractBynderObject(backgroundMedia);
 
         return {
             entryId: siteGameData.id,
             gameId: siteGameData.gameId, // Assuming gameId is the same as entryId
-            name: gameName,
+            name: gameName || '',
             navigation,
-            ...(sash && { sash }),
-            ...(gamePlatformConfig && { gameSkin: gamePlatformConfig?.gameSkin }),
+            ...(typeof sash === 'string' && { sash }),
+            ...(typeof gameSkin === 'string' && { gameSkin }),
             ...(gamePlatformConfig && { demoUrl: gamePlatformConfig?.demoUrl }),
             ...(gamePlatformConfig && { realUrl: gamePlatformConfig?.realUrl }),
             ...(representativeColor && { representativeColor }),
             ...(gameData?.title && { title: localizedGameTitle }),
             ...(tags && { tags }),
-            ...(imgUrl && { imgUrlPattern: imgUrl }),
+            ...(finalImageUrl && { imgUrlPattern: finalImageUrl }),
             ...(animationMedia && { animationMedia }),
             ...(foregroundLogoMediaObj && { foregroundLogoMedia: foregroundLogoMediaObj }),
             ...(backgroundMediaObj && { backgroundMedia: backgroundMediaObj }),
@@ -223,6 +231,12 @@ export const createGamesSearchQuery = (
                                     inner_hits: {
                                         _source: [
                                             'game.gamePlatformConfig',
+                                            'game.gameName',
+                                            'game.gameSkin',
+                                            'game.mobileGameName',
+                                            'game.mobileGameSkin',
+                                            'game.mobileOverride',
+                                            'game.rtp',
                                             'game.title',
                                             'game.tags',
                                             'game.infoImgUrlPattern',
@@ -338,7 +352,7 @@ export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGat
         const games = await getGamesSiteGames(
             client,
             sectionGamesListQuery,
-            GAMES_V2_INDEX_ALIAS,
+            IG_GAMES_V2_READ_ALIAS,
             ventureId,
             siteName,
             platform,
@@ -353,10 +367,17 @@ export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGat
             showOnlyLoggedIn,
         );
 
-        return {
-            statusCode: 200,
-            body: JSON.stringify(gamesResponse),
-        };
+        const bodyString = JSON.stringify(gamesResponse);
+        const sizeInMb = jsonSizeInMb(bodyString);
+        const compressedResponse = gzipResponse(bodyString);
+
+        console.info(
+            'all-games-search-uncompressed-response-size',
+            { sizeInMb },
+            'all-games-search-compressed-response-size:',
+            jsonSizeInMb(compressedResponse),
+        );
+        return compressedResponse;
     } catch (err) {
         const errorLogParams = {
             eventReqId,

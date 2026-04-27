@@ -2,6 +2,191 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.13.12](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-historical-game-titles-0.13.11...get-historical-game-titles-0.13.12) (2026-04-22)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.53.0`
+## [0.13.11](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-historical-game-titles-0.13.10...get-historical-game-titles-0.13.11) (2026-04-22)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.52.0`
+## [0.13.10](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-historical-game-titles-0.13.9...get-historical-game-titles-0.13.10) (2026-04-21)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.51.1`
+## [0.13.9](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-historical-game-titles-0.13.8...get-historical-game-titles-0.13.9) (2026-04-21)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.51.0`
+## [0.13.8](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-historical-game-titles-0.13.7...get-historical-game-titles-0.13.8) (2026-04-20)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.50.0`
+## [0.13.7](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-historical-game-titles-0.13.6...get-historical-game-titles-0.13.7) (2026-04-13)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.49.0`
+## [0.13.6](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-historical-game-titles-0.13.5...get-historical-game-titles-0.13.6) (2026-04-10)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.48.3`
+## [0.13.5](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-historical-game-titles-0.13.4...get-historical-game-titles-0.13.5) (2026-04-09)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.48.2`
+## [0.13.4](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-historical-game-titles-0.13.3...get-historical-game-titles-0.13.4) (2026-04-09)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.48.1`
+## [0.13.3](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-historical-game-titles-0.13.2...get-historical-game-titles-0.13.3) (2026-03-25)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.48.0`
+## [0.13.2](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-historical-game-titles-0.13.1...get-historical-game-titles-0.13.2) (2026-03-25)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.47.0`
+## [0.13.1](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-historical-game-titles-0.13.0...get-historical-game-titles-0.13.1) (2026-03-24)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.46.0`
+## [0.13.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-historical-game-titles-0.12.12...get-historical-game-titles-0.13.0) (2026-03-20)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.45.0`
+
+### Features
+
+* **gtech-1314814-1:** refactor lambdas to work with new game index mapping ([ac824da](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/commit/ac824daa58b93411881d2250ab79c32f331ffe90))
+
+## [0.12.12](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-historical-game-titles-0.12.11...get-historical-game-titles-0.12.12) (2026-03-17)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.44.0`
+## [0.12.11](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-historical-game-titles-0.12.10...get-historical-game-titles-0.12.11) (2026-03-17)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.43.5`
+## [0.12.10](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-historical-game-titles-0.12.9...get-historical-game-titles-0.12.10) (2026-03-06)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.43.4`
+## [0.12.9](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-historical-game-titles-0.12.8...get-historical-game-titles-0.12.9) (2026-03-06)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.43.3`
+## [0.12.8](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-historical-game-titles-0.12.7...get-historical-game-titles-0.12.8) (2026-03-06)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.43.2`
+## [0.12.7](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-historical-game-titles-0.12.6...get-historical-game-titles-0.12.7) (2026-03-05)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.43.1`
+## [0.12.6](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-historical-game-titles-0.12.5...get-historical-game-titles-0.12.6) (2026-03-05)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.43.0`
+## [0.12.5](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-historical-game-titles-0.12.4...get-historical-game-titles-0.12.5) (2026-03-05)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.42.1`
+## [0.12.4](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-historical-game-titles-0.12.3...get-historical-game-titles-0.12.4) (2026-02-25)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.42.0`
+## [0.12.3](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-historical-game-titles-0.12.2...get-historical-game-titles-0.12.3) (2026-02-23)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.41.2`
+## [0.12.2](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-historical-game-titles-0.12.1...get-historical-game-titles-0.12.2) (2026-02-20)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.41.1`
+## [0.12.1](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-historical-game-titles-0.12.0...get-historical-game-titles-0.12.1) (2026-01-28)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.41.0`
+## [0.12.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-historical-game-titles-0.11.16...get-historical-game-titles-0.12.0) (2026-01-23)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.40.0`
+
+### Features
+
+* **gtech-1317745:** default encoding for uncompressed lambdas ([9dba5d2](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/commit/9dba5d25387276374a2c1ce46055ec224098953e))
+
+## [0.11.16](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-historical-game-titles-0.11.15...get-historical-game-titles-0.11.16) (2026-01-19)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.39.0`
+## [0.11.15](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-historical-game-titles-0.11.14...get-historical-game-titles-0.11.15) (2026-01-19)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.38.0`
+## [0.11.14](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-historical-game-titles-0.11.13...get-historical-game-titles-0.11.14) (2025-12-16)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.37.0`
+## [0.11.13](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-historical-game-titles-0.11.12...get-historical-game-titles-0.11.13) (2025-12-09)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.36.0`
+## [0.11.12](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-historical-game-titles-0.11.11...get-historical-game-titles-0.11.12) (2025-12-05)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.35.0`
+## [0.11.11](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-historical-game-titles-0.11.10...get-historical-game-titles-0.11.11) (2025-12-03)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.34.2`
+## [0.11.10](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-historical-game-titles-0.11.9...get-historical-game-titles-0.11.10) (2025-12-02)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.34.1`
+## [0.11.9](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-historical-game-titles-0.11.8...get-historical-game-titles-0.11.9) (2025-11-28)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.34.0`
+## [0.11.8](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-historical-game-titles-0.11.7...get-historical-game-titles-0.11.8) (2025-11-26)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.33.0`
 ## [0.11.7](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-historical-game-titles-0.11.6...get-historical-game-titles-0.11.7) (2025-11-14)
 
 ### Dependency Updates

@@ -2,6 +2,226 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.28.4](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-all-games-search-0.28.3...get-all-games-search-0.28.4) (2026-04-22)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.53.0`
+## [0.28.3](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-all-games-search-0.28.2...get-all-games-search-0.28.3) (2026-04-22)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.52.0`
+## [0.28.2](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-all-games-search-0.28.1...get-all-games-search-0.28.2) (2026-04-21)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.51.1`
+## [0.28.1](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-all-games-search-0.28.0...get-all-games-search-0.28.1) (2026-04-21)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.51.0`
+## [0.28.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-all-games-search-0.27.7...get-all-games-search-0.28.0) (2026-04-20)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.50.0`
+
+### Features
+
+* **gtech-1321127:** always return image assets from sectionview endpoint ([14999c9](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/commit/14999c9a559e735a1e744d8405c67cc9f0a3c59e))
+
+## [0.27.7](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-all-games-search-0.27.6...get-all-games-search-0.27.7) (2026-04-13)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.49.0`
+## [0.27.6](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-all-games-search-0.27.5...get-all-games-search-0.27.6) (2026-04-10)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.48.3`
+## [0.27.5](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-all-games-search-0.27.4...get-all-games-search-0.27.5) (2026-04-09)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.48.2`
+## [0.27.4](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-all-games-search-0.27.3...get-all-games-search-0.27.4) (2026-04-09)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.48.1`
+## [0.27.3](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-all-games-search-0.27.2...get-all-games-search-0.27.3) (2026-03-25)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.48.0`
+## [0.27.2](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-all-games-search-0.27.1...get-all-games-search-0.27.2) (2026-03-25)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.47.0`
+## [0.27.1](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-all-games-search-0.27.0...get-all-games-search-0.27.1) (2026-03-24)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.46.0`
+## [0.27.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-all-games-search-0.26.2...get-all-games-search-0.27.0) (2026-03-20)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.45.0`
+
+### Features
+
+* **gtech-1314814-1:** refactor lambdas to work with new game index mapping ([ac824da](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/commit/ac824daa58b93411881d2250ab79c32f331ffe90))
+
+## [0.26.2](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-all-games-search-0.26.1...get-all-games-search-0.26.2) (2026-03-17)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.44.0`
+## [0.26.1](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-all-games-search-0.26.0...get-all-games-search-0.26.1) (2026-03-17)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.43.5`
+## [0.26.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-all-games-search-0.25.9...get-all-games-search-0.26.0) (2026-03-09)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.43.4`
+
+### Features
+
+* **gtech-1319543:** always return image assets from search endpoint ([003af5a](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/commit/003af5a758481e524ce25f1466e6de3ee99dd60f))
+
+## [0.25.9](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-all-games-search-0.25.8...get-all-games-search-0.25.9) (2026-03-06)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.43.4`
+## [0.25.8](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-all-games-search-0.25.7...get-all-games-search-0.25.8) (2026-03-06)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.43.3`
+## [0.25.7](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-all-games-search-0.25.6...get-all-games-search-0.25.7) (2026-03-06)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.43.2`
+## [0.25.6](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-all-games-search-0.25.5...get-all-games-search-0.25.6) (2026-03-05)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.43.1`
+## [0.25.5](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-all-games-search-0.25.4...get-all-games-search-0.25.5) (2026-03-05)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.43.0`
+## [0.25.4](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-all-games-search-0.25.3...get-all-games-search-0.25.4) (2026-03-05)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.42.1`
+## [0.25.3](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-all-games-search-0.25.2...get-all-games-search-0.25.3) (2026-02-25)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.42.0`
+## [0.25.2](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-all-games-search-0.25.1...get-all-games-search-0.25.2) (2026-02-23)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.41.2`
+## [0.25.1](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-all-games-search-0.25.0...get-all-games-search-0.25.1) (2026-02-20)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.41.1`
+## [0.25.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-all-games-search-0.24.0...get-all-games-search-0.25.0) (2026-01-28)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.41.0`
+
+### Features
+
+* **gtech-1317745:** add compressed size log ([606f4c3](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/commit/606f4c341df1443dd1696aaded0e2fe5bef7e3d3))
+
+## [0.24.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-all-games-search-0.23.0...get-all-games-search-0.24.0) (2026-01-28)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.41.0`
+
+### Features
+
+* **gtech-1317745:** add compression at the lambda level ([ed45cf3](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/commit/ed45cf3868056b4e8aebf4c3fa9baf6a3bd1b6fb))
+
+## [0.23.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-all-games-search-0.22.0...get-all-games-search-0.23.0) (2026-01-23)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.40.0`
+
+### Features
+
+* **gtech-1317745:** default encoding for uncompressed lambdas ([9dba5d2](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/commit/9dba5d25387276374a2c1ce46055ec224098953e))
+
+## [0.22.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-all-games-search-0.21.15...get-all-games-search-0.22.0) (2026-01-19)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.39.0`
+
+### Features
+
+* **gtech-1317745:** add compression at the lambda level, test on search ([aa50855](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/commit/aa508559fc1877ec877dd1b0fe3a7dffd97e0906))
+
+## [0.21.15](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-all-games-search-0.21.14...get-all-games-search-0.21.15) (2026-01-19)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.38.0`
+## [0.21.14](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-all-games-search-0.21.13...get-all-games-search-0.21.14) (2025-12-16)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.37.0`
+## [0.21.13](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-all-games-search-0.21.12...get-all-games-search-0.21.13) (2025-12-09)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.36.0`
+## [0.21.12](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-all-games-search-0.21.11...get-all-games-search-0.21.12) (2025-12-05)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.35.0`
+## [0.21.11](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-all-games-search-0.21.10...get-all-games-search-0.21.11) (2025-12-03)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.34.2`
+## [0.21.10](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-all-games-search-0.21.9...get-all-games-search-0.21.10) (2025-12-02)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.34.1`
+## [0.21.9](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-all-games-search-0.21.8...get-all-games-search-0.21.9) (2025-11-28)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.34.0`
+## [0.21.8](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-all-games-search-0.21.7...get-all-games-search-0.21.8) (2025-11-26)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.33.0`
 ## [0.21.7](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-all-games-search-0.21.6...get-all-games-search-0.21.7) (2025-11-14)
 
 ### Dependency Updates

@@ -171,58 +171,32 @@ export const GAMES_SUCCESS_RESP: any = {
                                             name: 'game',
                                         },
                                         game: {
-                                            entryTitle: {
-                                                'en-GB': 'EYE_FLUFFY_ARCADE_RING_TOSS_LUCKYTAP',
-                                            },
+                                            entryTitle: 'EYE_FLUFFY_ARCADE_RING_TOSS_LUCKYTAP',
+                                            gameName: 'play-eye-fluffy-arcade-ring-toss-lucky-tap',
+                                            mobileGameName: 'play-eye-fluffy-arcade-ring-toss-lucky-tap-m',
+                                            gameSkin: 'EYE_FLUFFY_ARCADE_RING_TOSS_LUCKYTAP',
+                                            mobileGameSkin: 'EYEM_FLUFFY_ARCADE_RING_TOSS_LUCKYTAP',
+                                            mobileOverride: true,
                                             gamePlatformConfig: {
-                                                'en-GB': {
-                                                    name: 'play-eye-fluffy-arcade-ring-toss-lucky-tap',
-                                                    demoUrl:
-                                                        '/service/game/demo/play-eye-fluffy-arcade-ring-toss-lucky-tap',
-                                                    realUrl:
-                                                        '/service/game/play/play-eye-fluffy-arcade-ring-toss-lucky-tap',
-                                                    gameSkin: 'EYE_FLUFFY_ARCADE_RING_TOSS_LUCKYTAP',
-                                                    gameType: {
-                                                        type: 'Instant Win',
-                                                        brand: '',
-                                                        themes: ['Nature', 'Retro', 'Farm'],
-                                                        features: ['Bonus Game', 'Multipliers (With or without wilds)'],
-                                                    },
-                                                    gameStudio: '',
-                                                    mobileName: 'play-eye-fluffy-arcade-ring-toss-lucky-tap-m',
-                                                    gameProvider: 'Eyecon',
-                                                    mobileDemoUrl:
-                                                        '/service/game/demo/play-eye-fluffy-arcade-ring-toss-lucky-tap-m',
-                                                    mobileRealUrl:
-                                                        '/service/game/play/play-eye-fluffy-arcade-ring-toss-lucky-tap-m',
-                                                    mobileGameSkin: 'EYEM_FLUFFY_ARCADE_RING_TOSS_LUCKYTAP',
-                                                    mobileOverride: true,
-                                                    gameLoaderFileName: 'EYE_FLUFFY_ARCADE_RING_TOSS_LUCKYTAP',
-                                                    mobileGameLoaderFileName: 'EYE_FLUFFY_ARCADE_RING_TOSS_LUCKYTAP',
-                                                },
+                                                demoUrl:
+                                                    '/service/game/demo/play-eye-fluffy-arcade-ring-toss-lucky-tap',
+                                                realUrl:
+                                                    '/service/game/play/play-eye-fluffy-arcade-ring-toss-lucky-tap',
+                                                mobileDemoUrl:
+                                                    '/service/game/demo/play-eye-fluffy-arcade-ring-toss-lucky-tap-m',
+                                                mobileRealUrl:
+                                                    '/service/game/play/play-eye-fluffy-arcade-ring-toss-lucky-tap-m',
                                             },
                                             platform: ['Desktop', 'Phone', 'Tablet'],
-                                            vendor: {
-                                                'en-GB': 'infinity',
-                                            },
+                                            vendor: 'infinity',
                                             showGameName: {
                                                 'en-GB': false,
                                             },
-                                            progressiveJackpot: {
-                                                'en-GB': false,
-                                            },
-                                            operatorBarDisabled: {
-                                                'en-GB': false,
-                                            },
-                                            rgpEnabled: {
-                                                'en-GB': true,
-                                            },
-                                            funPanelEnabled: {
-                                                'en-GB': false,
-                                            },
-                                            funPanelDefaultCategory: {
-                                                'en-GB': '',
-                                            },
+                                            progressiveJackpot: false,
+                                            operatorBarDisabled: false,
+                                            rgpEnabled: true,
+                                            funPanelEnabled: false,
+                                            funPanelDefaultCategory: '',
                                             representativeColor: {
                                                 'en-GB': '#3F1D83',
                                                 es: '#3F1D83',
@@ -271,12 +245,8 @@ export const GAMES_SUCCESS_RESP: any = {
                                             nativeRequirement: {
                                                 'en-GB': null,
                                             },
-                                            showNetPosition: {
-                                                'en-GB': true,
-                                            },
-                                            platformVisibility: {
-                                                'en-GB': ['web', 'ios', 'android'],
-                                            },
+                                            showNetPosition: true,
+                                            platformVisibility: ['web', 'ios', 'android'],
                                             contentType: 'gameV2',
                                             id: '6tKrAnhhnMzjjV7zcLcfqi',
                                             cmsEnv: 'iGamingMigrationsEU',
@@ -377,56 +347,30 @@ export const GAMES_SUCCESS_RESP: any = {
                                             name: 'game',
                                         },
                                         game: {
-                                            entryTitle: {
-                                                'en-GB': 'MGSD_WHACK_THE_BELL_TAP_N_CASH',
-                                            },
+                                            entryTitle: 'MGSD_WHACK_THE_BELL_TAP_N_CASH',
+                                            gameName: 'play-micro-whack-the-bell-tap-n-cash',
+                                            mobileGameName: 'play-micro-whack-the-bell-tap-n-cash-m',
+                                            gameSkin: 'MGSD_WHACK_THE_BELL_TAP_N_CASH',
+                                            mobileGameSkin: 'MGSM_WHACK_THE_BELL_TAP_N_CASH',
+                                            mobileOverride: true,
                                             gamePlatformConfig: {
-                                                'en-GB': {
-                                                    name: 'play-micro-whack-the-bell-tap-n-cash',
-                                                    demoUrl: '/service/game/demo/play-micro-whack-the-bell-tap-n-cash',
-                                                    realUrl: '/service/game/play/play-micro-whack-the-bell-tap-n-cash',
-                                                    gameSkin: 'MGSD_WHACK_THE_BELL_TAP_N_CASH',
-                                                    gameType: {
-                                                        type: 'Instant Win',
-                                                        brand: '',
-                                                        themes: ['Other'],
-                                                        features: ['Multipliers (With or without wilds)', 'Bonus Game'],
-                                                    },
-                                                    gameStudio: '',
-                                                    mobileName: 'play-micro-whack-the-bell-tap-n-cash-m',
-                                                    gameProvider: 'Games Global',
-                                                    mobileDemoUrl:
-                                                        '/service/game/demo/play-micro-whack-the-bell-tap-n-cash-m',
-                                                    mobileRealUrl:
-                                                        '/service/game/play/play-micro-whack-the-bell-tap-n-cash-m',
-                                                    mobileGameSkin: 'MGSM_WHACK_THE_BELL_TAP_N_CASH',
-                                                    mobileOverride: true,
-                                                    gameLoaderFileName: 'MGSD_WHACK_THE_BELL_TAP_N_CASH',
-                                                    mobileGameLoaderFileName: 'MGSM_WHACK_THE_BELL_TAP_N_CASH',
-                                                },
+                                                demoUrl: '/service/game/demo/play-micro-whack-the-bell-tap-n-cash',
+                                                realUrl: '/service/game/play/play-micro-whack-the-bell-tap-n-cash',
+                                                mobileDemoUrl:
+                                                    '/service/game/demo/play-micro-whack-the-bell-tap-n-cash-m',
+                                                mobileRealUrl:
+                                                    '/service/game/play/play-micro-whack-the-bell-tap-n-cash-m',
                                             },
                                             platform: ['Phone', 'Tablet', 'Desktop'],
-                                            vendor: {
-                                                'en-GB': 'infinity',
-                                            },
+                                            vendor: 'infinity',
                                             showGameName: {
                                                 'en-GB': false,
                                             },
-                                            progressiveJackpot: {
-                                                'en-GB': false,
-                                            },
-                                            operatorBarDisabled: {
-                                                'en-GB': false,
-                                            },
-                                            rgpEnabled: {
-                                                'en-GB': true,
-                                            },
-                                            funPanelEnabled: {
-                                                'en-GB': false,
-                                            },
-                                            funPanelDefaultCategory: {
-                                                'en-GB': '',
-                                            },
+                                            progressiveJackpot: false,
+                                            operatorBarDisabled: false,
+                                            rgpEnabled: true,
+                                            funPanelEnabled: false,
+                                            funPanelDefaultCategory: '',
                                             representativeColor: {
                                                 'en-GB': '#D2412C',
                                             },
@@ -470,13 +414,8 @@ export const GAMES_SUCCESS_RESP: any = {
                                             nativeRequirement: {
                                                 'en-GB': null,
                                             },
-                                            showNetPosition: {
-                                                'en-GB': true,
-                                                es: false,
-                                            },
-                                            platformVisibility: {
-                                                'en-GB': ['web', 'ios', 'android'],
-                                            },
+                                            showNetPosition: true,
+                                            platformVisibility: ['web', 'ios', 'android'],
                                             contentType: 'gameV2',
                                             id: '68UdNRecbboKjD0HQ86yLv',
                                             cmsEnv: 'iGamingMigrationsEU',
@@ -577,61 +516,28 @@ export const GAMES_SUCCESS_RESP: any = {
                                             name: 'game',
                                         },
                                         game: {
-                                            entryTitle: {
-                                                'en-GB': 'PT_PIGGIES_AND_THE_BANK_LUCKY_TAP',
-                                            },
+                                            entryTitle: 'PT_PIGGIES_AND_THE_BANK_LUCKY_TAP',
+                                            gameName: 'play-pt-piggies-and-the-bank-lucky-tap',
+                                            mobileGameName: '',
+                                            gameSkin: 'PT_PIGGIES_AND_THE_BANK_LUCKY_TAP',
+                                            mobileGameSkin: '',
+                                            mobileOverride: false,
                                             gamePlatformConfig: {
-                                                'en-GB': {
-                                                    name: 'play-pt-piggies-and-the-bank-lucky-tap',
-                                                    demoUrl:
-                                                        '/service/game/demo/play-pt-piggies-and-the-bank-lucky-tap',
-                                                    realUrl:
-                                                        '/service/game/play/play-pt-piggies-and-the-bank-lucky-tap',
-                                                    gameSkin: 'PT_PIGGIES_AND_THE_BANK_LUCKY_TAP',
-                                                    gameType: {
-                                                        type: 'Instant Win',
-                                                        brand: '',
-                                                        themes: ['Money', 'Bank', 'Other'],
-                                                        features: [
-                                                            'Mystery Symbols',
-                                                            'Multipliers (With or without wilds)',
-                                                            'Bonus Game',
-                                                            'Cash Collect',
-                                                        ],
-                                                    },
-                                                    gameStudio: '',
-                                                    mobileName: '',
-                                                    gameProvider: 'Playtech',
-                                                    mobileDemoUrl: '',
-                                                    mobileRealUrl: '',
-                                                    mobileGameSkin: '',
-                                                    mobileOverride: false,
-                                                    gameLoaderFileName: 'PT_PIGGIES_AND_THE_BANK_LUCKY_TAP',
-                                                    mobileGameLoaderFileName: '',
-                                                },
+                                                demoUrl: '/service/game/demo/play-pt-piggies-and-the-bank-lucky-tap',
+                                                realUrl: '/service/game/play/play-pt-piggies-and-the-bank-lucky-tap',
+                                                mobileDemoUrl: '',
+                                                mobileRealUrl: '',
                                             },
                                             platform: ['Desktop', 'Phone', 'Tablet'],
-                                            vendor: {
-                                                'en-GB': 'infinity',
-                                            },
+                                            vendor: 'infinity',
                                             showGameName: {
                                                 'en-GB': false,
                                             },
-                                            progressiveJackpot: {
-                                                'en-GB': false,
-                                            },
-                                            operatorBarDisabled: {
-                                                'en-GB': false,
-                                            },
-                                            rgpEnabled: {
-                                                'en-GB': true,
-                                            },
-                                            funPanelEnabled: {
-                                                'en-GB': false,
-                                            },
-                                            funPanelDefaultCategory: {
-                                                'en-GB': '',
-                                            },
+                                            progressiveJackpot: false,
+                                            operatorBarDisabled: false,
+                                            rgpEnabled: true,
+                                            funPanelEnabled: false,
+                                            funPanelDefaultCategory: '',
                                             representativeColor: {
                                                 'en-GB': '#4A2866',
                                                 es: '#6B422C',
@@ -676,13 +582,8 @@ export const GAMES_SUCCESS_RESP: any = {
                                             nativeRequirement: {
                                                 'en-GB': null,
                                             },
-                                            showNetPosition: {
-                                                'en-GB': true,
-                                                es: false,
-                                            },
-                                            platformVisibility: {
-                                                'en-GB': ['web', 'ios', 'android'],
-                                            },
+                                            showNetPosition: true,
+                                            platformVisibility: ['web', 'ios', 'android'],
                                             contentType: 'gameV2',
                                             id: '2M2VCmWfqpWG8hgJyxcr3M',
                                             cmsEnv: 'iGamingMigrationsEU',

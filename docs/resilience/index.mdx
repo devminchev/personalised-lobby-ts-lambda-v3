@@ -1,0 +1,20 @@
+---
+title: Resilience
+description: Ongoing architectural work to keep the Personalised Lobby APIs serving traffic under high or critical load
+---
+
+# Resilience
+
+This section documents the architectural work in progress to make the Personalised Lobby service more resilient to high and critical load conditions. The guiding principle is simple:
+
+> Under load, **preserve the core user journey** — even if that means turning off everything else.
+
+The first piece of this work is a tiering model that classifies every endpoint by how essential it is to the core user journey, so non-critical paths can be shed first when the system is under pressure.
+
+## In this section
+
+- [Service tiers](./service-tiers) — how endpoints are grouped into tiers (A / B / C and non-live traffic), the OpenSearch queries each tier depends on, and the order in which they would be shed during a load event.
+- [Circuit-breaker alarms](./circuit-breaker-alarms) — definition of the CloudWatch alarms that drive the global circuit-breaker state: signal tiers, detection timing, missing-data semantics, and the invariants callers can rely on.
+- [Circuit-breaker behaviour](./circuit-breaker-behaviour) — how those alarms interact with the controller state machine under representative load scenarios (slow ramp, short critical peak, low traffic, warning-only pressure).
+
+More resilience topics (load-shedding controls, cache fallbacks, etc.) will be added here as that work lands.

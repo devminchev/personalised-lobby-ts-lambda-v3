@@ -1,21 +1,8 @@
 /* eslint-disable prettier/prettier */
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import {
-    getClient,
-    handleSpaceLocalization,
-    checkRequestParams,
-    getVentureId,
-    patchVentureName,
-    getLambdaExecutionEnvironment,
-    validateLocaleQuery,
-    errorResponseHandler,
-    EmptyPageViewResponse,
-    validators,
-} from 'os-client';
-import { getView } from './lib/processViews';
-import { getSections } from './lib/processSections';
-import { getTheme } from './lib/processTheme';
-import { IViewApiResponse } from './lib/types';
+import { handler } from './control/handler';
+import { AB_VARIANT_HEADER, AbVariant, isAbVariant, LogCode, logMessage } from 'os-client';
+import { compileFunction } from 'vm';
 /**
  * GetViewFunction
  * Version: 1.0.1
@@ -28,96 +15,24 @@ import { IViewApiResponse } from './lib/types';
  * Return doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html
  * @returns {Object} object - API Gateway Lambda Proxy Output Format
  *
+ * lobby variants:
+ *  - treatment: x percent of users using new adaptive feature
+ *  - control: x percent of user using current feature
+ *  - unaffected: not affected but still using current feature
  */
 
 export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-    const eventReqId = event?.requestContext?.requestId;
+    const lobbyVariant = event.headers?.[AB_VARIANT_HEADER];
 
-    // Path params
-    const siteNameFromParams = event.pathParameters?.sitename as string;
-    const siteName = patchVentureName(siteNameFromParams);
-    const platform = event.pathParameters?.platform as string;
-    const viewSlug = event.pathParameters?.viewslug as string;
-
-    // Query params
-    const authenticated = event.queryStringParameters?.auth || '';
-    const userLocale: string = validateLocaleQuery(event.queryStringParameters?.locale);
-
-    try {
-        const client = getClient();
-
-        // Runtime Params
-        const envVisibility = getLambdaExecutionEnvironment();
-        const spaceLocale = handleSpaceLocalization();
-
-        const sessionVisibility = authenticated.trim().toLowerCase() === 'true' ? 'loggedIn' : 'loggedOut';
-
-        checkRequestParams(
-            [siteName, validators.siteName],
-            [platform, validators.platform],
-            [viewSlug, validators.viewSlug],
-        );
-
-        const ventureId = await getVentureId(client, siteName, spaceLocale, platform);
-
-        const { topContent, primaryContent, name, slug, liveHidden, classification, entryId, themeId } = await getView({
-            client,
-            viewSlug,
-            ventureId,
-            platform,
-            spaceLocale,
-            userLocale,
-            sessionVisibility,
-            envVisibility,
-            siteName,
-        }); // 404 or 422
-
-        const { topContent: top, primaryContent: primary } = await getSections({
-            client,
-            topContent,
-            primaryContent,
-            siteName,
-            spaceLocale,
-            userLocale,
-            platform,
-            sessionVisibility,
-            envVisibility,
-        }); // 404
-
-        const viewTheme = themeId && (await getTheme(client, themeId, spaceLocale, entryId, siteName, platform));
-
-        const viewResponse: IViewApiResponse = {
-            entryId,
-            name,
-            viewSlug: slug,
-            classification,
-            topContent: top,
-            primaryContent: primary,
-            liveHidden,
-            ...(viewTheme && {
-                theme: viewTheme,
-            }),
-        };
-
-        return {
-            statusCode: 200,
-            body: JSON.stringify(viewResponse),
-        };
-    } catch (err) {
-        const expectedEmptyBody: EmptyPageViewResponse = {
-            name: '',
-            viewSlug: '',
-            classification: 'general',
-            topContent: [],
-            primaryContent: [],
-        };
-        const errorLogParams = {
-            eventReqId,
-            siteName,
-            platform,
-            viewSlug,
-            userLocale,
-        };
-        return errorResponseHandler(err, expectedEmptyBody, errorLogParams);
+    if (isAbVariant(lobbyVariant)) {
+        logMessage('log', LogCode.VariantUsed, {}, lobbyVariant);
     }
+
+    if (lobbyVariant === AbVariant.Treatment) {
+        //TODO: change to treatment handler logic
+        return handler(event);
+    }
+
+    // return control / unaffected variant
+    return handler(event);
 };

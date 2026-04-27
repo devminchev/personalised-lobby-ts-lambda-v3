@@ -1,11 +1,11 @@
 {
   "body": "",
   "resource": "/sites/{sitename}/platform/{platform}/view/{viewslug}?auth={auth}",
-  "path": "/sites/monopolycasino/platform/web/platform/view/homepage",
+  "path": "/sites/virgingames/platform/web/platform/view/homepage",
   "httpMethod": "GET",
   "isBase64Encoded": false,
   "pathParameters": {
-    "sitename": "rainbowriches",
+    "sitename": "virgingames",
     "viewslug": "homepage",
     "platform": "web"
   },
@@ -31,7 +31,8 @@
     "X-Amz-Cf-Id": "cDehVQoZnx43VYQb9j2-nvCh-9z396Uhbp027Y2JvkCPNLmGJHqlaA==",
     "X-Forwarded-For": "127.0.0.1, 127.0.0.2",
     "X-Forwarded-Port": "443",
-    "X-Forwarded-Proto": "https"
+    "X-Forwarded-Proto": "https",
+    "X-LOBBY-VARIANT": "treatment"
   },
   "requestContext": {
     "accountId": "123456789012",
@@ -53,7 +54,7 @@
       "userAgent": "Custom User Agent String",
       "user": null
     },
-    "path": "/sites/jackpotjoy/platform/web/platform/view/slots?auth=true",
+    "path": "/sites/virgingames/platform/web/platform/view/homepage?auth=true",
     "resourcePath": "/sites/{sitename}/platform/{platform}/view/{viewslug}?auth={auth}",
     "httpMethod": "GET",
     "apiId": "1234567890",

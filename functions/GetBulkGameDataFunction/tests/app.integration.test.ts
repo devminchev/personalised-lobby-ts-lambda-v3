@@ -8,14 +8,7 @@ import nock from 'nock';
 import { jest, describe, beforeEach, it, expect } from '@jest/globals';
 import { mockApiEvent } from './mocks/gatewayMocks';
 import { NOT_FOUND_RESPONSE, VENTURE_SUCCESS_RESP } from './mocks/responses';
-import {
-    ErrorCode,
-    getErrorMessage,
-    VENTURES_INDEX_ALIAS,
-    CATEGORIES_INDEX_ALIAS,
-    NAVIGATION_INDEX,
-    NAVIGATION_INDEX_READ_ALIAS,
-} from 'os-client';
+import { ErrorCode, getErrorMessage, VENTURES_INDEX_ALIAS, NAVIGATION_INDEX_READ_ALIAS } from 'os-client';
 
 const SITE_NAME = 'jackpotjoy';
 const PLATFORM = 'web';

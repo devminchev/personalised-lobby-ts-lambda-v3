@@ -1,15 +1,15 @@
 {
   "body": "",
   "resource": "/sites/{sitename}/platform/{platform}/suggested-for-you?memberid={memberId}",
-  "path": "/sites/doublebubblebingo/platform/web/suggested-for-you?memberid=21551306&locale=en-GB",
+  "path": "/sites/jackpotjoy/platform/web/suggested-for-you?memberid=12527569&locale=en-GB",
   "httpMethod": "GET",
   "isBase64Encoded": false,
   "pathParameters": {
-    "sitename": "doublebubblebingo",
+    "sitename": "jackpotjoy",
     "platform": "web"
   },
   "queryStringParameters": {
-    "memberid": "21551306",
+    "memberid": "12527569",
     "locale": "en-GB"
   },
   "stageVariables": {},
@@ -54,7 +54,7 @@
       "user": null
     },
     "resource": "/sites/{sitename}/platform/{platform}/suggested-for-you?memberid={memberId}",
-    "path": "/sites/doublebubblebingo/platform/ios/suggested-for-you?memberid=13267801&locale=en-GB",
+    "path": "/sites/jackpotjoy/platform/ios/suggested-for-you?memberid=13267801&locale=en-GB",
     "httpMethod": "get",
     "apiId": "1234567890",
     "protocol": "HTTP/1.1"

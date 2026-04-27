@@ -1,0 +1,16 @@
+{
+  "name": "post-games-payload-handler",
+  "version": "0.3.3",
+  "description": "Triggered by a Contentful webhook and syncs game data to the games-v3 index",
+  "main": "app.js",
+  "repository": "https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda",
+  "relComponent": "igaming_lobby_post_historical_game_titles_v3",
+  "skipRelTicket": true,
+  "scripts": {
+    "unit": "jest",
+    "clean": "rm -rf node_modules coverage",
+    "clean:lock": "rimraf package-lock.json yarn.lock",
+    "format:check": "prettier --check '**/*.{ts,tsx,js,jsx,json,md}'"
+  },
+  "dependencies": {}
+}

@@ -12,8 +12,9 @@ import {
     getVentureId,
     patchVentureName,
     getLambdaExecutionEnvironment,
-    GAMES_V2_INDEX_ALIAS,
+    IG_GAMES_V2_READ_ALIAS,
     ARCHIVED_GAMES_READ_ALIAS,
+    jsonResponse,
 } from 'os-client';
 import { FullApiResponse } from 'os-client/lib/sharedInterfaces/interfaces.js';
 
@@ -63,8 +64,10 @@ const getGameAndSiteGame = async (
                                 size: 1,
                                 _source: [
                                     `game.gamePlatformConfig.${spaceLocale}.gameSkin`,
+                                    `game.gameSkin`,
                                     'game.title',
                                     `game.gamePlatformConfig.${spaceLocale}.name`,
+                                    `game.gameName`,
                                 ],
                             },
                         },
@@ -121,6 +124,10 @@ const getOldGames = async (
     return result.map((item) => item.games).flat();
 };
 
+type BackwardCompatibleGamePlatformConfig =
+    | FullApiResponse['innerHit']['game']['gamePlatformConfig']
+    | Record<string, { gameSkin?: string } | undefined>;
+
 const createResponseObject = (
     gameHits: FullApiResponse[],
     localeOverride: string,
@@ -128,7 +135,11 @@ const createResponseObject = (
 ): HistoricGameTitleResponse[] => {
     const gamePayload = gameHits.map((item: FullApiResponse) => {
         const gameData = item.innerHit?.game;
-        const gameSkin = gameData?.gamePlatformConfig?.[spaceLocale]?.gameSkin || '';
+        const gamePlatformConfig = gameData?.gamePlatformConfig as BackwardCompatibleGamePlatformConfig | undefined;
+        const legacyLocalizedGamePlatformConfig = gamePlatformConfig as
+            | Record<string, { gameSkin?: string } | undefined>
+            | undefined;
+        const gameSkin = legacyLocalizedGamePlatformConfig?.[spaceLocale]?.gameSkin || gameData?.gameSkin || '';
         const localizedGameTitle = tryGetValueFromLocalised(localeOverride, spaceLocale, gameData?.title, '');
         return {
             gameSkin: gameSkin,
@@ -161,7 +172,7 @@ export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGat
             client,
             ventureId,
             spaceLocale,
-            GAMES_V2_INDEX_ALIAS,
+            IG_GAMES_V2_READ_ALIAS,
             siteName,
             '',
         );
@@ -208,22 +219,19 @@ export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGat
         });
         const allGameTitlesResp = Array.from(gameMap.values());
 
-        return {
-            statusCode: 200,
-            body: JSON.stringify(allGameTitlesResp),
-        };
+        return jsonResponse(allGameTitlesResp);
     } catch (err) {
         const errorCode = (err as any).code;
         const statusCode = (err as any).statusCode || 500;
         const errorMessage = (err as Error).message;
         logError(ErrorCode.ExecutionError, statusCode, { siteName, userLocale, err });
 
-        return {
-            statusCode: statusCode,
-            body: JSON.stringify({
+        return jsonResponse(
+            {
                 code: errorCode,
                 message: errorMessage,
-            }),
-        };
+            },
+            statusCode,
+        );
     }
 };

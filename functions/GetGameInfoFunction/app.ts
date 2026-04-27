@@ -22,8 +22,10 @@ import {
     coalescePropValue,
     IGameInfoResponse,
     errorResponseHandler,
+    gzipResponse,
+    resolveGameProp,
 } from 'os-client';
-import { GAMES_INDEX_V2_ALIAS } from 'os-client/lib/constants';
+import { IG_GAMES_V2_READ_ALIAS } from 'os-client/lib/constants';
 import { extractBynderObject, validators } from 'os-client/lib/utils';
 
 /**
@@ -111,7 +113,7 @@ export const getGameAndSiteGameByGameName = async (
     const responses = await getSiteGameHits<{ game: IGameInfo }, { siteGame: ISiteGameInfo }>(
         client,
         query,
-        GAMES_INDEX_V2_ALIAS,
+        IG_GAMES_V2_READ_ALIAS,
         siteName,
         platform,
     );
@@ -136,21 +138,20 @@ const createResponseObject = async (
         '',
     );
 
-    const platformConfig: GamePlatformConfig = game.gamePlatformConfig[defaultLocale];
+    const platformConfig: GamePlatformConfig = resolveGameProp(
+        game.gamePlatformConfig,
+        defaultLocale,
+        {} as GamePlatformConfig,
+    );
     const gameType = platformConfig?.gameType?.type;
 
-    const funPanelDefaultCategory: string = tryGetValueFromLocalised(
-        userLocale,
-        defaultLocale,
-        game.funPanelDefaultCategory,
-        '',
-    );
-    const funPanelEnabled: boolean = tryGetValueFromLocalised(userLocale, defaultLocale, game.funPanelEnabled, false);
+    const funPanelDefaultCategory: string = resolveGameProp(game.funPanelDefaultCategory, defaultLocale, '');
+    const funPanelEnabled: boolean = resolveGameProp(game.funPanelEnabled, defaultLocale, false);
     const funPanelGame: FunPanelGame | boolean = funPanelDefaultCategory
         ? { defaultCategory: funPanelDefaultCategory }
         : funPanelEnabled;
 
-    const isMobile = platform !== 'web' && platformConfig.mobileOverride;
+    const isMobile = platform !== 'web' && game.mobileOverride;
     const platformDemoUrl = isMobile ? platformConfig.mobileDemoUrl : platformConfig.demoUrl;
 
     const showNetPosition: boolean = coalescePropValue({
@@ -186,13 +187,13 @@ const createResponseObject = async (
     const loggedOutForegroundLogoMediaObj = extractBynderObject(loggedOutForegroundLogoMedia);
     const backgroundMediaObj = extractBynderObject(backgroundMedia);
     const loggedOutBackgroundMediaObj = extractBynderObject(loggedOutBackgroundMedia);
-    const backgroundImage = tryGetValueFromLocalised(userLocale, defaultLocale, game.funPanelBackgroundImage, '');
+    const backgroundImage = resolveGameProp(game.funPanelBackgroundImage, defaultLocale, '');
     const liveHidden = siteGame.liveHidden?.[defaultLocale];
 
     const gameInfo: IGameInfoResponse = {
         entryId: siteGame.id,
         ...(platformDemoUrl && { demoUrl: platformDemoUrl }),
-        gameSkin: (isMobile ? platformConfig.mobileGameSkin : platformConfig.gameSkin) || '',
+        gameSkin: (isMobile ? game.mobileGameSkin : game.gameSkin) ?? '',
         ...(gameType && { gameType }),
         howToPlayContent: tryGetValueFromLocalised(userLocale, defaultLocale, howToPlayContent, ''),
         infoDetails: tryGetValueFromLocalised(userLocale, defaultLocale, game.infoDetails, ''),
@@ -200,7 +201,7 @@ const createResponseObject = async (
         introductionContent: tryGetValueFromLocalised(userLocale, defaultLocale, game.introductionContent, ''),
         maxBet: tryGetValueFromLocalised(userLocale, defaultLocale, maxBet, ''),
         minBet: tryGetValueFromLocalised(userLocale, defaultLocale, minBet, ''),
-        name: (isMobile ? platformConfig.mobileName : platformConfig.name) || '',
+        name: (isMobile ? game.mobileGameName : game.gameName) ?? '',
         realUrl: (isMobile ? platformConfig.mobileRealUrl : platformConfig.realUrl) || '',
         representativeColor: tryGetValueFromLocalised(userLocale, defaultLocale, game.representativeColor, ''),
         title: tryGetValueFromLocalised(userLocale, defaultLocale, game.title, ''),
@@ -252,10 +253,7 @@ export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGat
 
         const responseObject: IGameInfoResponse = await createResponseObject(models, userLocale, spaceLocale, platform);
 
-        return {
-            statusCode: 200,
-            body: JSON.stringify(responseObject),
-        };
+        return gzipResponse(responseObject);
     } catch (err) {
         const errorLogParams = {
             eventReqId,

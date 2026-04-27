@@ -8,7 +8,7 @@ import { handleSuggestedGames } from '../collaborativeBased/suggestedGames';
 import { LogCode, logMessage } from '../../logger';
 import { createGamesQuery, orderedPayload } from '../../utils';
 import { gamesPayloadBySiteGame } from '../../gamesPayloads';
-import { GAMES_V2_INDEX_ALIAS } from '../../constants';
+import { IG_GAMES_V2_READ_ALIAS } from '../../constants';
 import { handleRecentlyPlayed } from '../similarityBased/recentlyPlayed';
 import { OrderCriteria } from './interfaces';
 
@@ -111,7 +111,7 @@ export const handleMissingMLRecommendations = async (
     const sectionGames = await getGamesSiteGames(
         client,
         sectionGamesListQuery,
-        GAMES_V2_INDEX_ALIAS,
+        IG_GAMES_V2_READ_ALIAS,
         ventureId,
         siteName,
         platform,

@@ -1,6 +1,6 @@
 {
   "name": "get-navigation",
-  "version": "0.10.7",
+  "version": "0.15.5",
   "description": "Get the navigation for the lobby.",
   "main": "app.js",
   "repository": "https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3",

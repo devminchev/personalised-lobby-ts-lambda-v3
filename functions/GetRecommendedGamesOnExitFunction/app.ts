@@ -7,6 +7,7 @@ import {
     handleSpaceLocalization,
     validators,
     errorResponseHandler,
+    gzipResponse,
 } from 'os-client';
 import { getGamebyGameSkin } from './lib/index';
 
@@ -42,10 +43,7 @@ export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGat
 
         const extraData = await getGamebyGameSkin(client, siteName, gameSkin, locale, spaceLocale, platform);
 
-        return {
-            statusCode: 200,
-            body: JSON.stringify(extraData),
-        };
+        return gzipResponse(extraData);
     } catch (err) {
         const errorLogParams = {
             eventReqId,

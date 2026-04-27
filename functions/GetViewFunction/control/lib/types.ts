@@ -1,4 +1,13 @@
-import { IBynderAsset, IGLinkItem, IIGTheme, IViewAll, LocalizedField, SysReference, SystemLink } from 'os-client';
+import {
+    IBynderAssets,
+    IGLinkItem,
+    IIGTheme,
+    IViewAll,
+    LocalizedField,
+    SysReference,
+    SystemLink,
+    SanitizedBynder,
+} from 'os-client';
 import { IViewAllOS } from 'os-client/lib/sharedInterfaces/interfaces';
 
 export type topContent =
@@ -61,17 +70,17 @@ export interface IJackpotSectionOS extends IViewAllOS {
         name: string;
     }>;
     headerImage?: LocalizedField<string>;
-    headerImageBynder?: LocalizedField<IBynderAsset>;
+    headerImageBynder?: IBynderAssets;
     backgroundImage?: LocalizedField<string>;
-    backgroundImageBynder?: LocalizedField<IBynderAsset>;
+    backgroundImageBynder?: IBynderAssets;
     pot1Image?: LocalizedField<string>;
-    pot1ImageBynder?: LocalizedField<IBynderAsset>;
+    pot1ImageBynder?: IBynderAssets;
     pot2Image?: LocalizedField<string>;
-    pot2ImageBynder?: LocalizedField<IBynderAsset>;
+    pot2ImageBynder?: IBynderAssets;
     pot3Image?: LocalizedField<string>;
-    pot3ImageBynder?: LocalizedField<IBynderAsset>;
+    pot3ImageBynder?: IBynderAssets;
     pot4Image?: LocalizedField<string>;
-    pot4ImageBynder?: LocalizedField<IBynderAsset>;
+    pot4ImageBynder?: IBynderAssets;
 }
 
 export interface IJackpotSection {
@@ -85,17 +94,17 @@ export interface IJackpotSection {
         name: string;
     };
     headerImage?: string;
-    bynderHeaderImage?: IBynderAsset;
+    bynderHeaderImage?: SanitizedBynder[];
     backgroundImage?: string;
-    bynderBackgroundImage?: IBynderAsset;
+    bynderBackgroundImage?: SanitizedBynder[];
     pot1Image?: string;
-    bynderPot1Image?: IBynderAsset;
+    bynderPot1Image?: SanitizedBynder[];
     pot2Image?: string;
-    bynderPot2Image?: IBynderAsset;
+    bynderPot2Image?: SanitizedBynder[];
     pot3Image?: string;
-    bynderPot3Image?: IBynderAsset;
+    bynderPot3Image?: SanitizedBynder[];
     pot4Image?: string;
-    bynderPot4Image?: IBynderAsset;
+    bynderPot4Image?: SanitizedBynder[];
     viewAll?: IViewAll;
 }
 
@@ -122,9 +131,9 @@ export interface IDFGSectionOS {
     media?: LocalizedField<string>;
     dynamicBackground?: LocalizedField<string>;
     dynamicLogo?: LocalizedField<string>;
-    bynderMedia?: LocalizedField<IBynderAsset>;
-    bynderDynamicBackground?: LocalizedField<IBynderAsset>;
-    bynderDynamicLogo?: LocalizedField<IBynderAsset>;
+    bynderMedia?: IBynderAssets;
+    bynderDynamicBackground?: IBynderAssets;
+    bynderDynamicLogo?: IBynderAssets;
     link?: LocalizedField<string>;
 }
 
@@ -136,9 +145,9 @@ export interface IDFGSection {
     media?: string;
     dynamicBackground?: string;
     dynamicLogo?: string;
-    bynderMedia?: IBynderAsset;
-    bynderDynamicBackground?: IBynderAsset;
-    bynderDynamicLogo?: IBynderAsset;
+    bynderMedia?: SanitizedBynder[];
+    bynderDynamicBackground?: SanitizedBynder[];
+    bynderDynamicLogo?: SanitizedBynder[];
     link?: string;
 }
 
@@ -148,7 +157,7 @@ export interface IBannerSectionOS {
     contentType: string;
     classification: LocalizedField<string>;
     displaySize: LocalizedField<string>;
-    bynderMedia?: LocalizedField<IBynderAsset>;
+    bynderMedia?: IBynderAssets;
     imageUrl?: LocalizedField<string>;
     videoUrl?: LocalizedField<string>;
     bannerLink?: LocalizedField<string>;
@@ -163,7 +172,7 @@ export interface IBannerSection {
     displaySize?: string;
     image?: string;
     video?: string;
-    bynderMedia?: IBynderAsset;
+    bynderMedia?: SanitizedBynder[];
     bannerLink?: string;
     bannerType?: string;
 }
@@ -261,9 +270,9 @@ export interface IGameSectionOS extends IViewAllOS {
     // only grid-c
     media?: LocalizedField<string>;
     image?: LocalizedField<string>;
-    bynderMedia?: LocalizedField<IBynderAsset>;
-    mediaLoggedIn?: LocalizedField<IBynderAsset>;
-    mediaLoggedOut?: LocalizedField<IBynderAsset>;
+    bynderMedia?: IBynderAssets;
+    mediaLoggedIn?: IBynderAssets;
+    mediaLoggedOut?: IBynderAssets;
 }
 
 export interface IGameSection {
@@ -278,7 +287,7 @@ export interface IGameSection {
 
     // only grid-c
     media?: string;
-    bynderMedia?: IBynderAsset;
+    bynderMedia?: SanitizedBynder[];
 
     // both carousels & all grids
     viewAll?: IViewAll;

@@ -1,0 +1,59 @@
+{
+  "resource": "/sync-games-payload",
+  "path": "/sync-games-payload",
+  "httpMethod": "POST",
+  "isBase64Encoded": false,
+  "pathParameters": {},
+  "queryStringParameters": {},
+  "stageVariables": {},
+  "headers": {
+    "Accept": "application/json",
+    "Content-Type": "application/json",
+    "Cache-Control": "no-cache",
+    "CloudFront-Forwarded-Proto": "https",
+    "CloudFront-Is-Desktop-Viewer": "true",
+    "CloudFront-Is-Mobile-Viewer": "false",
+    "CloudFront-Is-SmartTV-Viewer": "false",
+    "CloudFront-Is-Tablet-Viewer": "false",
+    "CloudFront-Viewer-Country": "US",
+    "Host": "https://search-lobby-opsearch-oc5o7t2piau33hcu5ej3ortis4.eu-west-1.es.amazonaws.com/",
+    "User-Agent": "Custom User Agent String",
+    "Via": "1.1 08f323deadbeefa7af34d5feb414ce27.cloudfront.net (CloudFront)",
+    "X-Amz-Cf-Id": "cDehVQoZnx43VYQb9j2-nvCh-9z396Uhbp027Y2JvkCPNLmGJHqlaA==",
+    "X-Forwarded-For": "127.0.0.1, 127.0.0.2",
+    "X-Forwarded-Port": "443",
+    "X-Forwarded-Proto": "https",
+    "X-Contentful-Topic": "ContentManagement.Entry.auto_save",
+    "X-Contentful-CRN": "<crn-of-signed-request>",
+    "X-Contentful-Space-Id": "nw2595tc1jdx",
+    "X-Contentful-Environment-Id": "dev",
+    "X-Contentful-Idempotency-Key": "66511519acf59f0d9608894a527893fd8d82b7f35fc491a947f1c2da36025416",
+    "X-Contentful-User-Id": "<user-id>",
+    "X-Contentful-Signature": "b79f39183d3b22ab01b577c9498f340ddadc7c1ec3a62c942f8919d826038b8d",
+    "X-Contentful-Signed-Headers": "content-length,content-type,user-agent,x-contentful-crn,x-contentful-event-datetime,x-contentful-idempotency-key,x-contentful-signed-headers,x-contentful-timestamp,x-contentful-topic,x-contentful-webhook-name,x-query-metadata,x-unique-own-deployment-env,x-unique-own-identifier",
+    "X-Contentful-Timestamp": "770932561553"
+  },
+  "multiValueHeaders": {
+    "X-Contentful-Topic": [
+      "ContentManagement.Entry.auto_save"
+    ]
+  },
+  "requestContext": {
+    "accountId": "123456789012",
+    "resourceId": "123456",
+    "stage": "v1",
+    "requestId": "c6af9ac6-7b61-11e6-9a41-93e8deadbeef",
+    "requestTime": "09/Apr/2015:12:34:56 +0000",
+    "requestTimeEpoch": 1428582896000,
+    "identity": {
+      "sourceIp": "127.0.0.1",
+      "userAgent": "Custom User Agent String"
+    },
+    "resource": "/sync-games-payload",
+    "path": "/sync-games-payload",
+    "httpMethod": "POST",
+    "apiId": "1234567890",
+    "protocol": "HTTP/1.1"
+  },
+  "body": "{\"game_to_sitegame\":{\"name\":\"game\"},\"game\":{\"cmsEnv\":\"dev\",\"gamePlatformConfig\":{\"en-GB\":{\"rtp\":0,\"name\":\"play-ins-luck-it-up\",\"demoUrl\":\"\",\"realUrl\":\"/service/game/play/play-ins-luck-it-up\",\"gameSkin\":\"INS_LUCK_IT_UP\",\"gameType\":{\"reel\":\"\",\"type\":\"Slots\",\"brand\":\"\",\"themes\":[],\"features\":[],\"winLines\":\"\",\"isJackpot\":false,\"waysToWin\":\"\",\"symbolType\":[],\"maxExposure\":\"\",\"symbolCount\":\"\",\"winLineType\":\"\",\"isPersistence\":false,\"maxMultiplier\":\"\",\"isJackpotFixedPrize\":false,\"isJackpotInGameProgressive\":false,\"isJackpotPlatformProgressive\":false},\"gameStudio\":\"Inspired Gaming\",\"mobileName\":\"\",\"subGameType\":\"Slots\",\"gameProvider\":\"Inspired\",\"mobileDemoUrl\":\"\",\"mobileRealUrl\":\"\",\"gameAggregator\":\"Inspired\",\"mobileGameSkin\":\"\",\"mobileOverride\":false,\"taxProductType\":\"\",\"federalGameType\":\"\",\"contractGameType\":\"\",\"gameLoaderFileName\":\"INS_LUCK_IT_UP\",\"mobileGameLoaderFileName\":\"\"}},\"launchCode\":{\"en-GB\":\"kjhi\"},\"showNetPosition\":{\"en-GB\":true,\"es\":false},\"title\":{\"en-GB\":\"Luck It Up \",\"es\":\"test\"},\"funPanelBackgroundImage\":{\"en-GB\":\"\"},\"operatorBarDisabled\":{\"en-GB\":false},\"vendor\":{\"en-GB\":\"infinity\"},\"nativeRequirement\":{\"en-GB\":null},\"id\":\"7u4FgOjWAE9mm434Sgzhcx\",\"contentType\":\"gameV2\",\"updatedAt\":\"2026-02-12T22:35:49.299Z\",\"createdAt\":\"2026-02-12T22:35:49.299Z\",\"funPanelEnabled\":{\"en-GB\":false},\"cmsChangeVersion\":60,\"rgpEnabled\":{\"en-GB\":true},\"funPanelDefaultCategory\":{\"en-GB\":\"\"},\"platformVisibility\":{\"en-GB\":[\"web\",\"ios\",\"android\"]},\"progressiveJackpot\":{\"en-GB\":false},\"entryTitle\":{\"en-GB\":\"INS_LUCK_IT_UP\"}}}"
+}

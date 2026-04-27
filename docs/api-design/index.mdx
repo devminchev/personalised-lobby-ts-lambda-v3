@@ -1,0 +1,21 @@
+---
+title: API Design
+description: Conventions and design principles that govern the Personalised Lobby APIs
+---
+
+# API Design
+
+This section documents the conventions that every endpoint in the Personalised Lobby service follows. The goal is a predictable, REST-aligned surface that plays well with our CloudFront caching and routing layer.
+
+## Principles
+
+- **Resource-oriented URLs.** Path segments name resources and sub-resources (sites, platforms, views, sections). Inputs that scope a response — but are not themselves resources — live in the query string.
+- **Two API gateways.** GET endpoints are served from `LobbyApi`. POST endpoints are served from a separate `LobbyPostApi` and are used internally.
+- **CloudFront-aware paths.** Endpoint paths are designed so CloudFront can route by path pattern and cache per-member without embedding member identity in the URL hierarchy.
+- **Strict input validation.** Required query parameters are validated by the handler; missing values return `400 Bad Request`.
+
+## In this section
+
+- [URL structure](./url-structure) — the hierarchical path pattern used by every GET endpoint.
+- [Member identification](./member-identification) — why `memberid` is a required query parameter, never a path segment.
+- [Personalised sub-resources](./personalised-resources) — how personalised variants of a collection are modelled.

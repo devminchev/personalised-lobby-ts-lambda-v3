@@ -1,4 +1,10 @@
-import { tryGetValueFromLocalised, IGLinkItemWithViewSlug, extendedViewSlugProp } from 'os-client';
+import {
+    tryGetValueFromLocalised,
+    IGLinkItemWithViewSlug,
+    extendedViewSlugProp,
+    sanitiseBynderAssets,
+    extractBynderObject,
+} from 'os-client';
 import {
     IBannerSection,
     IBannerSectionOS,
@@ -77,20 +83,24 @@ export const buildQuickLinksSection = ({
         entryId: section.id,
         classification: section.classification[spaceLocale],
         layoutType: section?.layoutType?.[spaceLocale] as QuickLinksLayoutType, // e.g. 'carousel-pill'
-        links: children.map((child) => ({
-            entryId: child.id,
-            label: tryGetValueFromLocalised(userLocale, spaceLocale, child?.label, ''),
-            ...(child?.linkedViewSlug && { viewSlug: child?.linkedViewSlug }),
-            ...(child.externalUrl?.[spaceLocale] && { externalUrl: child.internalUrl?.[spaceLocale] }),
-            ...(child.internalUrl?.[spaceLocale] && { internalUrl: child.internalUrl?.[spaceLocale] }),
-            ...(child.image?.[spaceLocale] && {
-                image: tryGetValueFromLocalised(userLocale, spaceLocale, child.image, ''),
-            }),
-            ...(child.bynderImage?.[spaceLocale] && {
-                bynderImage: tryGetValueFromLocalised(userLocale, spaceLocale, child.bynderImage, {}),
-            }),
-            ...(child.liveHidden?.[spaceLocale] && { liveHidden: child.liveHidden?.[spaceLocale] }),
-        })),
+        links: children.map((child) => {
+            const bynderImage = tryGetValueFromLocalised(userLocale, spaceLocale, child?.bynderImage, null);
+            const bynderImageObj = extractBynderObject(bynderImage);
+            return {
+                entryId: child.id,
+                label: tryGetValueFromLocalised(userLocale, spaceLocale, child?.label, ''),
+                ...(child?.linkedViewSlug && { viewSlug: child?.linkedViewSlug }),
+                ...(child.externalUrl?.[spaceLocale] && { externalUrl: child.internalUrl?.[spaceLocale] }),
+                ...(child.internalUrl?.[spaceLocale] && { internalUrl: child.internalUrl?.[spaceLocale] }),
+                ...(child.image?.[spaceLocale] && {
+                    image: tryGetValueFromLocalised(userLocale, spaceLocale, child.image, ''),
+                }),
+                ...(bynderImage && {
+                    bynderImage: bynderImageObj,
+                }),
+                ...(child.liveHidden?.[spaceLocale] && { liveHidden: child.liveHidden?.[spaceLocale] }),
+            };
+        }),
     };
 };
 
@@ -119,14 +129,18 @@ export const buildMarketingSection = ({
         classification: section.classification[spaceLocale],
         title: tryGetValueFromLocalised(userLocale, spaceLocale, section.title, ''),
         displayType: section?.displayType?.[spaceLocale] || '',
-        elements: children.map((child) => ({
-            entryId: child.id,
-            title: tryGetValueFromLocalised(userLocale, spaceLocale, child.title, ''),
-            ...(child.imageUrl?.[spaceLocale] && { image: child.imageUrl?.[spaceLocale] }),
-            ...(child.videoUrl?.[spaceLocale] && { video: child.videoUrl?.[spaceLocale] }),
-            ...(child.bynderMedia?.[spaceLocale] && { bynderMedia: child.bynderMedia?.[spaceLocale] }),
-            ...(child.bannerLink?.[spaceLocale] && { bannerLink: child.bannerLink?.[spaceLocale] }),
-        })),
+        elements: children.map((child) => {
+            const bynderMedia = child.bynderMedia?.[spaceLocale] || null;
+            const bynderMediaAssets = sanitiseBynderAssets(bynderMedia);
+            return {
+                entryId: child.id,
+                title: tryGetValueFromLocalised(userLocale, spaceLocale, child.title, ''),
+                ...(child.imageUrl?.[spaceLocale] && { image: child.imageUrl?.[spaceLocale] }),
+                ...(child.videoUrl?.[spaceLocale] && { video: child.videoUrl?.[spaceLocale] }),
+                ...(bynderMediaAssets && { bynderMedia: bynderMediaAssets }),
+                ...(child.bannerLink?.[spaceLocale] && { bannerLink: child.bannerLink?.[spaceLocale] }),
+            };
+        }),
         ...(showViewAll && { viewAll: viewAllObj }),
         // TODO: revisit below for EU
         // "layoutType": "carousel-a",
@@ -159,6 +173,24 @@ export const buildJackpotSectionsBlock = ({
                 viewAllActionText: child.viewAllActionText?.[spaceLocale] || '',
             };
 
+            const bynderHeaderImageAsset = child?.headerImageBynder?.[spaceLocale] || null;
+            const bynderHeaderImage = sanitiseBynderAssets(bynderHeaderImageAsset);
+
+            const bynderBackgroundImageAsset = child?.backgroundImageBynder?.[spaceLocale] || null;
+            const bynderBackgroundImage = sanitiseBynderAssets(bynderBackgroundImageAsset);
+
+            const pot1BynderImageAsset = child?.pot1ImageBynder?.[spaceLocale] || null;
+            const pot1BynderImage = sanitiseBynderAssets(pot1BynderImageAsset);
+
+            const pot2BynderImageAsset = child?.pot2ImageBynder?.[spaceLocale] || null;
+            const pot2BynderImage = sanitiseBynderAssets(pot2BynderImageAsset);
+
+            const pot3BynderImageAsset = child.pot3ImageBynder?.[spaceLocale] || null;
+            const pot3BynderImage = sanitiseBynderAssets(pot3BynderImageAsset);
+
+            const pot4BynderImageAsset = child.pot4ImageBynder?.[spaceLocale] || null;
+            const pot4BynderImage = sanitiseBynderAssets(pot4BynderImageAsset);
+
             return {
                 entryId: child.id,
                 classification: child.classification[spaceLocale],
@@ -172,43 +204,43 @@ export const buildJackpotSectionsBlock = ({
                 ...(child.headerImage?.[spaceLocale] && {
                     headerImage: child.headerImage[spaceLocale],
                 }),
-                ...(child.headerImageBynder?.[spaceLocale] && {
-                    bynderHeaderImage: child.headerImageBynder[spaceLocale],
+                ...(bynderHeaderImage && {
+                    bynderHeaderImage,
                 }),
 
                 ...(child.backgroundImage?.[spaceLocale] && {
                     backgroundImage: child.backgroundImage[spaceLocale],
                 }),
-                ...(child.backgroundImageBynder?.[spaceLocale] && {
-                    bynderBackgroundImage: child.backgroundImageBynder[spaceLocale],
+                ...(bynderBackgroundImage && {
+                    bynderBackgroundImage,
                 }),
 
                 ...(child.pot1Image?.[spaceLocale] && {
                     pot1Image: child.pot1Image[spaceLocale],
                 }),
-                ...(child.pot1ImageBynder?.[spaceLocale] && {
-                    bynderPot1Image: child.pot1ImageBynder[spaceLocale],
+                ...(pot1BynderImage && {
+                    bynderPot1Image: pot1BynderImage,
                 }),
 
                 ...(child.pot2Image?.[spaceLocale] && {
                     pot2Image: child.pot2Image[spaceLocale],
                 }),
-                ...(child.pot2ImageBynder?.[spaceLocale] && {
-                    bynderPot2Image: child.pot2ImageBynder[spaceLocale],
+                ...(pot2BynderImage && {
+                    bynderPot2Image: pot2BynderImage,
                 }),
 
                 ...(child.pot3Image?.[spaceLocale] && {
                     pot3Image: child.pot3Image[spaceLocale],
                 }),
-                ...(child.pot3ImageBynder?.[spaceLocale] && {
-                    bynderPot3Image: child.pot3ImageBynder[spaceLocale],
+                ...(pot3BynderImage && {
+                    bynderPot3Image: pot3BynderImage,
                 }),
 
                 ...(child.pot4Image?.[spaceLocale] && {
                     pot4Image: child.pot4Image[spaceLocale],
                 }),
-                ...(child.pot4ImageBynder?.[spaceLocale] && {
-                    bynderPot4Image: child.pot4ImageBynder[spaceLocale],
+                ...(pot4BynderImage && {
+                    bynderPot4Image: pot4BynderImage,
                 }),
 
                 ...(showViewAll && { viewAll: viewAllObj }),
@@ -294,6 +326,8 @@ export const buildBannerSection = ({ section, spaceLocale, userLocale }: BannerP
             }),
         };
     } else {
+        const bynderMediaAssets = section?.bynderMedia?.[spaceLocale] || null;
+        const bynderMedia = sanitiseBynderAssets(bynderMediaAssets);
         return {
             entryId: section.id,
             classification: section?.classification?.[spaceLocale],
@@ -307,8 +341,8 @@ export const buildBannerSection = ({ section, spaceLocale, userLocale }: BannerP
             ...(section?.videoUrl?.[spaceLocale] && {
                 video: section.videoUrl[spaceLocale],
             }),
-            ...(section?.bynderMedia?.[spaceLocale] && {
-                bynderMedia: section.bynderMedia[spaceLocale],
+            ...(bynderMedia && {
+                bynderMedia: bynderMedia,
             }),
             ...(section?.bannerLink?.[spaceLocale] && {
                 bannerLink: section.bannerLink[spaceLocale],
@@ -332,9 +366,11 @@ export const buildGameSection = ({ section, spaceLocale, userLocale, sessionVisi
     const isTruncated = !neverTruncate;
 
     const gridCBynderMedia =
-        sessionVisibility === 'loggedIn'
+        (sessionVisibility === 'loggedIn'
             ? section?.mediaLoggedIn?.[spaceLocale]
-            : section?.mediaLoggedOut?.[spaceLocale];
+            : section?.mediaLoggedOut?.[spaceLocale]) || null;
+
+    const gridCBynderMediaAsset = sanitiseBynderAssets(gridCBynderMedia);
     // ViewAll logic
     const viewActionTypeText = getViewAllActionTypeText(section?.viewAllType?.[spaceLocale]);
     const shouldShow = shouldShowGameSectionViewAll(isTruncated, viewActionTypeText);
@@ -355,8 +391,8 @@ export const buildGameSection = ({ section, spaceLocale, userLocale, sessionVisi
         ...(section?.image?.[spaceLocale] && {
             media: section?.image?.[spaceLocale],
         }),
-        ...(gridCBynderMedia && {
-            bynderMedia: gridCBynderMedia,
+        ...(gridCBynderMediaAsset && {
+            bynderMedia: gridCBynderMediaAsset,
         }),
         ...(shouldShow && {
             viewAll: {
@@ -382,6 +418,25 @@ export const buildJackpotSection = ({ section, spaceLocale, userLocale }: Jackpo
         viewAllActionType: viewAllActionTypeText,
         viewAllActionText: section.viewAllActionText?.[spaceLocale] || '',
     };
+
+    const bynderHeaderImageAsset = section?.headerImageBynder?.[spaceLocale] || null;
+    const bynderHeaderImage = sanitiseBynderAssets(bynderHeaderImageAsset);
+
+    const bynderBackgroundImageAsset = section?.backgroundImageBynder?.[spaceLocale] || null;
+    const bynderBackgroundImage = sanitiseBynderAssets(bynderBackgroundImageAsset);
+
+    const pot1BynderImageAsset = section?.pot1ImageBynder?.[spaceLocale] || null;
+    const pot1BynderImage = sanitiseBynderAssets(pot1BynderImageAsset);
+
+    const pot2BynderImageAsset = section?.pot2ImageBynder?.[spaceLocale] || null;
+    const pot2BynderImage = sanitiseBynderAssets(pot2BynderImageAsset);
+
+    const pot3BynderImageAsset = section.pot3ImageBynder?.[spaceLocale] || null;
+    const pot3BynderImage = sanitiseBynderAssets(pot3BynderImageAsset);
+
+    const pot4BynderImageAsset = section.pot4ImageBynder?.[spaceLocale] || null;
+    const pot4BynderImage = sanitiseBynderAssets(pot4BynderImageAsset);
+
     return {
         entryId: section.id,
         classification: section?.classification?.[spaceLocale],
@@ -396,43 +451,43 @@ export const buildJackpotSection = ({ section, spaceLocale, userLocale }: Jackpo
         ...(section?.headerImage?.[spaceLocale] && {
             headerImage: section.headerImage[spaceLocale],
         }),
-        ...(section?.headerImageBynder?.[spaceLocale] && {
-            bynderHeaderImage: section.headerImageBynder[spaceLocale],
+        ...(bynderHeaderImage && {
+            bynderHeaderImage,
         }),
 
         ...(section?.backgroundImage?.[spaceLocale] && {
             backgroundImage: section.backgroundImage[spaceLocale],
         }),
-        ...(section?.backgroundImageBynder?.[spaceLocale] && {
-            bynderBackgroundImage: section.backgroundImageBynder[spaceLocale],
+        ...(bynderBackgroundImage && {
+            bynderBackgroundImage,
         }),
 
         ...(section?.pot1Image?.[spaceLocale] && {
             pot1Image: section.pot1Image[spaceLocale],
         }),
-        ...(section?.pot1ImageBynder?.[spaceLocale] && {
-            bynderPot1Image: section.pot1ImageBynder[spaceLocale],
+        ...(pot1BynderImage && {
+            bynderPot1Image: pot1BynderImage,
         }),
 
         ...(section?.pot2Image?.[spaceLocale] && {
             pot2Image: section.pot2Image[spaceLocale],
         }),
-        ...(section?.pot2ImageBynder?.[spaceLocale] && {
-            bynderPot2Image: section.pot2ImageBynder[spaceLocale],
+        ...(pot2BynderImage && {
+            bynderPot2Image: pot2BynderImage,
         }),
 
         ...(section?.pot3Image?.[spaceLocale] && {
             pot3Image: section.pot3Image[spaceLocale],
         }),
-        ...(section?.pot3ImageBynder?.[spaceLocale] && {
-            bynderPot3Image: section.pot3ImageBynder[spaceLocale],
+        ...(pot3BynderImage && {
+            bynderPot3Image: pot3BynderImage,
         }),
 
         ...(section?.pot4Image?.[spaceLocale] && {
             pot4Image: section.pot4Image[spaceLocale],
         }),
-        ...(section?.pot4ImageBynder?.[spaceLocale] && {
-            bynderPot4Image: section.pot4ImageBynder[spaceLocale],
+        ...(pot4BynderImage && {
+            bynderPot4Image: pot4BynderImage,
         }),
 
         ...(showViewAll && { viewAll: viewAllObj }),
@@ -446,6 +501,13 @@ type DFGParams = {
 };
 
 export const buildDFGSection = ({ section, spaceLocale, userLocale }: DFGParams): IDFGSection => {
+    const bynderMediaAssets = section?.bynderMedia?.[spaceLocale] || null;
+    const bynderMedia = sanitiseBynderAssets(bynderMediaAssets);
+    const bynderDynamicBackgroundAssets = section.bynderDynamicBackground?.[spaceLocale] || null;
+    const bynderDynamicBackground = sanitiseBynderAssets(bynderDynamicBackgroundAssets);
+    const bynderDynamicLogoAssets = section.bynderDynamicLogo?.[spaceLocale] || null;
+    const bynderDynamicLogo = sanitiseBynderAssets(bynderDynamicLogoAssets);
+
     return {
         entryId: section.id,
         classification: section?.classification[spaceLocale],
@@ -464,14 +526,14 @@ export const buildDFGSection = ({ section, spaceLocale, userLocale }: DFGParams)
         }),
 
         // optional Bynder assets
-        ...(section?.bynderMedia?.[spaceLocale] && {
-            bynderMedia: section.bynderMedia[spaceLocale],
+        ...(bynderMedia && {
+            bynderMedia,
         }),
-        ...(section?.bynderDynamicBackground?.[spaceLocale] && {
-            bynderDynamicBackground: section.bynderDynamicBackground[spaceLocale],
+        ...(bynderDynamicBackground && {
+            bynderDynamicBackground,
         }),
-        ...(section?.bynderDynamicLogo?.[spaceLocale] && {
-            bynderDynamicLogo: section.bynderDynamicLogo[spaceLocale],
+        ...(bynderDynamicLogo && {
+            bynderDynamicLogo,
         }),
 
         // optional link

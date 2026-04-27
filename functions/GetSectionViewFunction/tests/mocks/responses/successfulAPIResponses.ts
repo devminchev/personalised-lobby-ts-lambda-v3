@@ -50,6 +50,59 @@ export const SUCCESSFUL_SECTION_VIEW_RESPONSE = {
     ],
 };
 
+export const SUCCESSFUL_SECTION_VIEW_RESPONSE_SPANISH = {
+    classification: 'GameSection',
+    title: 'New Slots - Spanish',
+    layoutType: 'grid-a',
+    games: [
+        {
+            name: 'play-igt-lucky-larry-lobstermania-2',
+            gameSkin: 'IGT_LUCKY_LARRYS_LOBSTERMANIA_2',
+            entryId: 'TvL4bljNtRPRV1RvFnFWr',
+            title: 'Lucky Larry Lobstermania 2 - Spanish',
+            gameId: '6JdG7QQH7s1AnttaOgnTNf',
+            isProgressiveJackpot: false,
+            realUrl: '/service/game/play/play-igt-lucky-larry-lobstermania-2',
+            demoUrl: '/service/game/demo/play-igt-lucky-larry-lobstermania-2',
+            imgUrlPattern:
+                '/api/content/gametiles/lucky-larrys-lobstermania-2/scale-s%s/lucky-larrys-lobstermania-2-tile-r%s-w%s.jpg',
+            loggedOutImgUrlPattern:
+                '/api/content/gametiles/lucky-larrys-lobstermania-2-logged-out/scale-s%s/lucky-larrys-lobstermania-2-logged-out-tile-r%s-w%s.jpg',
+            representativeColor: '#3876E9',
+        },
+        {
+            name: 'play-micro-massive-gold-maxxd',
+            gameSkin: 'MGSD_MASSIVE_GOLD_MAXXED',
+            entryId: '4vlxSOhkyXjfpS4kTo9Dv1',
+            title: 'Massive Gold Maxxd - Spanish',
+            gameId: '6Zaylk8JyjuvgAkpnZKJLc',
+            isProgressiveJackpot: false,
+            realUrl: '/service/game/play/play-micro-massive-gold-maxxd',
+            demoUrl: '/service/game/demo/play-micro-massive-gold-maxxd',
+            imgUrlPattern:
+                '/api/content/gametiles/massive-gold-maxxed/scale-s%s/massive-gold-maxxed-tile-r%s-w%s-spanish.jpg',
+            loggedOutImgUrlPattern:
+                '/api/content/gametiles/massive-gold-maxxed-logged-out/scale-s%s/massive-gold-maxxed-logged-out-tile-r%s-w%s.jpg',
+            representativeColor: '#530B00',
+        },
+        {
+            name: 'play-micro-treasures-of-kilauea-2',
+            gameSkin: 'MGSD_TREASURES_OF_KILAUEA_2',
+            entryId: '75yHQezU5gUvcUHuApO0fy',
+            title: 'Treasures of Kilauea 2',
+            gameId: '2UkyvrNwT2bHnWq1uuvG2V',
+            isProgressiveJackpot: false,
+            realUrl: '/service/game/play/play-micro-treasures-of-kilauea-2',
+            demoUrl: '/service/game/demo/play-micro-treasures-of-kilauea-2',
+            imgUrlPattern:
+                '/api/content/gametiles/treasures-of-kilauea-2/scale-s%s/treasures-of-kilauea-2-tile-r%s-w%s.jpg',
+            loggedOutImgUrlPattern:
+                '/api/content/gametiles/treasures-of-kilauea-2/scale-s%s/treasures-of-kilauea-2-tile-r%s-w%s.jpg',
+            representativeColor: '#C62BD1',
+        },
+    ],
+};
+
 export const SUCCESSFUL_JACKPOT_SECTION_RESPONSE = {
     classification: 'JackpotSection',
     title: 'Rapid Fire',

@@ -1,7 +1,7 @@
 {
   "name": "get-bulk-game-data",
-  "version": "0.12.15",
-  "description": "Lambda to get fresh game data for ML ",
+  "version": "0.18.1",
+  "description": "Lambda to get fresh game data for ML",
   "main": "app.js",
   "repository": "https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda",
   "relComponent": "igaming_lobby_bulk_game_data_v3",

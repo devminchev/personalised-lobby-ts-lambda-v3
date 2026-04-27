@@ -1,8 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import {
     getClient,
-    ErrorCode,
-    logError,
     validateLocaleQuery,
     handleSpaceLocalization,
     checkRequestParams,
@@ -10,6 +8,8 @@ import {
     patchVentureName,
     validators,
     errorResponseHandler,
+    jsonSizeInMb,
+    gzipResponse,
 } from 'os-client';
 import { getGameShuffleData, getGamesSiteGamesOnGameSkin } from './lib/processGames';
 import { constructResponse } from './lib/utils';
@@ -35,34 +35,22 @@ export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGat
     const userLocale: string = validateLocaleQuery(event.queryStringParameters?.locale);
 
     try {
+        checkRequestParams([siteNameFromParams, validators.siteName], [platform, validators.platform]);
+
         const client = getClient();
         const spaceLocale = handleSpaceLocalization();
 
         const ventureId = await getVentureId(client, siteName, spaceLocale, platform);
-
-        checkRequestParams([siteNameFromParams, validators.siteName], [platform, validators.platform]);
 
         const gameShuffle = await getGameShuffleData(client, siteName, platform);
 
         const firstBucketHits = gameShuffle.firstBucket;
         const secondThirdBucketHits = gameShuffle.secondThirdBucket;
 
-        const firstBucketGames = await getGamesSiteGamesOnGameSkin(
-            client,
-            ventureId,
-            siteName,
-            platform,
-            spaceLocale,
-            firstBucketHits,
-        );
-        const secondThirdBucketGames = await getGamesSiteGamesOnGameSkin(
-            client,
-            ventureId,
-            siteName,
-            platform,
-            spaceLocale,
-            secondThirdBucketHits,
-        );
+        const [firstBucketGames, secondThirdBucketGames] = await Promise.all([
+            getGamesSiteGamesOnGameSkin(client, ventureId, siteName, platform, spaceLocale, firstBucketHits),
+            getGamesSiteGamesOnGameSkin(client, ventureId, siteName, platform, spaceLocale, secondThirdBucketHits),
+        ]);
 
         const gameShuffleResponse = constructResponse(
             firstBucketGames,
@@ -73,10 +61,11 @@ export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGat
             false,
         );
 
-        return {
-            statusCode: 200,
-            body: JSON.stringify(gameShuffleResponse),
-        };
+        console.info('game-shuffle-uncompressed-response-size', { sizeInMb: jsonSizeInMb(gameShuffleResponse) });
+
+        return gzipResponse(gameShuffleResponse, 200, {
+            'X-Request-Id-timestamp': `Lambda invoked at: ${new Date().toISOString()}`,
+        });
     } catch (err) {
         const errorLogParams = {
             eventReqId,
@@ -84,6 +73,7 @@ export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGat
             platform,
             userLocale,
         };
+
         return errorResponseHandler(err, [], errorLogParams);
     }
 };

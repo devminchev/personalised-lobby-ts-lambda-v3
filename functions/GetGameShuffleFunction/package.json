@@ -1,10 +1,11 @@
 {
   "name": "get-game-shuffle",
-  "version": "0.1.6",
+  "version": "0.7.13",
   "description": "Provides  s list of games based on rtp criteria for the game shuffle feature ",
   "main": "app.js",
   "repository": "https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3",
   "relComponent": "igaming_lobby_game_shuffle_v3",
+  "skipRelTicket": true,
   "scripts": {
     "unit": "jest",
     "test": "jest --config jest.config.ts",

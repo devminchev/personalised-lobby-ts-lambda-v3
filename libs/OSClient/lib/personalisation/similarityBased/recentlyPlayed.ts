@@ -219,7 +219,7 @@ export const handleRecentlyPlayed = async ({
         }
 
         const filteredRecentlyPlayed = recentlyPlayed.filter(
-            (item) => !item.hit?.game?.metadataTags?.some((t) => t?.sys?.id === RP_EXCLUSION_TAG),
+            (item) => !item.hit?.game?.metadataTags?.some((t) => t === RP_EXCLUSION_TAG),
         );
 
         // Create games Payload

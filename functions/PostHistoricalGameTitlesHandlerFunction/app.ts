@@ -16,6 +16,7 @@ import {
     GamePostRequest,
     SiteGamePostRequest,
     patchVentureName,
+    jsonResponse,
 } from 'os-client';
 
 type HttpMethod = 'GET' | 'PATCH' | 'HEAD' | 'POST' | 'DELETE' | 'OPTIONS' | 'PUT';
@@ -238,7 +239,7 @@ const requestVerification = (event: APIGatewayProxyEvent, secretKey: string): bo
         // Construct the canonical request object
         const canonicalReq: CanonicalRequest = {
             method: event.httpMethod as HttpMethod,
-            path: '/backoffice/v1/historical-game-titles-handler', // Ensure the correct path is passed
+            path: '/backoffice/v2/historical-game-titles-handler', // Ensure the correct path is passed
             headers: headers,
             body: JSON.stringify(requestBody) || '',
         };
@@ -272,16 +273,10 @@ export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGat
         // Ensure request verification before processing
         const isVerifiedRequest = requestVerification(event, signingSecret);
         if (!isVerifiedRequest) {
-            return {
-                statusCode: 403,
-                body: JSON.stringify({ message: 'Unauthorized' }),
-            };
+            return jsonResponse({ message: 'Unauthorized' }, 403);
         }
         if (!event.body) {
-            return {
-                statusCode: 400,
-                body: JSON.stringify({ message: 'Missing request body' }),
-            };
+            return jsonResponse({ message: 'Missing request body' }, 400);
         }
         const payload = JSON.parse(event.body) as {
             sys: {
@@ -297,17 +292,11 @@ export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGat
         const contentTypeId = contentType.sys.id;
 
         if (environment.sys.id !== ALLOWED_EVENT_TRIGGER_ENV) {
-            return {
-                statusCode: 200,
-                body: JSON.stringify({ message: 'The event did not originate from the master environment.' }),
-            };
+            return jsonResponse({ message: 'The event did not originate from the master environment.' });
         }
 
         if (contentTypeId !== GAME_V2_TYPE && contentTypeId !== SITEGAME_V2_TYPE) {
-            return {
-                statusCode: 200,
-                body: JSON.stringify({ message: 'Content type not valid' }),
-            };
+            return jsonResponse({ message: 'Content type not valid' });
         }
 
         const spaceLocale = handleSpaceLocalization();
@@ -330,20 +319,17 @@ export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGat
             isUpdated = true;
         }
 
-        return {
-            statusCode: 200,
-            body: JSON.stringify({ updated: isUpdated }),
-        };
+        return jsonResponse({ updated: isUpdated });
     } catch (err) {
         console.error('Lambda execution error:', err);
         logError(ErrorCode.ExecutionError, 500, { siteName, platform, err });
 
-        return {
-            statusCode: 500,
-            body: JSON.stringify({
+        return jsonResponse(
+            {
                 code: 'ExecutionError',
                 message: err instanceof Error ? err.message : 'Unknown error occurred',
-            }),
-        };
+            },
+            500,
+        );
     }
 };

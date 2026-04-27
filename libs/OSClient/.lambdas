@@ -15,3 +15,5 @@ personalisation-lobby-historical-game-titles-handler
 personalisation-lobby-recommended-games-on-exit
 personalisation-lobby-game-shuffle
 personalisation-lobby-recently-played
+personalisation-lobby-variant
+personalisation-lobby-games-payload-handler

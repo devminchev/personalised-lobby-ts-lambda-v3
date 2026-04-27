@@ -1,0 +1,87 @@
+---
+title: Service Tiers
+description: Tiered classification of Personalised Lobby endpoints used to drive load shedding under high or critical load
+---
+
+# Service Tiers
+
+Every lambda in the Personalised Lobby is assigned a **tier** based on how essential it is to the core user journey. The tier determines the order in which traffic is shed under high or critical load, so the core experience stays available even when capacity is constrained.
+
+## Core user journey
+
+The non-negotiable behaviour we will protect at all costs:
+
+> **The user can see games and play them.**
+
+Everything else — personalisation, recommendations, search, mini-games — is enrichment around that journey, and is the first thing to go when capacity is constrained.
+
+## Shedding order
+
+Tiers are shed in reverse order of importance:
+
+1. **Tier C** is disabled first.
+2. **Tier B** is disabled next if pressure persists.
+3. **Tier A** is the last line of defence — the smallest set of endpoints that still satisfies the core user journey.
+
+Non-live traffic does not run on the live request path and is not part of the shedding sequence; it is governed separately.
+
+## Tier A — Core
+
+Endpoints required for the core user journey (browse the lobby, see a game, launch it).
+
+### Endpoints
+
+- `/navigation`
+- `/view`
+- `/sitegames` (anonymous, **not** personalised)
+- `/game-config`
+- `/game-info`
+
+### OpenSearch queries
+
+- `venture` index — fetch the venture
+- `navigation` index — fetch the navigation
+- `view` index — fetch the view
+- `section` index — fetch section details and game ids
+- `games-v2` index — fetch game details (uses a join to enrich game data)
+
+## Tier B — Important
+
+Endpoints that improve the lobby experience (personalised lists, skin config) but whose absence does not break the core journey.
+
+### Endpoints
+
+- `/sectionview`
+- `/sitegames/personalised`
+- `/game-skin-config`
+
+### OpenSearch queries
+
+- `section` index — fetch section details and game ids
+- `games-v2` index — fetch game details (uses a join)
+
+## Tier C — Enrichment
+
+Discovery, recommendation, and personalised-extra surfaces. First to be shed under load. These tend to be the most expensive endpoints in terms of OpenSearch work.
+
+### Endpoints
+
+- `/minigames`
+- `/search`
+- `/suggested-for-you`
+- `/personalised-extra-data`
+- `/recommended-games-on-exit`
+
+### OpenSearch queries
+
+- `navigation` index — fetch the navigation
+- `view` index — fetch the view
+- `section` index — recursive section traversal, **up to 3 levels deep**
+- `games-v2` index — includes the most expensive query in the system, where the full set of games is served
+
+## Non-live traffic
+
+These endpoints do not serve live user traffic and are not part of the tier-based shedding model. They run for backoffice / data sync purposes only.
+
+- `/historical-game-titles`
+- `/bulk-game-data`

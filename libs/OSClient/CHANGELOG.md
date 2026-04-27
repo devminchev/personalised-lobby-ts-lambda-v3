@@ -2,6 +2,181 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.53.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/os-client-0.52.0...os-client-0.53.0) (2026-04-22)
+
+
+### Features
+
+* **gtech-1321602:** remove fallbacks for the game properties post os new index schema release ([479705b](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/479705b926ffab21d0d3c67ee655da5fac6dcc68))
+
+## [0.52.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/os-client-0.51.1...os-client-0.52.0) (2026-04-22)
+
+
+### Features
+
+* **gtech-1320067:** remove fallbacks for the game properties ([39f6b16](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/39f6b16be6c008f9f4ee1caa9f6dbfc7762475ee))
+
+## [0.51.1](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/os-client-0.51.0...os-client-0.51.1) (2026-04-21)
+
+## [0.51.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/os-client-0.50.0...os-client-0.51.0) (2026-04-21)
+
+
+### Features
+
+* **gtech-1314814:** games sync lambda to use write alias ([4dba858](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/4dba858f226887022f2f08ade43d436f515636de))
+
+## [0.50.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/os-client-0.49.0...os-client-0.50.0) (2026-04-20)
+
+
+### Features
+
+* **gtech-1321127:** always return image assets from sectionview endpoint ([14999c9](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/14999c9a559e735a1e744d8405c67cc9f0a3c59e))
+
+## [0.49.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/os-client-0.48.3...os-client-0.49.0) (2026-04-13)
+
+
+### Features
+
+* **gtech-1320574:** separate section games lambda for logged in members only using personalisation ([7c7f24f](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/7c7f24fa03bf04087b7f025b51e4e0949b1c02bf))
+
+## [0.48.3](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/os-client-0.48.2...os-client-0.48.3) (2026-04-10)
+
+## [0.48.2](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/os-client-0.48.1...os-client-0.48.2) (2026-04-09)
+
+## [0.48.1](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/os-client-0.48.0...os-client-0.48.1) (2026-04-09)
+
+## [0.48.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/os-client-0.47.0...os-client-0.48.0) (2026-03-25)
+
+
+### Features
+
+* **gtech-1314814:** fallback values for webComponent and section view ([12e3710](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/12e3710b7cb13def22fd1f5408a1094860b719fc))
+
+## [0.47.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/os-client-0.46.0...os-client-0.47.0) (2026-03-25)
+
+
+### Features
+
+* **gtech-1314814:** fallback values for sitegame ([3583afb](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/3583afb0a77df550eed33f9aeebf8fa327e4f9a2))
+
+## [0.46.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/os-client-0.45.0...os-client-0.46.0) (2026-03-24)
+
+
+### Features
+
+* **gtech-1314814:** properties fallback for game info and game config ([c775b3a](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/c775b3af79564a7e16fe6180210456447404237f))
+
+## [0.45.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/os-client-0.44.0...os-client-0.45.0) (2026-03-20)
+
+
+### Features
+
+* **gtech-1314814-1:** refactor lambdas to work with new game index mapping ([ac824da](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/ac824daa58b93411881d2250ab79c32f331ffe90))
+
+## [0.44.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/os-client-0.43.5...os-client-0.44.0) (2026-03-17)
+
+
+### Features
+
+* **gtech-1320448:** add game aggregator to bulk endpoint ([cd7f4d2](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/cd7f4d27c9527d486683ffe453bafa6c28a1861e))
+
+## [0.43.5](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/os-client-0.43.4...os-client-0.43.5) (2026-03-17)
+
+## [0.43.4](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/os-client-0.43.3...os-client-0.43.4) (2026-03-06)
+
+## [0.43.3](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/os-client-0.43.2...os-client-0.43.3) (2026-03-06)
+
+## [0.43.2](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/os-client-0.43.1...os-client-0.43.2) (2026-03-06)
+
+## [0.43.1](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/os-client-0.43.0...os-client-0.43.1) (2026-03-05)
+
+## [0.43.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/os-client-0.42.1...os-client-0.43.0) (2026-03-05)
+
+
+### Features
+
+* **gtech-1319911:** add new lambda game skin config ([a31c605](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/a31c6056da951139ad57762a20d679842b85b947))
+
+## [0.42.1](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/os-client-0.42.0...os-client-0.42.1) (2026-03-05)
+
+## [0.42.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/os-client-0.41.2...os-client-0.42.0) (2026-02-25)
+
+
+### Features
+
+* **gtech-1314814:** mitigate opensearch field explosion for games-v2 index ([faa5b1d](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/faa5b1d759072675abc2c2cf9d4d04e0a179b414))
+
+## [0.41.2](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/os-client-0.41.1...os-client-0.41.2) (2026-02-23)
+
+## [0.41.1](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/os-client-0.41.0...os-client-0.41.1) (2026-02-20)
+
+## [0.41.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/os-client-0.40.0...os-client-0.41.0) (2026-01-28)
+
+
+### Features
+
+* **gtech-1317745:** add compression at the lambda level ([ed45cf3](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/ed45cf3868056b4e8aebf4c3fa9baf6a3bd1b6fb))
+
+## [0.40.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/os-client-0.39.0...os-client-0.40.0) (2026-01-23)
+
+
+### Features
+
+* **gtech-1317745:** default encoding for uncompressed lambdas ([9dba5d2](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/9dba5d25387276374a2c1ce46055ec224098953e))
+
+## [0.39.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/os-client-0.38.0...os-client-0.39.0) (2026-01-19)
+
+
+### Features
+
+* **gtech-1317745:** add compression at the lambda level, test on search ([aa50855](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/aa508559fc1877ec877dd1b0fe3a7dffd97e0906))
+
+## [0.38.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/os-client-0.37.0...os-client-0.38.0) (2026-01-19)
+
+
+### Features
+
+* **gtech-1318864:** add greece to locale validaiton ([5fbeef4](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/5fbeef4918c2115259ba8cc0a3350fb09257e8ff))
+
+## [0.37.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/os-client-0.36.0...os-client-0.37.0) (2025-12-16)
+
+
+### Features
+
+* **gtech-1317892:** add tags to bynder response ([cf4fe04](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/cf4fe0408c2af3363644b21d8e834073d6ec8716))
+
+## [0.36.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/os-client-0.35.0...os-client-0.36.0) (2025-12-09)
+
+
+### Features
+
+* **gtech-1315951:** create new variant lambda endpoint to fetch experiment variants for a user ([a2c76f2](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/a2c76f2a6a444882cb3162ff52c08c18ad5c085f))
+
+## [0.35.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/os-client-0.34.2...os-client-0.35.0) (2025-12-05)
+
+
+### Features
+
+* **gtech-1317704:** return only relevant bynder properties, fix async function ([9eafe07](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/9eafe0779febd879cd46361cff16cb0ffae0bee8))
+
+## [0.34.2](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/os-client-0.34.1...os-client-0.34.2) (2025-12-03)
+
+## [0.34.1](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/os-client-0.34.0...os-client-0.34.1) (2025-12-02)
+
+## [0.34.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/os-client-0.33.0...os-client-0.34.0) (2025-11-28)
+
+
+### Features
+
+* **gtech-1315952:** add ab testing capabilities to relevant lambdas ([5e3d175](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/5e3d175c92b2b2674c82f1666786cbae248281e0))
+
+## [0.33.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/os-client-0.32.0...os-client-0.33.0) (2025-11-26)
+
+
+### Features
+
+* **gtech-1317464:** add bynder properties to the os query ([a56eac4](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/a56eac4c06fe129d4980023bd9b436d7803e3c9f))
+
 ## [0.32.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/os-client-0.31.2...os-client-0.32.0) (2025-11-14)
 
 

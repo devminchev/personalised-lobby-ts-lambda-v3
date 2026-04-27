@@ -247,14 +247,17 @@ export const MINIGAMES_GAMES_SUCCESS_RESP: any = {
                                     _id: '23ZCD98T0sdDn0kjqlpaoZ',
                                     _source: {
                                         game: {
+                                            entryTitle: 'play-blackjack-singlehand-mini',
+                                            gameName: 'play-blackjack-singlehand-mini',
+                                            gameSkin: 'play-blackjack-singlehand-mini',
+                                            mobileGameName: '',
+                                            mobileGameSkin: '',
+                                            mobileOverride: false,
                                             gamePlatformConfig: {
-                                                'en-GB': {
-                                                    demoUrl: '/service/game/demo/play-blackjack-singlehand-mini',
-                                                    gameSkin: 'play-blackjack-singlehand-mini',
-                                                    gameLoaderFileName: 'play-blackjack-singlehand-mini',
-                                                    name: 'play-blackjack-singlehand-mini',
-                                                    realUrl: '/service/game/play/play-blackjack-singlehand-mini',
-                                                },
+                                                demoUrl: '/service/game/demo/play-blackjack-singlehand-mini',
+                                                realUrl: '/service/game/play/play-blackjack-singlehand-mini',
+                                                mobileDemoUrl: '',
+                                                mobileRealUrl: '',
                                             },
                                             representativeColor: {
                                                 'en-GB': '#000000',
@@ -291,29 +294,28 @@ export const MINIGAMES_GAMES_SUCCESS_RESP: any = {
                                     _id: 'slaqrBjg18dRvXXEObWvQ',
                                     _source: {
                                         game: {
+                                            entryTitle: 'js-dfg-doubly-bubbly',
+                                            gameName: 'js-dfg-doubly-bubbly',
+                                            gameSkin: 'js-dfg-doubly-bubbly',
+                                            mobileGameName: '',
+                                            mobileGameSkin: '',
+                                            mobileOverride: false,
                                             loggedOutImgUrlPattern: {
                                                 'en-GB':
                                                     '/api/content/gametiles/new-doubly-bubbly/scale-s%s/doubly-bubbly-tile-r%s-w%s.jpg',
                                             },
                                             gamePlatformConfig: {
-                                                'en-GB': {
-                                                    gameType: {
-                                                        type: '',
-                                                    },
-                                                    gameSkin: 'js-dfg-doubly-bubbly',
-                                                    gameStudio: '',
-                                                    gameProvider: '',
-                                                    mobileDemoUrl: '',
-                                                    demoUrl: '',
-                                                    mobileOverride: false,
-                                                    mobileGameLoaderFileName: '',
-                                                    gameLoaderFileName: 'js-dfg-doubly-bubbly',
-                                                    name: 'js-dfg-doubly-bubbly',
-                                                    realUrl: '/service/game/play/js-dfg-doubly-bubbly',
-                                                    mobileRealUrl: '',
-                                                    mobileGameSkin: '',
-                                                    mobileName: '',
+                                                gameType: {
+                                                    type: '',
                                                 },
+                                                gameStudio: '',
+                                                gameProvider: '',
+                                                demoUrl: '',
+                                                realUrl: '/service/game/play/js-dfg-doubly-bubbly',
+                                                mobileDemoUrl: '',
+                                                mobileRealUrl: '',
+                                                gameLoaderFileName: 'js-dfg-doubly-bubbly',
+                                                mobileGameLoaderFileName: '',
                                             },
                                             representativeColor: {
                                                 'en-GB': '#FAA0CC',
@@ -350,14 +352,17 @@ export const MINIGAMES_GAMES_SUCCESS_RESP: any = {
                                     _id: '14nUSaeByp2mpe1jkMJyvM',
                                     _source: {
                                         game: {
+                                            entryTitle: 'play-diamond-ultracash-mini',
+                                            gameName: 'play-diamond-ultracash-mini',
+                                            gameSkin: 'play-diamond-ultracash-mini',
+                                            mobileGameName: '',
+                                            mobileGameSkin: '',
+                                            mobileOverride: false,
                                             gamePlatformConfig: {
-                                                'en-GB': {
-                                                    demoUrl: '/service/game/demo/play-diamond-ultracash-mini',
-                                                    gameSkin: 'play-diamond-ultracash-mini',
-                                                    gameLoaderFileName: 'play-diamond-ultracash-mini',
-                                                    name: 'play-diamond-ultracash-mini',
-                                                    realUrl: '/service/game/play/play-diamond-ultracash-mini',
-                                                },
+                                                demoUrl: '/service/game/demo/play-diamond-ultracash-mini',
+                                                realUrl: '/service/game/play/play-diamond-ultracash-mini',
+                                                mobileDemoUrl: '',
+                                                mobileRealUrl: '',
                                             },
                                             representativeColor: {
                                                 'en-GB': '#180839',
@@ -394,14 +399,17 @@ export const MINIGAMES_GAMES_SUCCESS_RESP: any = {
                                     _id: '5OJhvzGJZBExYQjgayuG7u',
                                     _source: {
                                         game: {
+                                            entryTitle: 'play-hi-lo-mini',
+                                            gameName: 'play-hi-lo-mini',
+                                            gameSkin: 'play-hi-lo-mini',
+                                            mobileGameName: '',
+                                            mobileGameSkin: '',
+                                            mobileOverride: false,
                                             gamePlatformConfig: {
-                                                'en-GB': {
-                                                    demoUrl: '/service/game/demo/play-hi-lo-mini',
-                                                    gameSkin: 'play-hi-lo-mini',
-                                                    gameLoaderFileName: 'play-hi-lo-mini',
-                                                    name: 'play-hi-lo-mini',
-                                                    realUrl: '/service/game/play/play-hi-lo-mini',
-                                                },
+                                                demoUrl: '/service/game/demo/play-hi-lo-mini',
+                                                realUrl: '/service/game/play/play-hi-lo-mini',
+                                                mobileDemoUrl: '',
+                                                mobileRealUrl: '',
                                             },
                                             representativeColor: {
                                                 'en-GB': '#25102f',
@@ -438,14 +446,17 @@ export const MINIGAMES_GAMES_SUCCESS_RESP: any = {
                                     _id: 'suuHbTushAUCfC7nAlYBi',
                                     _source: {
                                         game: {
+                                            entryTitle: 'play-scratchcard-shop-mini',
+                                            gameName: 'play-scratchcard-shop-mini',
+                                            gameSkin: 'play-scratchcard-shop-mini',
+                                            mobileGameName: '',
+                                            mobileGameSkin: '',
+                                            mobileOverride: false,
                                             gamePlatformConfig: {
-                                                'en-GB': {
-                                                    demoUrl: '/service/game/demo/play-scratchcard-shop-mini',
-                                                    gameSkin: 'play-scratchcard-shop-mini',
-                                                    gameLoaderFileName: 'play-scratchcard-shop-mini',
-                                                    name: 'play-scratchcard-shop-mini',
-                                                    realUrl: '/service/game/play/play-scratchcard-shop-mini',
-                                                },
+                                                demoUrl: '/service/game/demo/play-scratchcard-shop-mini',
+                                                realUrl: '/service/game/play/play-scratchcard-shop-mini',
+                                                mobileDemoUrl: '',
+                                                mobileRealUrl: '',
                                             },
                                             representativeColor: {
                                                 'en-GB': '#405f35',
@@ -490,24 +501,23 @@ export const MINIGAMES_GAMES_SUCCESS_RESP: any = {
                                     _score: 1.0,
                                     _source: {
                                         game: {
+                                            entryTitle: 'play-micro-amazing-catch',
+                                            gameName: 'play-micro-amazing-catch',
+                                            gameSkin: 'MGSD_AMAZING_CATCH',
+                                            mobileGameName: 'play-micro-amazing-catch-m',
+                                            mobileGameSkin: 'MGSM_AMAZING_CATCH',
+                                            mobileOverride: true,
                                             loggedOutImgUrlPattern: {
                                                 'en-GB':
                                                     '/api/content/gametiles/amazing-catch/scale-s%s/amazing-catch-tile-r%s-w%s.jpg',
                                             },
                                             gamePlatformConfig: {
-                                                'en-GB': {
-                                                    demoUrl: '/service/game/demo/play-micro-amazing-catch',
-                                                    gameSkin: 'MGSD_AMAZING_CATCH',
-                                                    mobileOverride: true,
-                                                    mobileGameLoaderFileName: 'MGSM_AMAZING_CATCH',
-                                                    gameLoaderFileName: 'MGSD_AMAZING_CATCH',
-                                                    name: 'play-micro-amazing-catch',
-                                                    realUrl: '/service/game/play/play-micro-amazing-catch',
-                                                    mobileDemoUrl: '/service/game/demo/play-micro-amazing-catch-m',
-                                                    mobileRealUrl: '/service/game/play/play-micro-amazing-catch-m',
-                                                    mobileGameSkin: 'MGSM_AMAZING_CATCH',
-                                                    mobileName: 'play-micro-amazing-catch-m',
-                                                },
+                                                demoUrl: '/service/game/demo/play-micro-amazing-catch',
+                                                realUrl: '/service/game/play/play-micro-amazing-catch',
+                                                mobileDemoUrl: '/service/game/demo/play-micro-amazing-catch-m',
+                                                mobileRealUrl: '/service/game/play/play-micro-amazing-catch-m',
+                                                gameLoaderFileName: 'MGSD_AMAZING_CATCH',
+                                                mobileGameLoaderFileName: 'MGSM_AMAZING_CATCH',
                                             },
                                             representativeColor: {
                                                 'en-GB': '#5CB5C0',

@@ -1,23 +1,22 @@
 {
   "body": "",
   "resource": "/sites/{sitename}/platform/{platform}/section/{sectionslug}?locale={locale}",
-  "path": "/sites/jackpotjoy/platform/web/section/slots?locale=en-GB",
+  "path": "/sites/botemania/platform/web/section/juegos-top-globales-slots-botemania?locale=es-ES",
   "httpMethod": "GET",
   "isBase64Encoded": false,
   "pathParameters": {
-    "sitename": "jackpotjoy",
-    "sectionslug": "slots",
+    "sitename": "botemania",
+    "sectionslug": "juegos-top-globales-slots-botemania",
     "platform": "web"
   },
   "queryStringParameters": {
-    "locale": "en-GB",
-    "auth": "true"
+    "locale": "es-ES"
   },
   "stageVariables": {},
   "headers": {
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
     "Accept-Encoding": "gzip, deflate, sdch",
-    "Accept-Language": "en-GB,en;q=0.8",
+    "Accept-Language": "es-ES,en;q=0.8",
     "Cache-Control": "max-age=0",
     "CloudFront-Forwarded-Proto": "https",
     "CloudFront-Is-Desktop-Viewer": "true",
@@ -32,7 +31,8 @@
     "X-Amz-Cf-Id": "cDehVQoZnx43VYQb9j2-nvCh-9z396Uhbp027Y2JvkCPNLmGJHqlaA==",
     "X-Forwarded-For": "127.0.0.1, 127.0.0.2",
     "X-Forwarded-Port": "443",
-    "X-Forwarded-Proto": "https"
+    "X-Forwarded-Proto": "https",
+    "X-LOBBY-VARIANT": "control"
   },
   "requestContext": {
     "accountId": "123456789012",
@@ -54,7 +54,7 @@
       "userAgent": "Custom User Agent String",
       "user": null
     },
-    "path": "/sites/rainbowrichescasino/platform/web/section/new-slots?locale=en-GB",
+    "path": "/sites/rainbowrichescasino/platform/web/section/new-juegos-top-globales-slots-botemania?locale=es-ES",
     "resourcePath": "/sites/{sitename}/platform/{platform}/section/{sectionslug}?locale={locale}",
     "httpMethod": "get",
     "apiId": "1234567890",

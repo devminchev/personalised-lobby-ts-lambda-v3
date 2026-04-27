@@ -8,17 +8,18 @@ import {
     tryGetValueFromLocalised,
     IOpenSearchQuery,
     IHeadlessJackpot,
-    IBynderAsset,
     FullApiResponse,
     getGameHits,
     LogCode,
+    SanitizedBynder,
 } from 'os-client';
-import { GAMES_INDEX_V2_ALIAS, ML_RECOMMENDED_GAMES_ON_EXIT_INDEX_ALIAS } from 'os-client/lib/constants';
+import { IG_GAMES_V2_READ_ALIAS, ML_RECOMMENDED_GAMES_ON_EXIT_INDEX_ALIAS } from 'os-client/lib/constants';
 import {
     extractBynderObject,
     GAME_SEARCH_QUERY_LIMIT,
     getLambdaExecutionEnvironment,
     pickGameOrSiteGameValue,
+    resolveGameProp,
 } from 'os-client/lib/utils';
 
 const MAX_SIZE = 1_000; // Maximum size for the ML query
@@ -51,7 +52,7 @@ export const createGamesByGameSkinQuery = (
     const ventureKey = `siteGame.venture.${spaceLocale}.sys.id`;
     const platformKey = `siteGame.platformVisibility.${spaceLocale}.keyword`;
     const environmentKey = `siteGame.environmentVisibility.${spaceLocale}.keyword`;
-    const gameSkinKey = `game.gamePlatformConfig.${spaceLocale}.gameSkin.keyword`;
+    const gameSkinKey = `game.gameSkin`;
 
     const gamesListQuery: IOpenSearchQuery = {
         query: {
@@ -75,6 +76,11 @@ export const createGamesByGameSkinQuery = (
                                     inner_hits: {
                                         _source: [
                                             'game.gamePlatformConfig',
+                                            'game.gameName',
+                                            'game.gameSkin',
+                                            'game.mobileGameName',
+                                            'game.mobileGameSkin',
+                                            'game.mobileOverride',
                                             'game.title',
                                             'game.tags',
                                             'game.infoImgUrlPattern',
@@ -128,7 +134,7 @@ export const getGamebyGameSkin = async (
     const gamesByGameSkin: FullApiResponse[] = await getGameHits(
         client,
         gamesByGameSkinQuery,
-        GAMES_INDEX_V2_ALIAS,
+        IG_GAMES_V2_READ_ALIAS,
         siteName,
         platform,
     );
@@ -148,19 +154,15 @@ const gameRecommendationResponse = (
     const response = gamesByGameSkin.map((item) => {
         const gameData = item.innerHit?.game;
         const siteGameData = item.hit?.siteGame;
-        const gamePlatformObject = gameData?.gamePlatformConfig[spaceLocale] || {};
-        const gameName =
-            platform.toLowerCase() !== 'web' && gamePlatformObject?.mobileOverride
-                ? gamePlatformObject?.mobileName
-                : gamePlatformObject?.name;
+        const gamePlatformObject = gameData?.gamePlatformConfig || {};
+        const isMobileOverride = platform.toLowerCase() !== 'web' && gameData?.mobileOverride;
+        const gameName = isMobileOverride ? gameData?.mobileGameName : gameData?.gameName;
+        const computedGameSkin = isMobileOverride ? gameData?.mobileGameSkin : gameData?.gameSkin;
+        const computedDemoUrl = isMobileOverride ? gamePlatformObject?.mobileDemoUrl : gamePlatformObject?.demoUrl;
+        const computedRealUrl = isMobileOverride ? gamePlatformObject?.mobileRealUrl : gamePlatformObject?.realUrl;
         const imgUrlPattern = tryGetValueFromLocalised(localeOverride, spaceLocale, gameData?.imgUrlPattern, '');
-        const gamePlatformConfig = tryGetValueFromLocalised(
-            localeOverride,
-            spaceLocale,
-            gameData?.gamePlatformConfig,
-            null,
-        );
-        const tags = pickGameOrSiteGameValue(gameData?.tags?.[spaceLocale], siteGameData?.tags?.[spaceLocale], null);
+        const gamePlatformConfig = gameData?.gamePlatformConfig || null;
+        const tags = pickGameOrSiteGameValue(gameData?.tags, siteGameData?.tags?.[spaceLocale], null);
         const backgroundMedia = tryGetValueFromLocalised(localeOverride, spaceLocale, gameData?.backgroundMedia, null);
         const loggedOutBackgroundMedia = tryGetValueFromLocalised(
             localeOverride,
@@ -200,11 +202,11 @@ const gameRecommendationResponse = (
             name: gameName,
             ...(gameData?.title && { title: localizedGameTitle }),
             ...(gameData?.progressiveJackpot && {
-                isProgressiveJackpot: gameData?.progressiveJackpot?.[spaceLocale],
+                isProgressiveJackpot: resolveGameProp(gameData?.progressiveJackpot, spaceLocale, false),
             }),
-            ...(gamePlatformConfig && { gameSkin: gamePlatformConfig?.gameSkin }),
-            ...(gamePlatformConfig && { demoUrl: gamePlatformConfig?.demoUrl }),
-            ...(gamePlatformConfig && { realUrl: gamePlatformConfig?.realUrl }),
+            ...(gamePlatformConfig && { gameSkin: computedGameSkin }),
+            ...(gamePlatformConfig && { demoUrl: computedDemoUrl || gamePlatformObject?.demoUrl }),
+            ...(gamePlatformConfig && { realUrl: computedRealUrl || gamePlatformConfig?.realUrl }),
             ...(imgUrlPattern && { imgUrlPattern: imgUrlPattern }),
             ...(animationMedia && { animationMedia }),
             ...(loggedOutAnimationMedia && { loggedOutAnimationMedia }),
@@ -239,8 +241,8 @@ interface IGameRecommendationResponse {
     imgUrlPattern?: string;
     isProgressiveJackpot?: boolean;
     animationMedia?: string;
-    backgroundMedia?: IBynderAsset;
-    foregroundLogoMedia?: IBynderAsset;
+    backgroundMedia?: SanitizedBynder;
+    foregroundLogoMedia?: SanitizedBynder;
     tags?: string[];
     headlessJackpot?: IHeadlessJackpot;
 }
@@ -279,8 +281,17 @@ export const getDataFromIndex = async (
         query: {
             bool: {
                 filter: [
-                    { term: { 'game.source_game_skin_name.keyword': gameSkin } },
                     { term: { 'tenant_name.keyword': tennant } },
+                    // at least one of these should match:
+                    {
+                        bool: {
+                            should: [
+                                { term: { 'game.source_game_skin_name.keyword': gameSkin } },
+                                { term: { 'game.mobile_game_skin_name.keyword': gameSkin } },
+                            ],
+                            minimum_should_match: 1,
+                        },
+                    },
                 ],
             },
         },

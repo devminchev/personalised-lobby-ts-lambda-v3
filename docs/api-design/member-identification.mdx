@@ -1,0 +1,47 @@
+---
+title: Member Identification
+description: Why memberid is a required query parameter, never a path segment
+---
+
+# Member Identification
+
+Endpoints that require a logged-in member use `memberid` as a **required query parameter**, not a path segment.
+
+```http
+GET /sites/{sitename}/platform/{platform}/suggested-for-you?memberid=123
+GET /sites/{sitename}/platform/{platform}/recently-played?memberid=123
+GET /sites/{sitename}/personalised-extra-data?memberid=123
+GET /sites/{sitename}/platform/{platform}/view/{viewslug}/sections/{sectionid}/sitegames/personalised?memberid=123
+```
+
+## Why not a path parameter?
+
+`memberid` is not a resource in our domain model. It does not identify or own the resource being requested — it is a required input that determines which personalised data to return.
+
+Path parameters should represent resources or sub-resources in the URL hierarchy (sites, platforms, views, sections). Placing `memberid` in the path would imply a `/members/{memberid}` resource collection that does not exist in this API.
+
+## Why a required query parameter is valid
+
+Required query parameters are a well-established REST pattern, including in the gaming industry. APIs that scope responses to a user in the same way:
+
+| API                    | Example                                                        |
+| ---------------------- | -------------------------------------------------------------- |
+| **Twitch Helix API**   | `GET /users/follows?from_id=123`, `GET /streams?user_id=123`   |
+| **Steam Web API**      | `GET /GetOwnedGames/v1/?steamid=765...`                        |
+| **YouTube Data API**   | `GET /activities?channelId=UC...`                              |
+
+In every case the user identifier is a required input that scopes the response — not a resource in the URL hierarchy. The same reasoning underpins our use of `memberid`.
+
+A required query parameter is **not** the same as an optional filter. It is a mandatory input that the server validates.
+
+> **Handlers must return `400 Bad Request` if `memberid` is missing.**
+
+## CloudFront caching and routing
+
+CloudFront fronts the API for caching and path-based routing. It is configured to include `memberid` in the cache key, so responses are cached per-member. This gives us the same caching granularity as if `memberid` were in the path, without polluting the URL hierarchy.
+
+Path-based routing is also why `sitegames` (anonymous) and `sitegames/personalised` (member-specific) are separate endpoints rather than a single endpoint that branches on the presence of `memberid`. CloudFront routes to different origins or behaviours based on path patterns; a single path with an optional query parameter cannot be routed differently.
+
+## Consistency rule
+
+**`memberid` is always a query parameter, never in the path.** Every endpoint that needs a member context follows this pattern, keeping the URL hierarchy clean and the API predictable for consumers.

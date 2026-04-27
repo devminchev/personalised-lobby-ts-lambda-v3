@@ -20,9 +20,11 @@ import {
     InnerPartialApiResponseConfig,
     IGameConfigResponse,
     coalescePropValue,
-    GAMES_INDEX_V2_ALIAS,
+    IG_GAMES_V2_READ_ALIAS,
     validators,
     errorResponseHandler,
+    gzipResponse,
+    resolveGameProp,
 } from 'os-client';
 
 /**
@@ -53,13 +55,19 @@ export const getGameAndSiteGameByGameName = async (
         spaceLocale,
     );
     const query = {
-        size: 100,
+        size: 2,
         _source: [
             'game.funPanelEnabled',
             'game.vendor',
             'game.minBet',
             'game.maxBet',
             'game.id',
+            'game.gameName',
+            'game.gameSkin',
+            'game.mobileGameName',
+            'game.mobileGameSkin',
+            'game.mobileOverride',
+            'game.rtp',
             'game.gamePlatformConfig',
             'game.showNetPosition',
             'game.launchCode',
@@ -119,7 +127,7 @@ export const getGameAndSiteGameByGameName = async (
     const responses = await getSiteGameHits<{ game: IGameConfig }, { siteGame: ISiteGameConfig }>(
         client,
         query,
-        GAMES_INDEX_V2_ALIAS,
+        IG_GAMES_V2_READ_ALIAS,
         siteName,
         platform,
     );
@@ -147,7 +155,11 @@ const createResponseObject = async (
 
     const headlessJackpot = siteGame?.headlessJackpot?.[defaultLocale];
 
-    const platformConfig: GamePlatformConfig = game?.gamePlatformConfig[defaultLocale];
+    const platformConfig: GamePlatformConfig = resolveGameProp(
+        game?.gamePlatformConfig,
+        defaultLocale,
+        {} as GamePlatformConfig,
+    );
     const chatData =
         (siteGame?.chat &&
             tryGetValueFromLocalised(userLocale, defaultLocale, siteGame.chat, {
@@ -156,27 +168,28 @@ const createResponseObject = async (
             })) ||
         null;
 
-    const isMobile = platform !== 'web' && platformConfig.mobileOverride;
+    const mobileOverride = game.mobileOverride || false;
+    const isMobile = platform !== 'web' && mobileOverride;
     const liveHidden = siteGame.liveHidden?.[defaultLocale];
 
     const gameObject: IGameConfigResponse = {
         entryId: siteGame.id,
         ...(chatData && { chat: chatData }),
-        funPanelEnabled: game.funPanelEnabled?.[defaultLocale],
+        funPanelEnabled: resolveGameProp(game.funPanelEnabled, defaultLocale, false),
         minBet: tryGetValueFromLocalised(userLocale, defaultLocale, minBet, ''),
-        vendor: game.vendor?.[defaultLocale],
+        vendor: resolveGameProp(game.vendor, defaultLocale, ''),
         maxBet: tryGetValueFromLocalised(userLocale, defaultLocale, maxBet, ''),
         showNetPosition,
-        mobileOverride: platformConfig.mobileOverride,
+        mobileOverride,
         ...(headlessJackpot && { headlessJackpot: headlessJackpot }),
         ...(game?.launchCode?.[defaultLocale] && { launchCode: game?.launchCode?.[defaultLocale] }),
-        gameSkin: isMobile ? platformConfig.mobileGameSkin : platformConfig.gameSkin,
-        gameName: isMobile ? platformConfig.mobileName : platformConfig.name,
+        gameSkin: isMobile ? game.mobileGameSkin : game.gameSkin,
+        gameName: isMobile ? game.mobileGameName : game.gameName,
         demoUrl: isMobile ? platformConfig.mobileDemoUrl : platformConfig.demoUrl,
         realUrl: isMobile ? platformConfig.mobileRealUrl : platformConfig.realUrl,
         gameLoaderFileName: isMobile ? platformConfig.mobileGameLoaderFileName : platformConfig.gameLoaderFileName,
-        mobileName: platformConfig.mobileName,
-        mobileGameSkin: platformConfig.mobileGameSkin,
+        mobileName: game.mobileGameName,
+        mobileGameSkin: game.mobileGameSkin,
         mobileRealUrl: platformConfig.mobileRealUrl,
         mobileDemoUrl: platformConfig.mobileDemoUrl,
         mobileGameLoaderFileName: platformConfig.mobileGameLoaderFileName,
@@ -222,10 +235,7 @@ export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGat
             platform,
         );
 
-        return {
-            statusCode: 200,
-            body: JSON.stringify(responseObject),
-        };
+        return gzipResponse(responseObject);
     } catch (err) {
         const errorLogParams = {
             eventReqId,

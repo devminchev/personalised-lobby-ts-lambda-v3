@@ -13,6 +13,7 @@ import {
     handleRecentlyPlayed,
     getLambdaExecutionEnvironment,
     OrderCriteria,
+    gzipResponse,
 } from 'os-client';
 import { getRpOrderCriteria } from './lib/recentlyPlayedSection';
 
@@ -77,10 +78,7 @@ export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGat
             orderCriteria,
         });
 
-        return {
-            statusCode: 200,
-            body: JSON.stringify(recentlyPlayedPayload),
-        };
+        return gzipResponse(recentlyPlayedPayload);
     } catch (err) {
         const errorLogParams = {
             eventReqId,

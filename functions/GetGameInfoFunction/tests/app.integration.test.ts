@@ -19,8 +19,8 @@ import {
     EXPECTED_ES_LOCALE_RESP,
     EXPECTED_MOBILE_OVERRIDE_RESP,
 } from './mocks/expectedAPIResponses';
-import { VENTURES_INDEX_ALIAS, ErrorCode, getErrorMessage } from 'os-client';
-import { GAMES_INDEX_V2_ALIAS } from 'os-client/lib/constants';
+import { VENTURES_INDEX_ALIAS, ErrorCode, getErrorMessage, parseCompressedBody } from 'os-client';
+import { IG_GAMES_V2_READ_ALIAS } from 'os-client/lib/constants';
 
 jest.mock('@opensearch-project/opensearch', () => {
     const actualOpenSearch: any = jest.requireActual('@opensearch-project/opensearch');
@@ -47,13 +47,13 @@ describe('Integration Test for Lambda Handler', () => {
                 .post(`/${VENTURES_INDEX_ALIAS}/_search?request_cache=true`)
                 .reply(200, VENTURE_SUCCESS_RESP);
             nock('http://localhost:9200')
-                .post(`/${GAMES_INDEX_V2_ALIAS}/_search?request_cache=true`)
+                .post(`/${IG_GAMES_V2_READ_ALIAS}/_search?request_cache=true`)
                 .reply(200, SUCCESSFUL_GAME_RESPONSE);
 
             const event: APIGatewayProxyEvent = mockApiEvent(SITENAME, PLATFORM, GAME_NAME);
             const result: APIGatewayProxyResult = await lambdaHandler(event);
 
-            const body = JSON.parse(result.body);
+            const body = parseCompressedBody(result);
             expect(result.statusCode).toEqual(200);
             expect(body).toEqual(EXPECTED_WEB_RESP);
         });
@@ -63,13 +63,13 @@ describe('Integration Test for Lambda Handler', () => {
                 .post(`/${VENTURES_INDEX_ALIAS}/_search?request_cache=true`)
                 .reply(200, VENTURE_SUCCESS_RESP);
             nock('http://localhost:9200')
-                .post(`/${GAMES_INDEX_V2_ALIAS}/_search?request_cache=true`)
+                .post(`/${IG_GAMES_V2_READ_ALIAS}/_search?request_cache=true`)
                 .reply(200, SUCCESSFUL_GAME_RESPONSE);
 
             const event: APIGatewayProxyEvent = mockApiEvent(SITENAME, PLATFORM, GAME_NAME, LOCALE_ES);
             const result: APIGatewayProxyResult = await lambdaHandler(event);
 
-            const body = JSON.parse(result.body);
+            const body = parseCompressedBody(result);
             expect(result.statusCode).toEqual(200);
             expect(body).toEqual(EXPECTED_ES_LOCALE_RESP);
         });
@@ -79,13 +79,13 @@ describe('Integration Test for Lambda Handler', () => {
                 .post(`/${VENTURES_INDEX_ALIAS}/_search?request_cache=true`)
                 .reply(200, VENTURE_SUCCESS_RESP);
             nock('http://localhost:9200')
-                .post(`/${GAMES_INDEX_V2_ALIAS}/_search?request_cache=true`)
+                .post(`/${IG_GAMES_V2_READ_ALIAS}/_search?request_cache=true`)
                 .reply(200, SUCCESS_MOBILE_GAME_OVERRIDES);
 
             const event: APIGatewayProxyEvent = mockApiEvent(SITENAME, PLATFORM_MOBILE, GAME_NAME);
             const result: APIGatewayProxyResult = await lambdaHandler(event);
 
-            const body = JSON.parse(result.body);
+            const body = parseCompressedBody(result);
             expect(result.statusCode).toEqual(200);
             expect(body).toEqual(EXPECTED_MOBILE_OVERRIDE_RESP);
         });
@@ -95,13 +95,13 @@ describe('Integration Test for Lambda Handler', () => {
                 .post(`/${VENTURES_INDEX_ALIAS}/_search?request_cache=true`)
                 .reply(200, VENTURE_SUCCESS_RESP);
             nock('http://localhost:9200')
-                .post(`/${GAMES_INDEX_V2_ALIAS}/_search?request_cache=true`)
+                .post(`/${IG_GAMES_V2_READ_ALIAS}/_search?request_cache=true`)
                 .reply(200, SUCCESSFUL_GAME_RESPONSE);
 
             const event: APIGatewayProxyEvent = mockApiEvent(SITENAME, PLATFORM, GAME_NAME, 'SPINACH TREE WAS HERE!');
             const result: APIGatewayProxyResult = await lambdaHandler(event);
 
-            const body = JSON.parse(result.body);
+            const body = parseCompressedBody(result);
             expect(result.statusCode).toEqual(200);
             expect(body).toEqual(EXPECTED_WEB_RESP);
         });
@@ -111,14 +111,14 @@ describe('Integration Test for Lambda Handler', () => {
                 .post(`/${VENTURES_INDEX_ALIAS}/_search?request_cache=true`)
                 .reply(200, VENTURE_SUCCESS_RESP);
             nock('http://localhost:9200')
-                .post(`/${GAMES_INDEX_V2_ALIAS}/_search?request_cache=true`)
+                .post(`/${IG_GAMES_V2_READ_ALIAS}/_search?request_cache=true`)
                 .reply(200, SUCCESSFUL_GAME_RESPONSE);
 
             const event: APIGatewayProxyEvent = mockApiEvent(SITENAME, PLATFORM, GAME_NAME, LOCALE_GB);
 
             const result: APIGatewayProxyResult = await lambdaHandler(event);
 
-            const body = JSON.parse(result.body);
+            const body = parseCompressedBody(result);
             expect(result.statusCode).toEqual(200);
             expect(body).toEqual(EXPECTED_WEB_RESP);
         });
@@ -128,13 +128,13 @@ describe('Integration Test for Lambda Handler', () => {
                 .post(`/${VENTURES_INDEX_ALIAS}/_search?request_cache=true`)
                 .reply(200, VENTURE_SUCCESS_RESP);
             nock('http://localhost:9200')
-                .post(`/${GAMES_INDEX_V2_ALIAS}/_search?request_cache=true`)
+                .post(`/${IG_GAMES_V2_READ_ALIAS}/_search?request_cache=true`)
                 .reply(200, SUCCESS_MOBILE_GAME_OVERRIDES);
 
             const event: APIGatewayProxyEvent = mockApiEvent(SITENAME, PLATFORM_MOBILE, GAME_NAME, LOCALE_GB);
             const result: APIGatewayProxyResult = await lambdaHandler(event);
 
-            const body = JSON.parse(result.body);
+            const body = parseCompressedBody(result);
             expect(result.statusCode).toEqual(200);
             expect(body).toEqual(EXPECTED_MOBILE_OVERRIDE_RESP);
         });
@@ -146,7 +146,7 @@ describe('Integration Test for Lambda Handler', () => {
                 .post(`/${VENTURES_INDEX_ALIAS}/_search?request_cache=true`)
                 .reply(200, VENTURE_SUCCESS_RESP);
             nock('http://localhost:9200')
-                .post(`/${GAMES_INDEX_V2_ALIAS}/_search?request_cache=true`)
+                .post(`/${IG_GAMES_V2_READ_ALIAS}/_search?request_cache=true`)
                 .reply(200, NOT_FOUND_RESPONSE);
 
             const event: APIGatewayProxyEvent = mockApiEvent(SITENAME, PLATFORM, GAME_NAME, LOCALE_ES);
@@ -162,7 +162,7 @@ describe('Integration Test for Lambda Handler', () => {
                 .post(`/${VENTURES_INDEX_ALIAS}/_search?request_cache=true`)
                 .reply(200, VENTURE_SUCCESS_RESP);
             nock('http://localhost:9200')
-                .post(`/${GAMES_INDEX_V2_ALIAS}/_search?request_cache=true`)
+                .post(`/${IG_GAMES_V2_READ_ALIAS}/_search?request_cache=true`)
                 .reply(200, NOT_FOUND_RESPONSE);
 
             const event: APIGatewayProxyEvent = mockApiEvent(SITENAME, undefined, GAME_NAME);
@@ -179,7 +179,7 @@ describe('Integration Test for Lambda Handler', () => {
                 .post(`/${VENTURES_INDEX_ALIAS}/_search?request_cache=true`)
                 .reply(200, VENTURE_SUCCESS_RESP);
             nock('http://localhost:9200')
-                .post(`/${GAMES_INDEX_V2_ALIAS}/_search?request_cache=true`)
+                .post(`/${IG_GAMES_V2_READ_ALIAS}/_search?request_cache=true`)
                 .reply(200, NOT_FOUND_RESPONSE);
 
             const event: APIGatewayProxyEvent = mockApiEvent(SITENAME, PLATFORM, undefined);
@@ -197,7 +197,7 @@ describe('Integration Test for Lambda Handler', () => {
             nock('http://localhost:9200')
                 .post(`/${VENTURES_INDEX_ALIAS}/_search?request_cache=true`)
                 .reply(200, VENTURE_SUCCESS_RESP);
-            nock('http://localhost:9200').post(`/${GAMES_INDEX_V2_ALIAS}/_search?request_cache=true`).reply(401, []);
+            nock('http://localhost:9200').post(`/${IG_GAMES_V2_READ_ALIAS}/_search?request_cache=true`).reply(401, []);
             const event: APIGatewayProxyEvent = mockApiEvent(SITENAME, PLATFORM, GAME_NAME);
             const result: APIGatewayProxyResult = await lambdaHandler(event);
             const body = JSON.parse(result.body);
@@ -211,7 +211,7 @@ describe('Integration Test for Lambda Handler', () => {
                 .post(`/${VENTURES_INDEX_ALIAS}/_search?request_cache=true`)
                 .reply(200, VENTURE_SUCCESS_RESP);
             nock('http://localhost:9200')
-                .post(`/${GAMES_INDEX_V2_ALIAS}/_search?request_cache=true`)
+                .post(`/${IG_GAMES_V2_READ_ALIAS}/_search?request_cache=true`)
                 .reply(500, 'INTERNAL_ERROR');
             const event: APIGatewayProxyEvent = mockApiEvent(SITENAME, PLATFORM, GAME_NAME);
             const result: APIGatewayProxyResult = await lambdaHandler(event);

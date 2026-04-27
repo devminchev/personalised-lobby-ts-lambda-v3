@@ -7,7 +7,7 @@ import { lambdaHandler } from '../app';
 import nock from 'nock';
 import { mockApiEvent } from './mocks/gatewayMocks';
 import { jest, describe, beforeEach, it, expect } from '@jest/globals';
-import { ErrorCode, GAMES_INDEX_V2_ALIAS, VENTURES_INDEX_ALIAS } from 'os-client';
+import { ErrorCode, IG_GAMES_V2_READ_ALIAS, VENTURES_INDEX_ALIAS, parseCompressedBody } from 'os-client';
 import { ML_RECOMMENDED_GAMES_ON_EXIT_INDEX_ALIAS } from 'os-client/lib/constants';
 
 const HOST = process.env.HOST || 'http://localhost:9200';
@@ -46,7 +46,7 @@ describe('Integration Test for Lambda Handler - recommended-games-on-exit', () =
         const event = mockApiEvent(sitename, platform, gameskin, locale);
         const result = await lambdaHandler(event);
         expect(result.statusCode).toBe(200);
-        expect(JSON.parse(result.body)).toEqual([]);
+        expect(parseCompressedBody(result)).toEqual([]);
     });
 
     it('should return 200 and recommended games when ML and games index return data', async () => {
@@ -121,16 +121,20 @@ describe('Integration Test for Lambda Handler - recommended-games-on-exit', () =
                                             _score: 1,
                                             _source: {
                                                 game: {
+                                                    gameName: 'play-micro-amazing-link-bounty',
+                                                    gameSkin: 'skin1',
+                                                    mobileGameName: '',
+                                                    mobileGameSkin: '',
+                                                    mobileOverride: false,
+                                                    tags: [],
                                                     gamePlatformConfig: {
-                                                        'en-GB': {
-                                                            gameType: { type: 'Slots' },
-                                                            gameSkin: 'skin1',
-                                                            name: 'play-micro-amazing-link-bounty',
-                                                            realUrl:
-                                                                '/service/game/play/play-micro-amazing-link-bounty',
-                                                            mobileRealUrl:
-                                                                '/service/game/play/play-micro-amazing-link-bounty-m',
-                                                        },
+                                                        gameType: { type: 'Slots' },
+                                                        name: 'play-micro-amazing-link-bounty',
+                                                        realUrl: '/service/game/play/play-micro-amazing-link-bounty',
+                                                        demoUrl: '',
+                                                        mobileDemoUrl: '',
+                                                        mobileRealUrl:
+                                                            '/service/game/play/play-micro-amazing-link-bounty-m',
                                                     },
                                                     imgUrlPattern: {
                                                         'en-GB':
@@ -158,13 +162,13 @@ describe('Integration Test for Lambda Handler - recommended-games-on-exit', () =
             .query(true)
             .reply(200, mlResponse);
 
-        nock('http://localhost:9200').post(`/${GAMES_INDEX_V2_ALIAS}/_search`).query(true).reply(200, gamesResponse);
+        nock('http://localhost:9200').post(`/${IG_GAMES_V2_READ_ALIAS}/_search`).query(true).reply(200, gamesResponse);
 
         const event = mockApiEvent(sitename, platform, gameskin, locale);
         const result = await lambdaHandler(event);
 
         expect(result.statusCode).toBe(200);
-        const body = JSON.parse(result.body);
+        const body = parseCompressedBody<Array<{ gameId: string; title?: string }>>(result);
         expect(body).toHaveLength(1);
         expect(body[0].gameId).toBe('game1');
         expect(body[0].title).toBe('Amazing Link Bounty');
@@ -211,7 +215,7 @@ describe('Integration Test for Lambda Handler - recommended-games-on-exit', () =
             .reply(200, mlResponse);
 
         nock('http://localhost:9200')
-            .post(`/${GAMES_INDEX_V2_ALIAS}/_search`)
+            .post(`/${IG_GAMES_V2_READ_ALIAS}/_search`)
             .query(true)
             .reply(200, { hits: { hits: [] } });
 
@@ -219,7 +223,7 @@ describe('Integration Test for Lambda Handler - recommended-games-on-exit', () =
         const result = await lambdaHandler(event);
 
         expect(result.statusCode).toBe(200);
-        expect(JSON.parse(result.body)).toEqual([]);
+        expect(parseCompressedBody(result)).toEqual([]);
     });
 
     it('should return 500 if ML index throws an error', async () => {
@@ -279,7 +283,10 @@ describe('Integration Test for Lambda Handler - recommended-games-on-exit', () =
 
         nock(HOST).post(`/${ML_RECOMMENDED_GAMES_ON_EXIT_INDEX_ALIAS}/_search`).query(true).reply(200, mlResponse);
 
-        nock(HOST).post(`/${GAMES_INDEX_V2_ALIAS}/_search`).query(true).reply(500, { error: 'Internal Server Error' });
+        nock(HOST)
+            .post(`/${IG_GAMES_V2_READ_ALIAS}/_search`)
+            .query(true)
+            .reply(500, { error: 'Internal Server Error' });
 
         const event = mockApiEvent(sitename, platform, gameskin, locale);
         const result = await lambdaHandler(event);
@@ -354,15 +361,20 @@ describe('Integration Test for Lambda Handler - recommended-games-on-exit', () =
                                             _score: 1,
                                             _source: {
                                                 game: {
+                                                    gameName: 'play-micro-amazing-link-bounty',
+                                                    gameSkin: 'skin1',
+                                                    mobileGameName: '',
+                                                    mobileGameSkin: '',
+                                                    mobileOverride: false,
+                                                    tags: [],
                                                     gamePlatformConfig: {
-                                                        'en-GB': {
-                                                            gameType: { type: 'Slots' },
-                                                            gameSkin: 'skin1',
-                                                            name: 'play-micro-amazing-link-bounty',
-                                                            realUrl: 'url1',
-                                                            mobileRealUrl:
-                                                                '/service/game/play/play-micro-amazing-link-bounty-m',
-                                                        },
+                                                        gameType: { type: 'Slots' },
+                                                        name: 'play-micro-amazing-link-bounty',
+                                                        realUrl: 'url1',
+                                                        demoUrl: '',
+                                                        mobileDemoUrl: '',
+                                                        mobileRealUrl:
+                                                            '/service/game/play/play-micro-amazing-link-bounty-m',
                                                     },
                                                     imgUrlPattern: {
                                                         'en-GB':
@@ -390,14 +402,14 @@ describe('Integration Test for Lambda Handler - recommended-games-on-exit', () =
 
         nock(HOST).post(`/${ML_RECOMMENDED_GAMES_ON_EXIT_INDEX_ALIAS}/_search`).query(true).reply(200, mlResponse);
 
-        nock(HOST).post(`/${GAMES_INDEX_V2_ALIAS}/_search`).query(true).reply(200, gamesResponse);
+        nock(HOST).post(`/${IG_GAMES_V2_READ_ALIAS}/_search`).query(true).reply(200, gamesResponse);
 
         const event = mockApiEvent(sitename, platform, gameskin, locale);
         const result = await lambdaHandler(event);
 
         console.log('result:', JSON.stringify(result));
         expect(result.statusCode).toBe(200);
-        const body = JSON.parse(result.body);
+        const body = parseCompressedBody<Array<{ gameId: string }>>(result);
         expect(body).toHaveLength(1);
         expect(body[0].gameId).toBe('game1');
     });
@@ -467,22 +479,25 @@ describe('Integration Test for Lambda Handler - recommended-games-on-exit', () =
                                             _score: 1,
                                             _source: {
                                                 game: {
+                                                    gameName: 'play-micro-amazing-link-bounty',
+                                                    gameSkin: 'skin2',
+                                                    mobileGameName: '',
+                                                    mobileGameSkin: '',
+                                                    mobileOverride: false,
                                                     title: { 'en-GB': 'Game Two' },
-                                                    tags: { 'en-GB': ['tag2'] },
+                                                    tags: ['tag2'],
                                                     imgUrlPattern: {
                                                         'en-GB':
                                                             '/api/content/gametiles/amazing-link-bounty/scale-s%s/amazing-link-bounty-tile-r%s-w%s.jpg',
                                                     },
                                                     gamePlatformConfig: {
-                                                        'en-GB': {
-                                                            gameType: { type: 'Slots' },
-                                                            gameSkin: 'skin2',
-                                                            name: 'play-micro-amazing-link-bounty',
-                                                            realUrl:
-                                                                '/service/game/play/play-micro-amazing-link-bounty',
-                                                            mobileRealUrl:
-                                                                '/service/game/play/play-micro-amazing-link-bounty-m',
-                                                        },
+                                                        gameType: { type: 'Slots' },
+                                                        name: 'play-micro-amazing-link-bounty',
+                                                        realUrl: '/service/game/play/play-micro-amazing-link-bounty',
+                                                        demoUrl: '',
+                                                        mobileDemoUrl: '',
+                                                        mobileRealUrl:
+                                                            '/service/game/play/play-micro-amazing-link-bounty-m',
                                                     },
                                                 },
                                             },
@@ -515,22 +530,25 @@ describe('Integration Test for Lambda Handler - recommended-games-on-exit', () =
                                             _score: 1,
                                             _source: {
                                                 game: {
+                                                    gameName: 'play-micro-amazing-link-bounty',
+                                                    gameSkin: 'skin1',
+                                                    mobileGameName: '',
+                                                    mobileGameSkin: '',
+                                                    mobileOverride: false,
                                                     title: { 'en-GB': 'Game One' },
-                                                    tags: { 'en-GB': ['tag1'] },
+                                                    tags: ['tag1'],
                                                     imgUrlPattern: {
                                                         'en-GB':
                                                             '/api/content/gametiles/amazing-link-bounty/scale-s%s/amazing-link-bounty-tile-r%s-w%s.jpg',
                                                     },
                                                     gamePlatformConfig: {
-                                                        'en-GB': {
-                                                            gameType: { type: 'Slots' },
-                                                            gameSkin: 'skin1',
-                                                            name: 'play-micro-amazing-link-bounty',
-                                                            realUrl:
-                                                                '/service/game/play/play-micro-amazing-link-bounty',
-                                                            mobileRealUrl:
-                                                                '/service/game/play/play-micro-amazing-link-bounty-m',
-                                                        },
+                                                        gameType: { type: 'Slots' },
+                                                        name: 'play-micro-amazing-link-bounty',
+                                                        realUrl: '/service/game/play/play-micro-amazing-link-bounty',
+                                                        demoUrl: '',
+                                                        mobileDemoUrl: '',
+                                                        mobileRealUrl:
+                                                            '/service/game/play/play-micro-amazing-link-bounty-m',
                                                     },
                                                 },
                                             },
@@ -548,13 +566,13 @@ describe('Integration Test for Lambda Handler - recommended-games-on-exit', () =
 
         nock(HOST).post(`/${ML_RECOMMENDED_GAMES_ON_EXIT_INDEX_ALIAS}/_search`).query(true).reply(200, mlResponse);
 
-        nock(HOST).post(`/${GAMES_INDEX_V2_ALIAS}/_search`).query(true).reply(200, gamesResponse);
+        nock(HOST).post(`/${IG_GAMES_V2_READ_ALIAS}/_search`).query(true).reply(200, gamesResponse);
 
         const event = mockApiEvent(sitename, platform, gameskin, locale);
         const result = await lambdaHandler(event);
 
         expect(result.statusCode).toBe(200);
-        const body = JSON.parse(result.body);
+        const body = parseCompressedBody<Array<{ gameId: string }>>(result);
         console.log('Response body:', body);
         expect(body).toHaveLength(2);
         // Game with lower distance should come first

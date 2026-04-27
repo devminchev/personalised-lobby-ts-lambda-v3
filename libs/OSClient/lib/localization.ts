@@ -6,7 +6,7 @@ const DEFAULT_EU_CONTENTFUL_SPACE_LOCALE = 'en-GB';
 const DEFAULT_US_CONTENTFUL_SPACE_LOCALE = 'en-US';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const DEFAULT_REGION = 'EU';
-const VALID_LOCALE_KEYS = ['en-GB', 'es', 'en-CA', 'en-US', 'sv', 'es-ES'];
+const VALID_LOCALE_KEYS = ['en-GB', 'es', 'en-CA', 'en-US', 'sv', 'es-ES', 'el-GR'];
 const SPANISH_LOCALE_MAP: ILocaleMap = {
     'es-ES': 'es',
 };

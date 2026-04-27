@@ -1,16 +1,23 @@
 #!/usr/bin/env node
 
-const axios = require('axios');
+const { execFileSync } = require('child_process');
 
-// Configuration - using same base URL as found in nja-rel-pipelines-v3
-const JIRA_TRANSITION_ENDPOINT = 'http://nja.psnative.pgt.gaia/ticket';
-
-// Valid transition states from nja-rel-pipelines-v3/src/lib/transitions/constants.ts
+// Valid transition states matching NJA's STATE_TO_STATE_NAME constants
 const VALID_STATES = {
     DEPLOY_TO_PP: 'Deploy to PP',
     PP_TESTING: 'PP Testing',
+    DEPLOYING: 'Deploying',
     RESOLVED: 'Resolved',
     CLOSED: 'Closed',
+};
+
+// CLI argument to NJA state name mapping
+const STATE_MAP = {
+    'deploy-pp': VALID_STATES.DEPLOY_TO_PP,
+    'pp-testing': VALID_STATES.PP_TESTING,
+    deploying: VALID_STATES.DEPLOYING,
+    resolved: VALID_STATES.RESOLVED,
+    closed: VALID_STATES.CLOSED,
 };
 
 // Command line argument parsing
@@ -19,63 +26,36 @@ const stateArg = args.find((arg) => arg.startsWith('--state='));
 
 if (!stateArg) {
     console.error('Error: --state parameter is required');
-    console.error('Usage: ./transition-jira-tickets.js --state=deploy-pp|pp-testing|resolved|closed');
+    console.error(`Usage: ./transition-jira-tickets.js --state=${Object.keys(STATE_MAP).join('|')}`);
     process.exit(1);
 }
 
 const stateParam = stateArg.split('=')[1];
-const state =
-    stateParam === 'deploy-pp'
-        ? VALID_STATES.DEPLOY_TO_PP
-        : stateParam === 'pp-testing'
-          ? VALID_STATES.PP_TESTING
-          : stateParam === 'resolved'
-            ? VALID_STATES.RESOLVED
-            : stateParam === 'closed'
-              ? VALID_STATES.CLOSED
-              : null;
+const state = STATE_MAP[stateParam] || null;
 
 if (!state) {
-    console.error('Error: State must be one of: deploy-pp, pp-testing, resolved, closed');
+    console.error(`Error: State must be one of: ${Object.keys(STATE_MAP).join(', ')}`);
     process.exit(1);
 }
 
 console.log(`Transitioning Jira tickets to state: ${state}`);
 
-// Function to transition a Jira ticket
-async function transitionJiraTicket(ticketId, targetState) {
-    const url = `${JIRA_TRANSITION_ENDPOINT}/${ticketId}/transition`;
-    const payload = {
-        state: targetState,
-    };
+// Function to transition a Jira ticket via NJA CLI
+function transitionJiraTicket(ticketId, targetState) {
+    const cliArgs = ['ticket', 'transition', ticketId, '--state', targetState];
 
     console.log(`Transitioning ticket ${ticketId} to "${targetState}"`);
 
     try {
-        const response = await axios.post(url, payload, {
-            headers: {
-                'Content-Type': 'application/json',
-                apikey: 'secret',
-            },
-        });
-
-        console.log(`✓ Successfully transitioned ${ticketId} to "${targetState}"`);
-
-        return {
-            success: true,
-            ticketId: ticketId,
-            state: targetState,
-            response: response.data,
-        };
+        execFileSync('nja', cliArgs, { encoding: 'utf-8' });
+        console.log(`Successfully transitioned ${ticketId} to "${targetState}"`);
+        return { success: true, ticketId, state: targetState };
     } catch (error) {
-        const errorMessage = error.response?.data || error.message;
-        const statusCode = error.response?.status || 'Unknown';
-        console.error(`✗ Failed to transition ticket ${ticketId}: HTTP ${statusCode}: ${errorMessage}`);
-        return {
-            success: false,
-            ticketId: ticketId,
-            error: `HTTP ${statusCode}: ${errorMessage}`,
-        };
+        const stdout = error.stdout || '';
+        const stderr = error.stderr || '';
+        const errorDetail = stdout || stderr || error.message;
+        console.error(`Failed to transition ticket ${ticketId}: ${errorDetail}`);
+        return { success: false, ticketId, error: errorDetail };
     }
 }
 
@@ -105,24 +85,33 @@ function validateInput(versions) {
     const ticketsWithRelIds = Object.entries(versions).filter(([, data]) => data.relTicket);
 
     if (ticketsWithRelIds.length === 0) {
-        throw new Error('No tickets with relTicket IDs found in versions.json');
+        return false;
     }
 
     console.log(`Found ${ticketsWithRelIds.length} tickets to transition`);
+    return true;
 }
 
 // Main execution
 async function main() {
     let inputData = '';
 
-    // Read from stdin - simple and clean
+    // Read from stdin
     for await (const chunk of process.stdin) {
         inputData += chunk;
     }
     try {
         // Parse and validate the JSON input
         const versions = JSON.parse(inputData);
-        validateInput(versions);
+        const hasTickets = validateInput(versions);
+
+        if (!hasTickets) {
+            console.log('No tickets with relTicket IDs found in versions.json - nothing to transition, skipping.');
+            console.log(
+                `\nNo tickets to transition to "${state}" - skipping (this is expected when all functions use skipRelTicket)`,
+            );
+            return;
+        }
 
         // Extract ticket IDs
         const ticketsToTransition = extractTicketIds(versions);
@@ -135,7 +124,7 @@ async function main() {
         // Process each ticket
         for (const ticket of ticketsToTransition) {
             try {
-                const result = await transitionJiraTicket(ticket.ticketId, state);
+                const result = transitionJiraTicket(ticket.ticketId, state);
 
                 results.push({
                     packageKey: ticket.packageKey,
@@ -179,7 +168,7 @@ async function main() {
         if (successful.length > 0) {
             console.log(`\nSuccessful transitions to "${state}":`);
             for (const result of successful) {
-                console.log(`  ✓ ${result.packageKey} → ${result.ticketId} (v${result.version})`);
+                console.log(`  ${result.packageKey} -> ${result.ticketId} (v${result.version})`);
             }
         }
 
@@ -187,17 +176,17 @@ async function main() {
             console.log(`\nFailed transitions:`);
             for (const result of failed) {
                 const error = errors.find((e) => e.ticketId === result.ticketId);
-                console.log(`  ✗ ${result.packageKey} → ${result.ticketId}${error ? `: ${error.error}` : ''}`);
+                console.log(`  ${result.packageKey} -> ${result.ticketId}${error ? `: ${error.error}` : ''}`);
             }
         }
 
-        // Exit with error if any transitions failed (requirement: pipeline should stop on failure)
+        // Exit with error if any transitions failed
         if (failed.length > 0) {
-            console.log(`\n💥 Pipeline will fail due to ${failed.length} failed transition(s)`);
+            console.log(`\nPipeline will fail due to ${failed.length} failed transition(s)`);
             process.exit(1);
         }
 
-        console.log(`\n✅ All ${successful.length} tickets successfully transitioned to "${state}"`);
+        console.log(`\nAll ${successful.length} tickets successfully transitioned to "${state}"`);
     } catch (error) {
         console.error('Error:', error.message);
         process.exit(1);

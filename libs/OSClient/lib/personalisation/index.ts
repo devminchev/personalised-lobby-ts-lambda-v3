@@ -11,7 +11,7 @@ export {
     ORDER_CRITERIA_TO_FIELD,
 } from './common/helpers';
 export { IMlPersonalizedSection } from './common/mappings';
-export { handlePersonalizedGames } from './common/personalisation';
+export { handlePersonalizedGames, handleMissingMLRecommendations } from './common/personalisation';
 export {
     becauseYouPlayedShared,
     IBecauseYouPlayedResult,

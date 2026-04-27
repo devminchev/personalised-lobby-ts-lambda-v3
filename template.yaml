@@ -15,9 +15,13 @@ Globals:
             LogFormat: JSON
 
 Parameters:
+    ServiceName:
+        Type: String
+        Default: lobby-v2
+        Description: The name of the service (used for alarm naming and tagging)
     StageName:
         Type: String
-        Default: v3
+        Default: v2
         Description: The name of the deployment stage
     LambdaArchitecture:
         Type: String
@@ -26,12 +30,678 @@ Parameters:
             - x86_64
             - arm64
         Description: Lambda architecture (x86_64 or arm64)
+    OpenSearchDomainName:
+        Type: String
+        Description: Name of the OpenSearch domain to monitor (used for os-* and jvm/cpu alarms)
 Resources:
+    # Async-invocation DLQ for the controller. EventBridge (and Scheduler) deliver
+    # to Lambda asynchronously; without a DLQ, failed invocations after 2 retries
+    # disappear silently. Messages here should trigger an operational alarm — the
+    # controller is load-bearing and failing controller invocations mean the
+    # breaker is not reacting to alarm transitions.
+    PostCloudWatchControllerDeadLetterQueue:
+        Type: AWS::SQS::Queue
+        Properties:
+            QueueName: !Sub "personalisation-lobby-cloudwatch-controller-dlq-${StageName}"
+            # 14 days retention gives an on-call engineer a window to inspect
+            # the cause of failure without dropping evidence.
+            MessageRetentionPeriod: 1209600
+            SqsManagedSseEnabled: true
+
+    # Dedicated log group with explicit retention. Lambda's implicit log group
+    # has "Never Expire" retention, which silently accumulates cost over time.
+    PostCloudWatchControllerLogGroup:
+        Type: AWS::Logs::LogGroup
+        Properties:
+            LogGroupName: /aws/lambda/personalisation-lobby-games-cloudwatch-controller
+            RetentionInDays: 30
+
+    PostCloudWatchControllerFunction:
+        Type: AWS::Serverless::Function
+        # Explicit dependency so the LogGroup exists before the function creates
+        # one of its own — otherwise CFN fails to create the LogGroup on first
+        # deploy because Lambda has already created an identically-named one.
+        DependsOn: PostCloudWatchControllerLogGroup
+        Properties:
+            FunctionName: personalisation-lobby-games-cloudwatch-controller
+            CodeUri: ./functions/PostCloudWatchController/
+            Handler: index.handler
+            Role: !GetAtt PostCloudWatchControllerRole.Arn
+            Runtime: nodejs20.x
+            Description: >
+              Circuit-breaker controller. Receives CloudWatch alarm state
+              changes, computes compound severity scores across all active
+              signals for a service, and persists breaker posture to DynamoDB.
+            Environment:
+                Variables:
+                    TABLE_NAME: !Ref CircuitControlTable
+            Timeout: 30
+            # Cap concurrency. An alarm storm (e.g. a region-wide OpenSearch
+            # glitch flipping many alarms at once) could otherwise scale this
+            # function to hundreds of concurrent invocations all contending on
+            # the same DynamoDB partition (BREAKER#GLOBAL). A small reservation
+            # bounds that contention and gives predictable worst-case cost.
+            ReservedConcurrentExecutions: 5
+            # Route async-invocation failures (after EventBridge's 2 default
+            # retries) to the DLQ so we never lose a state transition silently.
+            DeadLetterQueue:
+                Type: SQS
+                TargetArn: !GetAtt PostCloudWatchControllerDeadLetterQueue.Arn
+            Architectures:
+                - !Ref LambdaArchitecture
+            Events:
+                # Triggered on every alarm state transition the controller consumes.
+                AlarmStateChange:
+                    Type: EventBridgeRule
+                    Properties:
+                        Pattern:
+                            source:
+                                - aws.cloudwatch
+                            detail-type:
+                                - CloudWatch Alarm State Change
+                            detail:
+                                alarmName:
+                                    - prefix: "breaker:"
+                                state:
+                                    value:
+                                        - ALARM
+                                        - OK
+                                        - INSUFFICIENT_DATA
+
+                # Recovery tick: drives OPEN→HALF_OPEN timeout transitions
+                RecoveryTick:
+                    Type: ScheduleV2
+                    Properties:
+                        ScheduleExpression: rate(1 minute)
+                        Input: '{"source":"aws.scheduler","detail-type":"Scheduled Recovery Tick","time":"","detail":{}}'
+        Metadata:
+            BuildMethod: makefile
+
+    PostCloudWatchControllerFunctionEventBridgePermission:
+        Type: AWS::Lambda::Permission
+        Properties:
+            Action: lambda:InvokeFunction
+            FunctionName: !GetAtt PostCloudWatchControllerFunction.Arn
+            Principal: events.amazonaws.com
+
+    PostCloudWatchControllerFunctionSchedulerPermission:
+        Type: AWS::Lambda::Permission
+        Properties:
+            Action: lambda:InvokeFunction
+            FunctionName: !GetAtt PostCloudWatchControllerFunction.Arn
+            Principal: scheduler.amazonaws.com
+
+    CircuitControlTable:
+        Type: AWS::DynamoDB::Table
+        Properties:
+            TableName: !Sub "CircuitControl-${StageName}"
+            BillingMode: PAY_PER_REQUEST
+            AttributeDefinitions:
+                - AttributeName: PK
+                  AttributeType: S
+                - AttributeName: SK
+                  AttributeType: S
+            KeySchema:
+                - AttributeName: PK
+                  KeyType: HASH
+                - AttributeName: SK
+                  KeyType: RANGE
+            TimeToLiveSpecification:
+                AttributeName: ttl
+                Enabled: true
+            # PITR gives 35-day point-in-time restore. Data volume in this
+            # table is tiny — the cost is negligible and it buys us forensic
+            # recovery if a bad controller deploy corrupts state.
+            PointInTimeRecoverySpecification:
+                PointInTimeRecoveryEnabled: true
+            # Prevents `sam delete` / an accidental CFN stack deletion from
+            # wiping breaker history. To delete the table you must explicitly
+            # set this to false in a prior deploy first.
+            DeletionProtectionEnabled: true
+            # Encrypt at rest with the AWS-managed DynamoDB KMS key (as opposed
+            # to AWS-owned keys which are the default). Gives us CloudTrail
+            # visibility on key usage and meets standard data-at-rest posture.
+            SSESpecification:
+                SSEEnabled: true
+                SSEType: KMS
+            Tags:
+                - Key: Service
+                  Value: !Ref ServiceName
+                - Key: Component
+                  Value: circuit-breaker
+
+    PostCloudWatchControllerRole:
+        Type: AWS::IAM::Role
+        Properties:
+            AssumeRolePolicyDocument:
+                Version: "2012-10-17"
+                Statement:
+                    - Effect: Allow
+                      Principal:
+                          Service:
+                              - lambda.amazonaws.com
+                      Action:
+                          - sts:AssumeRole
+            ManagedPolicyArns:
+                - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+            Policies:
+                - PolicyName: CircuitControlDynamoAccess
+                  PolicyDocument:
+                      Version: "2012-10-17"
+                      Statement:
+                          - Effect: Allow
+                            Action:
+                                - dynamodb:BatchGetItem
+                                - dynamodb:DeleteItem
+                                - dynamodb:GetItem
+                                - dynamodb:PutItem
+                                - dynamodb:TransactWriteItems
+                                - dynamodb:UpdateItem
+                            Resource:
+                                - !GetAtt CircuitControlTable.Arn
+                # Required by the Lambda service to deliver failed async
+                # invocations into the DLQ defined above. Without this the
+                # DeadLetterQueue config silently fails at runtime.
+                - PolicyName: CircuitControlDlqAccess
+                  PolicyDocument:
+                      Version: "2012-10-17"
+                      Statement:
+                          - Effect: Allow
+                            Action:
+                                - sqs:SendMessage
+                            Resource:
+                                - !GetAtt PostCloudWatchControllerDeadLetterQueue.Arn
+
+    # ---------------------------------------------------------------------------
+    # Circuit-breaker CloudWatch alarms
+    #
+    # Naming conventions (parsed by PostCloudWatchControllerFunction):
+    #   - 3-part: `breaker:GLOBAL:<signal>`            (e.g. breaker:GLOBAL:os-search-rejections)
+    #   - 4-part: `breaker:GLOBAL:<label>:<signal>`    (e.g. breaker:GLOBAL:lobby-v2:api-p99)
+    #
+    # The `GLOBAL` segment is a fixed routing key — every alarm writes to the
+    # single `BREAKER#GLOBAL` partition in DynamoDB. The controller does not
+    # support per-service breakers (see parseAlarmName in src/index.ts for why).
+    #
+    # The optional <label> segment (e.g. ${ServiceName}) is a human-readable
+    # identifier preserved in the alarm name for CloudWatch console / ticket /
+    # log searches. It is intentionally ignored by the breaker routing logic.
+    # ---------------------------------------------------------------------------
+
+    # CRITICAL — os-search-rejections: single alarm triggers OPEN immediately.
+    #
+    # ## Why this is a metric-math alarm (DIFF) and not a plain Sum threshold
+    #
+    # `AWS/ES ThreadpoolSearchRejected` is a **monotonic lifetime counter**,
+    # not a per-period rate. AWS publishes the running total of rejections
+    # since node start, once per minute. A plain `Statistic: Sum, Period: 60`
+    # alarm therefore returns the same lifetime count every minute forever —
+    # e.g. a dev domain that had a single load-test burst months ago will sit
+    # at "131294.0" indefinitely, trivially crossing any small threshold and
+    # wedging the breaker in OPEN even while the domain is perfectly healthy.
+    # Empirically reproduced on 2026-04-23: three consecutive minutes all
+    # reported exactly 131294.0 on a quiet domain.
+    #
+    # The fix is `DIFF(counter)`, which evaluates to "new rejections in the
+    # last period" by subtracting the previous datapoint from the current
+    # one. A healthy domain reports 0 every minute; a rejecting domain
+    # reports the actual per-minute rate. Threshold stays 5/min — the
+    # semantics of "5 rejections per minute is bad" are what the operator
+    # intended all along.
+    #
+    # ## Node restart edge case
+    #
+    # If a node restarts, the counter resets and DIFF briefly returns a
+    # large negative number (-131294). That is below the threshold, so the
+    # alarm stays OK — no false fire. The chart looks weird for one
+    # datapoint, which is acceptable.
+    #
+    # ## Tuning / missing-data rationale (unchanged from prior version)
+    #
+    # Period=60s + 2-of-3 datapoints → worst-case detection ~3 minutes. The
+    # prior 5-minute period with 3-of-5 datapoints gave up to 15 minutes of
+    # detection lag, which is far too slow for a "stop hammering the OS
+    # domain now" signal. The tighter window still gives two datapoints of
+    # smoothing against truly transient spikes.
+    #
+    # TreatMissingData=breaching: critical OS signals must not silently pass
+    # when metric publication stops (OpenSearch outage, IAM glitch). If the
+    # metric stream stalls we want the breaker to trip, not stay closed.
+    BreakerAlarmOsSearchRejections:
+        Type: AWS::CloudWatch::Alarm
+        Properties:
+            AlarmName: breaker:GLOBAL:os-search-rejections
+            AlarmDescription: OpenSearch search thread-pool rejections per minute — critical circuit-breaker signal
+            EvaluationPeriods: 3
+            DatapointsToAlarm: 2
+            Threshold: 5
+            ComparisonOperator: GreaterThanOrEqualToThreshold
+            TreatMissingData: breaching
+            Metrics:
+                # Result expression: per-period delta of the lifetime counter.
+                # Only entry with ReturnData: true, so this is the value the
+                # alarm compares against Threshold.
+                - Id: rejectionDelta
+                  Expression: "DIFF(counter)"
+                  Label: Search rejections per minute (delta of lifetime counter)
+                  ReturnData: true
+                # Input: raw lifetime-counter metric. Stat=Sum across nodes
+                # keeps the cluster-wide total semantic; DIFF on that gives
+                # cluster-wide rejections per period.
+                - Id: counter
+                  MetricStat:
+                      Metric:
+                          Namespace: AWS/ES
+                          MetricName: ThreadpoolSearchRejected
+                          Dimensions:
+                              - Name: DomainName
+                                Value: !Ref OpenSearchDomainName
+                              - Name: ClientId
+                                Value: !Ref AWS::AccountId
+                      Period: 60
+                      Stat: Sum
+                  ReturnData: false
+
+    # CRITICAL — os-write-rejections: single alarm triggers OPEN immediately.
+    # Same lifetime-counter gotcha as BreakerAlarmOsSearchRejections above —
+    # see that block for the full DIFF / tuning / missing-data rationale.
+    BreakerAlarmOsWriteRejections:
+        Type: AWS::CloudWatch::Alarm
+        Properties:
+            AlarmName: breaker:GLOBAL:os-write-rejections
+            AlarmDescription: OpenSearch write thread-pool rejections per minute — critical circuit-breaker signal
+            EvaluationPeriods: 3
+            DatapointsToAlarm: 2
+            Threshold: 5
+            ComparisonOperator: GreaterThanOrEqualToThreshold
+            TreatMissingData: breaching
+            Metrics:
+                - Id: rejectionDelta
+                  Expression: "DIFF(counter)"
+                  Label: Write rejections per minute (delta of lifetime counter)
+                  ReturnData: true
+                - Id: counter
+                  MetricStat:
+                      Metric:
+                          Namespace: AWS/ES
+                          MetricName: ThreadpoolWriteRejected
+                          Dimensions:
+                              - Name: DomainName
+                                Value: !Ref OpenSearchDomainName
+                              - Name: ClientId
+                                Value: !Ref AWS::AccountId
+                      Period: 60
+                      Stat: Sum
+                  ReturnData: false
+
+    # WARNING — api-p99: triggers OPEN when combined with another warning signal.
+    #
+    # ## Why this is a metric-math alarm (and not a plain ExtendedStatistic)
+    #
+    # The previous version of this alarm was `ExtendedStatistic: p99` directly
+    # on the raw `Latency` metric at `Threshold: 5000` (5 s). That reads "P99
+    # latency above 5 s", which is correct at normal traffic. BUT: a P99 is a
+    # percentile computed over the SAMPLE in the evaluation period, so at very
+    # low traffic the percentile collapses to individual request outliers:
+    #
+    #   - 1 request  at 5.1 s → P99 = 5.1 s → alarm fires
+    #   - 2 requests (one at 5.1 s, one at 200 ms) → P99 = 5.1 s → alarm fires
+    #
+    # That produces a breaker that trips on a single slow request during quiet
+    # periods (3 AM, warm-up, synthetic probes only). Combined with api-5xx it
+    # is enough to open the compound-warning breaker on events that are not
+    # actually user-visible incidents. Symmetric gotcha to api-5xx below.
+    #
+    # ## The count floor
+    #
+    # We replace the single-metric alarm with a metric-math expression:
+    #
+    #   p99Gated = IF(requestCount >= 100, p99Latency, 0)
+    #
+    # - `requestCount` is `Sum(AWS/ApiGateway Count)` over the same 300 s window.
+    # - `p99Latency`   is `p99(AWS/ApiGateway Latency)` over the same window.
+    # - When the API served fewer than 100 requests in the window (~0.33 rps
+    #   sustained) the expression returns 0, which is below the 5000 ms
+    #   threshold and so the alarm stays OK regardless of how slow any one of
+    #   those few requests happened to be. 100 is chosen to match the api-5xx
+    #   floor exactly, so both warning signals have the same traffic gate and
+    #   can only compound-trip under statistically meaningful load.
+    # - When the API served ≥ 100 requests, the expression returns the true
+    #   P99 and behaves identically to the old alarm (threshold 5000 ms).
+    #
+    # Only `p99Gated` has `ReturnData: true` — the two raw metrics are inputs
+    # to the expression and must NOT be set to ReturnData: true or CloudWatch
+    # would evaluate them as independent alarm signals.
+    #
+    # TreatMissingData stays `notBreaching`: "no traffic" and "metrics stalled"
+    # both look the same here, and a missing-data breach on a warning signal
+    # would over-trigger compound warnings.
+    BreakerAlarmApiP99:
+        Type: AWS::CloudWatch::Alarm
+        Properties:
+            # 4-part name: GLOBAL is the routing key (all alarms share BREAKER#GLOBAL);
+            # ${ServiceName} is a display-only label preserved for discoverability.
+            AlarmName: !Sub "breaker:GLOBAL:${ServiceName}:api-p99"
+            AlarmDescription: API Gateway P99 latency above 5 s with ≥100 req/period — warning circuit-breaker signal
+            EvaluationPeriods: 5
+            DatapointsToAlarm: 3
+            Threshold: 5000
+            ComparisonOperator: GreaterThanOrEqualToThreshold
+            TreatMissingData: notBreaching
+            Metrics:
+                # Result expression: the only `ReturnData: true` entry, so this
+                # is the value the alarm compares against Threshold.
+                - Id: p99Gated
+                  Expression: "IF(requestCount >= 100, p99Latency, 0)"
+                  Label: P99 latency gated by traffic (suppressed when requestCount < 100)
+                  ReturnData: true
+                # Input 1: total request count per period.
+                - Id: requestCount
+                  MetricStat:
+                      Metric:
+                          Namespace: AWS/ApiGateway
+                          MetricName: Count
+                          Dimensions:
+                              - Name: ApiName
+                                Value: !Ref ServiceName
+                              - Name: Stage
+                                Value: !Ref StageName
+                      Period: 300
+                      Stat: Sum
+                  ReturnData: false
+                # Input 2: P99 latency per period.
+                - Id: p99Latency
+                  MetricStat:
+                      Metric:
+                          Namespace: AWS/ApiGateway
+                          MetricName: Latency
+                          Dimensions:
+                              - Name: ApiName
+                                Value: !Ref ServiceName
+                              - Name: Stage
+                                Value: !Ref StageName
+                      Period: 300
+                      Stat: p99
+                  ReturnData: false
+
+    # WARNING — api-5xx: triggers OPEN when combined with another warning signal.
+    #
+    # ## Why this is a metric-math alarm (and not a plain Average threshold)
+    #
+    # The previous version of this alarm was `Statistic: Average` on the raw
+    # `5XXError` metric at `Threshold: 0.01` (1 %). That reads "5xx rate at or
+    # above 1 %", which is correct at normal traffic. BUT: API Gateway's
+    # `5XXError` metric is 0/1 per request, so `Average` is literally the
+    # proportion of failing requests. In quiet periods (3 AM, warm-up, synthetic
+    # checks only) that proportion is computed over a handful of samples:
+    #
+    #   - 2 requests, 1 is 5xx → Average = 0.50 → alarm fires at 50 % "error"
+    #   - 1 request,  0 are 5xx → Average = 0.00 → alarm is silent
+    #
+    # That produces a breaker that flaps every time a single backoffice request
+    # happens to 5xx at low traffic, which trips compound-warning (api-p99 +
+    # api-5xx) breakers on events that are not actually user-visible incidents.
+    #
+    # ## The count floor
+    #
+    # We replace the single-metric alarm with a metric-math expression:
+    #
+    #   errorRatio = IF(requestCount >= 100, errorCount / requestCount, 0)
+    #
+    # - `requestCount` is `Sum(AWS/ApiGateway Count)` over the same 300 s window.
+    # - `errorCount`   is `Sum(AWS/ApiGateway 5XXError)` over the same window.
+    # - When the API served fewer than 100 requests in the window (~0.33 rps
+    #   sustained) the expression returns 0, which is below the 0.01 threshold
+    #   and so the alarm stays OK regardless of how many of those few requests
+    #   happened to be 5xx. 100 is high enough to make the ratio statistically
+    #   meaningful and low enough that normal daytime traffic clears it within
+    #   a single period.
+    # - When the API served ≥ 100 requests, the expression returns the true
+    #   error ratio and behaves identically to the old alarm (threshold 0.01).
+    #
+    # Only `errorRatio` has `ReturnData: true` — the two raw metrics are inputs
+    # to the expression and must NOT be set to ReturnData: true or CloudWatch
+    # would evaluate them as independent alarm signals.
+    #
+    # TreatMissingData stays `notBreaching` because "no traffic" and "metrics
+    # stalled" both look the same here, and a missing-data breach on a warning
+    # signal would over-trigger compound warnings. The critical ES alarms above
+    # need `breaching` because losing ES metrics is a genuine incident; losing
+    # API Gateway metrics usually means we have no traffic, which is fine.
+    BreakerAlarmApi5xx:
+        Type: AWS::CloudWatch::Alarm
+        Properties:
+            # 4-part name: see BreakerAlarmApiP99 above for the label convention.
+            AlarmName: !Sub "breaker:GLOBAL:${ServiceName}:api-5xx"
+            AlarmDescription: API Gateway 5XX error rate above 1 % with ≥100 req/period — warning circuit-breaker signal
+            EvaluationPeriods: 5
+            DatapointsToAlarm: 3
+            Threshold: 0.01
+            ComparisonOperator: GreaterThanOrEqualToThreshold
+            TreatMissingData: notBreaching
+            Metrics:
+                # Result expression: the only `ReturnData: true` entry, so this
+                # is the value the alarm compares against Threshold.
+                - Id: errorRatio
+                  Expression: "IF(requestCount >= 100, errorCount / requestCount, 0)"
+                  Label: 5xx error ratio (suppressed when requestCount < 100)
+                  ReturnData: true
+                # Input 1: total request count per period.
+                - Id: requestCount
+                  MetricStat:
+                      Metric:
+                          Namespace: AWS/ApiGateway
+                          MetricName: Count
+                          Dimensions:
+                              - Name: ApiName
+                                Value: !Ref ServiceName
+                              - Name: Stage
+                                Value: !Ref StageName
+                      Period: 300
+                      Stat: Sum
+                  ReturnData: false
+                # Input 2: total 5xx response count per period.
+                - Id: errorCount
+                  MetricStat:
+                      Metric:
+                          Namespace: AWS/ApiGateway
+                          MetricName: 5XXError
+                          Dimensions:
+                              - Name: ApiName
+                                Value: !Ref ServiceName
+                              - Name: Stage
+                                Value: !Ref StageName
+                      Period: 300
+                      Stat: Sum
+                  ReturnData: false
+
+    # WARNING — jvm-pressure: triggers OPEN when combined with another warning signal.
+    #
+    # ## Detection timing (Period=60, 3-of-5 datapoints)
+    #
+    # The evaluation cadence is deliberately tuned to sit **just above** the
+    # critical-signal detection speed, so the tiered-signal design works as
+    # intended (warnings catch trouble *before* critical fires, not after):
+    #
+    #   - Best case (sustained breach): DatapointsToAlarm × Period = 3 × 60 s = 3 min
+    #   - Worst case (3-of-5 sliding):  EvaluationPeriods × Period = 5 × 60 s = 5 min
+    #   - Critical signals for comparison: 2-3 min detection
+    #
+    # The previous tuning (`Period: 300, EvaluationPeriods: 5, DatapointsToAlarm: 3`)
+    # gave a 15–25 min detection window, which is strictly slower than the
+    # critical signals — meaning under a load ramp the critical breaker trips
+    # first and the warnings become a lagging confirmation rather than an
+    # early-warning tier. See `docs/resilience/circuit-breaker-alarms.mdx` for
+    # the full timing table and the reasoning.
+    #
+    # ## Why Period: 60 does not make alarms chatty
+    #
+    # CloudWatch alarms publish EventBridge events only on **state transitions**
+    # (OK↔ALARM), not on every evaluation. A 2-hour sustained incident produces
+    # exactly 2 events (trip + recovery) regardless of Period. Faster evaluation
+    # speeds up detection but does not increase steady-state event volume.
+    #
+    # The `3-of-5` rule is the noise filter: a single transient JVM spike from
+    # GC still requires 3 of the last 5 minutes to be above threshold before
+    # the alarm fires, so short blips do not trip the breaker. The controller
+    # also enforces `openHoldMs = 60s` on the OPEN state, so even with some
+    # metric flap at the threshold, downstream consumers cannot see the breaker
+    # whip-saw faster than once per minute.
+    #
+    # ## Statistic: Maximum + domain-level dimension
+    #
+    # AWS/ES publishes JVMMemoryPressure at both DomainName+ClientId and
+    # DomainName+ClientId+NodeId dimension sets, with one raw per-node sample
+    # per minute. Querying the domain-level dimension with `Statistic: Maximum`
+    # returns the hottest-node/hottest-minute reading in the evaluation period,
+    # which is exactly what we want: a single hot node is caught even if the
+    # cluster average looks healthy.
+    BreakerAlarmJvmPressure:
+        Type: AWS::CloudWatch::Alarm
+        Properties:
+            AlarmName: breaker:GLOBAL:jvm-pressure
+            AlarmDescription: OpenSearch JVM memory pressure at or above 85 % — warning circuit-breaker signal
+            Namespace: AWS/ES
+            MetricName: JVMMemoryPressure
+            Dimensions:
+                - Name: DomainName
+                  Value: !Ref OpenSearchDomainName
+                - Name: ClientId
+                  Value: !Ref AWS::AccountId
+            Statistic: Maximum
+            Period: 60
+            EvaluationPeriods: 5
+            DatapointsToAlarm: 3
+            Threshold: 85
+            ComparisonOperator: GreaterThanOrEqualToThreshold
+            TreatMissingData: notBreaching
+
+    # WARNING — cpu-high: triggers OPEN when combined with another warning signal.
+    # Same detection-timing / anti-flap / domain-level reasoning as
+    # BreakerAlarmJvmPressure above — see that block for the full treatment.
+    # Threshold 80 % (vs JVM's 85 %) because sustained CPU saturation on a
+    # search cluster degrades p99 well before the JVM starts struggling.
+    BreakerAlarmCpuHigh:
+        Type: AWS::CloudWatch::Alarm
+        Properties:
+            AlarmName: breaker:GLOBAL:cpu-high
+            AlarmDescription: OpenSearch CPU utilisation at or above 80 % — warning circuit-breaker signal
+            Namespace: AWS/ES
+            MetricName: CPUUtilization
+            Dimensions:
+                - Name: DomainName
+                  Value: !Ref OpenSearchDomainName
+                - Name: ClientId
+                  Value: !Ref AWS::AccountId
+            Statistic: Maximum
+            Period: 60
+            EvaluationPeriods: 5
+            DatapointsToAlarm: 3
+            Threshold: 80
+            ComparisonOperator: GreaterThanOrEqualToThreshold
+            TreatMissingData: notBreaching
+
+    # ---------------------------------------------------------------------------
+    # Controller self-observability alarms
+    #
+    # These two alarms watch the controller Lambda itself (its error rate and
+    # its DLQ depth) rather than OpenSearch or the APIs. They are deliberately
+    # NOT breaker signals:
+    #
+    #   - Names intentionally do NOT start with `breaker:`. The EventBridge
+    #     rule on the controller function matches `alarmName prefix: "breaker:"`,
+    #     so these alarms are invisible to the controller. If one of these were
+    #     ever renamed with the `breaker:` prefix, a controller error would fire
+    #     this alarm, which would invoke the controller, which might fail again,
+    #     which would keep the alarm in ALARM — a runaway self-feedback loop.
+    #   - They do not participate in the signal tiers, compound scoring, state
+    #     machine transitions, or any DynamoDB writes. They are pure CloudWatch
+    #     observability instruments. Consumers are the CloudWatch console, a
+    #     future dashboard, and (later) an SNS → paging pipeline.
+    #
+    # See docs/resilience/circuit-breaker-alarms.mdx for the full definition.
+    # ---------------------------------------------------------------------------
+
+    # Self-monitoring: the controller is load-bearing. An error here means the
+    # breaker has stopped reacting to alarm transitions — a silent but severe
+    # failure because downstream consumers keep reading an increasingly stale
+    # BREAKER#GLOBAL state while conditions have moved on.
+    #
+    # Threshold: 1 — the controller is invoked rarely (alarm state changes +
+    # the 60 s tick) and there is no legitimate "error budget" for it. Any
+    # error is a real signal.
+    #
+    # 3-of-5 smoothing — filters a single transient Lambda auto-retry before
+    # paging. If the retry also fails, the DLQ alarm below catches it.
+    #
+    # TreatMissingData: notBreaching — no invocations ≠ error.
+    ControllerErrorsAlarm:
+        Type: AWS::CloudWatch::Alarm
+        Properties:
+            AlarmName: !Sub "lobby-controller-errors-${StageName}"
+            AlarmDescription: PostCloudWatchController Lambda errors — self-monitoring, NOT a breaker signal
+            Namespace: AWS/Lambda
+            MetricName: Errors
+            Dimensions:
+                - Name: FunctionName
+                  Value: !Ref PostCloudWatchControllerFunction
+            Statistic: Sum
+            Period: 60
+            EvaluationPeriods: 5
+            DatapointsToAlarm: 3
+            Threshold: 1
+            ComparisonOperator: GreaterThanOrEqualToThreshold
+            TreatMissingData: notBreaching
+
+    # DLQ depth: messages only land in this queue after Lambda has already
+    # exhausted its async-invocation retries (default: initial attempt + 2
+    # retries = 3 failures). So a non-empty DLQ means an alarm state-change
+    # event has been permanently lost to the controller and operator
+    # intervention is required. No smoothing is appropriate here — the first
+    # message is already the incident.
+    #
+    # TreatMissingData: notBreaching — SQS may not publish depth datapoints
+    # when the queue has been empty for a while. Empty / absent both mean OK.
+    ControllerDlqDepthAlarm:
+        Type: AWS::CloudWatch::Alarm
+        Properties:
+            AlarmName: !Sub "lobby-controller-dlq-depth-${StageName}"
+            AlarmDescription: PostCloudWatchController DLQ has pending messages — async invocations are permanently failing
+            Namespace: AWS/SQS
+            MetricName: ApproximateNumberOfMessagesVisible
+            Dimensions:
+                - Name: QueueName
+                  Value: !GetAtt PostCloudWatchControllerDeadLetterQueue.QueueName
+            Statistic: Maximum
+            Period: 60
+            EvaluationPeriods: 1
+            DatapointsToAlarm: 1
+            Threshold: 1
+            ComparisonOperator: GreaterThanOrEqualToThreshold
+            TreatMissingData: notBreaching
+
     # API Resource
     LobbyApi:
         Type: AWS::Serverless::Api
         Properties:
-            Name: "lobby-v3"
+            # Must match the ApiName dimension used by BreakerAlarmApiP99 /
+            # BreakerAlarmApi5xx. Hardcoding this string drifts silently from
+            # !Ref ServiceName if the parameter is ever overridden at deploy,
+            # which would leave the breaker alarms watching a non-existent
+            # dimension.
+            Name: !Ref ServiceName
+            StageName: !Ref StageName
+            OpenApiVersion: "2.0"
+            BinaryMediaTypes:
+                - "*/*"
+            EndpointConfiguration:
+                Type: REGIONAL
+
+    # POST API Resource (separate API GW without binary media/content encoding)
+    LobbyPostApi:
+        Type: AWS::Serverless::Api
+        Properties:
+            Name: "backoffice-v2"
             StageName: !Ref StageName
             OpenApiVersion: "2.0"
             EndpointConfiguration:
@@ -118,6 +788,36 @@ Resources:
         Metadata:
             BuildMethod: makefile
 
+    # Get Personalised Games
+    GetPersonalisedSectionGamesFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            FunctionName: personalisation-lobby-personalised-section-games
+            CodeUri: ./functions/GetPersonalisedSectionGamesFunction/  # Folder of the lambda function
+            Handler: app.lambdaHandler  # Adjust the handler path to dist/app.lambdaHandler
+            Runtime: nodejs20.x
+            Environment:
+                Variables:
+                    HOST: !Sub "{{resolve:ssm:/personalised-lobby/dev/HOST:3}}"
+                    OS_USER: !Sub "{{resolve:ssm:/personalised-lobby/dev/OS_USER:3}}"
+                    OS_PASS: !Sub "{{resolve:ssm:/personalised-lobby/dev/OS_PASS:4}}"
+                    CONTENTFUL_SPACE_LOCALE: !Sub "{{resolve:ssm:/personalised-lobby/dev/CONTENTFUL_SPACE_LOCALE:1}}"
+                    EXECUTION_ENVIRONMENT: !Sub "{{resolve:ssm:/personalised-lobby/dev/EXECUTION_ENVIRONMENT:1}}"
+            Architectures:
+                - !Ref LambdaArchitecture
+            Events:
+                GetPersonalisedGames:
+                    Type: Api
+                    Properties:
+                        Path: /sites/{sitename}/platform/{platform}/view/{viewslug}/sections/{sectionid}/sitegames/personalised
+                        Method: get
+                        RestApiId: !Ref LobbyApi
+                        RequestParameters:
+                            - method.request.querystring.memberid:
+                                  Required: true
+        Metadata:
+            BuildMethod: makefile
+
     # Get Suggested Games
     GetSuggestedForYouFunction:
         Type: AWS::Serverless::Function
@@ -137,12 +837,15 @@ Resources:
             Architectures:
                 - !Ref LambdaArchitecture
             Events:
-                GetGames:
+                GetSuggestedForYou:
                     Type: Api
                     Properties:
                         Path: /sites/{sitename}/platform/{platform}/suggested-for-you
                         Method: get
                         RestApiId: !Ref LobbyApi
+                        RequestParameters:
+                            - method.request.querystring.memberid:
+                                  Required: true
         Metadata:
             BuildMethod: makefile
 
@@ -165,12 +868,15 @@ Resources:
             Architectures:
                 - !Ref LambdaArchitecture
             Events:
-                GetGames:
+                GetRecentlyPlayed:
                     Type: Api
                     Properties:
                         Path: /sites/{sitename}/platform/{platform}/recently-played
                         Method: get
                         RestApiId: !Ref LobbyApi
+                        RequestParameters:
+                            - method.request.querystring.memberid:
+                                  Required: true
         Metadata:
             BuildMethod: makefile
 
@@ -251,7 +957,7 @@ Resources:
                 GetAllGamesSearch:
                     Type: Api
                     Properties:
-                        Path: /content/sites/{sitename}/platform/{platform}/search
+                        Path: /sites/{sitename}/platform/{platform}/search
                         Method: get
                         RestApiId: !Ref LobbyApi
         Metadata:
@@ -309,6 +1015,9 @@ Resources:
                         Path: /sites/{sitename}/personalised-extra-data
                         Method: get
                         RestApiId: !Ref LobbyApi
+                        RequestParameters:
+                            - method.request.querystring.memberid:
+                                  Required: true
         Metadata:
             BuildMethod: makefile
 
@@ -338,6 +1047,7 @@ Resources:
                         RestApiId: !Ref LobbyApi
         Metadata:
             BuildMethod: makefile
+
     # get-bulk-game-data
     GetBulkGameDataFunction:
         Type: AWS::Serverless::Function
@@ -416,7 +1126,39 @@ Resources:
                     Properties:
                         Path: /historical-game-titles-handler
                         Method: post
-                        RestApiId: !Ref LobbyApi
+                        RestApiId: !Ref LobbyPostApi
+        Metadata:
+            BuildMethod: makefile
+
+    # post-games-payload-handler
+    PostGamesPayloadFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            FunctionName: personalisation-lobby-games-payload-handler
+            CodeUri: ./functions/PostGamesPayloadFunction/  # Folder of the lambda function
+            Handler: app.lambdaHandler  # Adjust the handler path to dist/app.lambdaHandler
+            Runtime: nodejs20.x
+            Environment:
+                Variables:
+                    HOST: !Sub "{{resolve:ssm:/personalised-lobby/dev/HOST:3}}"
+                    OS_USER: !Sub "{{resolve:ssm:/personalised-lobby/dev/OS_USER:3}}"
+                    OS_PASS: !Sub "{{resolve:ssm:/personalised-lobby/dev/OS_PASS:4}}"
+                    CONTENTFUL_SPACE_LOCALE: !Sub "{{resolve:ssm:/personalised-lobby/dev/CONTENTFUL_SPACE_LOCALE:1}}"
+                    CONTENTFUL_ACCESS_TOKEN: !Sub '{{resolve:ssm:/personalised-lobby/dev/CONTENTFUL_ACCESS_TOKEN:2}}'
+                    CONTENTFUL_ENVIRONMENT: !Sub "{{resolve:ssm:/personalised-lobby/dev/CONTENTFUL_ENVIRONMENT:1}}"
+                    CONTENTFUL_SIGNING_SECRET: !Sub '{{resolve:ssm:/personalised-lobby/dev/CONTENTFUL_SIGNING_SECRET:3}}'
+                    CONTENTFUL_WEBHOOKS_SIGNING_SECRET: !Sub '{{resolve:ssm:/personalised-lobby/dev/CONTENTFUL_WEBHOOKS_SIGNING_SECRET:2}}'
+                    SPACE_ID: !Sub "{{resolve:ssm:/personalised-lobby/dev/SPACE_ID:1}}"
+                    EXECUTION_ENVIRONMENT: !Sub "{{resolve:ssm:/personalised-lobby/dev/EXECUTION_ENVIRONMENT:1}}"
+            Architectures:
+                - !Ref LambdaArchitecture
+            Events:
+                PostGamesPayload:
+                    Type: Api
+                    Properties:
+                        Path: /sync-games-payload
+                        Method: post
+                        RestApiId: !Ref LobbyPostApi
         Metadata:
             BuildMethod: makefile
 
@@ -492,10 +1234,71 @@ Resources:
         Metadata:
             BuildMethod: makefile
 
+    # get-variant
+    GetVariantFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            FunctionName: personalisation-lobby-variant
+            CodeUri: ./functions/GetVariantFunction/  # Folder of the lambda function
+            Handler: app.lambdaHandler  # Adjust the handler path to dist/app.lambdaHandler
+            Runtime: nodejs20.x
+            Timeout: 10
+            Environment:
+                Variables:
+                    HOST: !Sub "{{resolve:ssm:/personalised-lobby/dev/HOST:3}}"
+                    OS_USER: !Sub "{{resolve:ssm:/personalised-lobby/dev/OS_USER:3}}"
+                    OS_PASS: !Sub "{{resolve:ssm:/personalised-lobby/dev/OS_PASS:4}}"
+                    CONTENTFUL_SPACE_LOCALE: !Sub '{{resolve:ssm:/personalised-lobby/dev/CONTENTFUL_SPACE_LOCALE:1}}'
+
+                    EXECUTION_ENVIRONMENT: !Sub "{{resolve:ssm:/personalised-lobby/dev/EXECUTION_ENVIRONMENT:1}}"
+            Architectures:
+                - !Ref LambdaArchitecture
+            Events:
+                GetGameShuffle:
+                    Type: Api
+                    Properties:
+                        Path: /sites/{sitename}/memberid/{memberid}/variant
+                        Method: get
+                        RestApiId: !Ref LobbyApi
+        Metadata:
+            BuildMethod: makefile
+
+    # get-game-skin-config
+    GetGameSkinConfigFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            FunctionName: personalisation-lobby-game-skin-config
+            CodeUri: ./functions/GetGameSkinConfigFunction/  # Folder of the lambda function
+            Handler: app.lambdaHandler  # Adjust the handler path to dist/app.lambdaHandler
+            Runtime: nodejs20.x
+            Environment:
+                Variables:
+                    HOST: !Sub "{{resolve:ssm:/personalised-lobby/dev/HOST:3}}"
+                    OS_USER: !Sub "{{resolve:ssm:/personalised-lobby/dev/OS_USER:3}}"
+                    OS_PASS: !Sub "{{resolve:ssm:/personalised-lobby/dev/OS_PASS:4}}"
+                    CONTENTFUL_SPACE_LOCALE: !Sub "{{resolve:ssm:/personalised-lobby/dev/CONTENTFUL_SPACE_LOCALE:1}}"
+                    EXECUTION_ENVIRONMENT: !Sub "{{resolve:ssm:/personalised-lobby/dev/EXECUTION_ENVIRONMENT:1}}"
+            Architectures:
+                - !Ref LambdaArchitecture
+            Events:
+                getGameSkinConfig:
+                    Type: Api
+                    Properties:
+                        Path: /sites/{sitename}/game-skin-config/{gameskin}
+                        Method: get
+                        RestApiId: !Ref LobbyApi
+        Metadata:
+            BuildMethod: makefile
+
 Outputs:
+
     LobbyApiUrl:
         Description: "API Gateway endpoint URL for the unified lobby-v1 API"
         Value: !Sub "https://${LobbyApi}.execute-api.${AWS::Region}.amazonaws.com/${StageName}"
+
+    LobbyPostApiUrl:
+        Description: "API Gateway endpoint URL for the POST-only lobby API"
+        Value: !Sub "https://${LobbyPostApi}.execute-api.${AWS::Region}.amazonaws.com/${StageName}"
 
     # GetHistoricalGameTitlesFunction
     GetHistoricalGameTitlesFunction:
@@ -549,6 +1352,19 @@ Outputs:
         Value: !GetAtt GetGamesFunctionRole.Arn
         Export:
             Name: !Sub "${AWS::StackName}-GetGamesFunctionIamRoleArn"
+
+    # Get Personalised Games
+    GetPersonalisedSectionGamesFunction:
+        Description: GetPersonalisedSectionGamesFunction Lambda Function ARN
+        Value: !GetAtt GetPersonalisedSectionGamesFunction.Arn
+        Export:
+            Name: !Sub "${AWS::StackName}-GetPersonalisedSectionGamesFunctionArn"
+
+    GetPersonalisedSectionGamesFunctionIamRole:
+        Description: Implicit IAM Role created for GetPersonalisedSectionGamesFunction function
+        Value: !GetAtt GetPersonalisedSectionGamesFunctionRole.Arn
+        Export:
+            Name: !Sub "${AWS::StackName}-GetPersonalisedSectionGamesFunctionIamRoleArn"
 
     # Get Suggested Games
     GetSuggestedForYouFunction:
@@ -678,7 +1494,7 @@ Outputs:
         Description: Implicit IAM Role created for GetGameShuffleFunction function
         Value: !GetAtt GetGameShuffleFunctionRole.Arn
         Export:
-            Name: !Sub "${AWS::StackName}-GetGameShuffleFunctionIamRoleArm"
+            Name: !Sub "${AWS::StackName}-GetGameShuffleFunctionIamRoleArn"
 
     # get-recently-played
     GetRecentlyPlayedFunction:
@@ -688,7 +1504,33 @@ Outputs:
             Name: !Sub "${AWS::StackName}-GetRecentlyPlayedFunctionArn"
 
     GetRecentlyPlayedFunctionIamRole:
-        Description: Implicit IAM Role created for GetGameShuffleFunction function
+        Description: Implicit IAM Role created for GetRecentlyPlayedFunction function
         Value: !GetAtt GetRecentlyPlayedFunctionRole.Arn
         Export:
-            Name: !Sub "${AWS::StackName}-GetRecentlyPlayedFunctionIamRoleArm"
+            Name: !Sub "${AWS::StackName}-GetRecentlyPlayedFunctionIamRoleArn"
+
+    # get-variant
+    GetVariantFunction:
+        Description: GetVariantFunction Lambda Function ARN
+        Value: !GetAtt GetVariantFunction.Arn
+        Export:
+            Name: !Sub "${AWS::StackName}-GetVariantFunctionArn"
+
+    GetVariantFunctionIamRole:
+        Description: Implicit IAM Role created for GetVariantFunction function
+        Value: !GetAtt GetVariantFunctionRole.Arn
+        Export:
+            Name: !Sub "${AWS::StackName}-GetVariantFunctionIamRoleArn"
+
+    # get-game-sking-config
+    GetGameSkinConfigFunction:
+        Description: GetGameSkinConfigFunction Lambda Function ARN
+        Value: !GetAtt GetGameSkinConfigFunction.Arn
+        Export:
+            Name: !Sub "${AWS::StackName}-GetGameSkinConfigFunctionArn"
+
+    GetGameSkinConfigFunctionIamRole:
+        Description: Implicit IAM Role created for GetGameSkinConfigFunction function
+        Value: !GetAtt GetGameSkinConfigFunctionRole.Arn
+        Export:
+            Name: !Sub "${AWS::StackName}-GetGameSkinConfigFunctionIamRoleArn"

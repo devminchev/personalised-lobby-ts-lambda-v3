@@ -52,8 +52,11 @@ export const ML_SECTIONS_READ_ALIAS = 'ml-sections-r';
 export const ALL_SECTIONS_SHARED_READ_ALIAS = 'ig-sections';
 export const IG_SECTIONS = 'game-sections';
 export const IG_GAMES_V2_READ_ALIAS = 'games-v2-r';
+export const IG_GAMES_V2_WRITE_ALIAS = 'games-v2-w';
 export const THEME_SECTION_INDEX = 'themes';
 export const THEME_INDEX_READ_ALIAS = 'themes-r';
+// AB Testing
+export const AB_VARIANT_INDEX_ALIAS = 'ab-variants-r';
 
 // Query sizes
 export const SECTION_GAMES_SECTION_RECORDS_LIMIT = 1000;
