@@ -2,6 +2,16 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.7.15](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-game-shuffle-0.7.14...get-game-shuffle-0.7.15) (2026-04-24)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.53.2`
+## [0.7.14](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-game-shuffle-0.7.13...get-game-shuffle-0.7.14) (2026-04-24)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.53.1`
 ## [0.7.13](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-game-shuffle-0.7.12...get-game-shuffle-0.7.13) (2026-04-22)
 
 ### Dependency Updates

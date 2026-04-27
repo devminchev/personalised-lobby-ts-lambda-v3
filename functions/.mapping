@@ -20,5 +20,4 @@ GetGameShuffleFunction=get-game-shuffle
 GetRecentlyPlayedFunction=get-recently-played
 GetVariantFunction=get-variant
 PostGamesPayloadFunction=post-games-payload-handler
-PostCloudWatchControllerFunction=post-cloud-watch-controller
 OSClient=os-client

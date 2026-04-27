@@ -1,6 +1,6 @@
 {
   "name": "post-historical-game-title-handler",
-  "version": "0.9.26",
+  "version": "0.9.28",
   "description": "updates the list of archived games for auditing and historical purposes",
   "main": "app.js",
   "repository": "https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda",

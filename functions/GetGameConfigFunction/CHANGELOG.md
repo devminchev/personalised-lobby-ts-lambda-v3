@@ -2,6 +2,16 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.20.3](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-gameconfig-0.20.2...get-gameconfig-0.20.3) (2026-04-24)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.53.2`
+## [0.20.2](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-gameconfig-0.20.1...get-gameconfig-0.20.2) (2026-04-24)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.53.1`
 ## [0.20.1](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-gameconfig-0.20.0...get-gameconfig-0.20.1) (2026-04-22)
 
 ### Dependency Updates

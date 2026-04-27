@@ -2,6 +2,10 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.53.2](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/os-client-0.53.1...os-client-0.53.2) (2026-04-24)
+
+## [0.53.1](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/os-client-0.53.0...os-client-0.53.1) (2026-04-24)
+
 ## [0.53.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/os-client-0.52.0...os-client-0.53.0) (2026-04-22)
 
 

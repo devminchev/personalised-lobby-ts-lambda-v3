@@ -6,7 +6,6 @@ version = 0.1
 [default]
 [default.global.parameters]
 stack_name = "personalised-lobby-v3"
-region = "eu-west-1"
 
 [default.build.parameters]
 cached        = true
@@ -20,11 +19,12 @@ lint = true
 capabilities         = "CAPABILITY_IAM"
 confirm_changeset    = true
 s3_prefix            = "personalised-lobby-v3"
+region               = "eu-west-1"
 resolve_s3           = true
 image_repositories   = []
 disable_rollback     = true
 profile              = "lobby-playground"
-parameter_overrides  = "StageName=\"v2\" LambdaArchitecture=\"arm64\" OpenSearchDomainName=\"lobby-opensearch\""
+parameter_overrides  = "StageName=\"v2\" LambdaArchitecture=\"arm64\""
 
 [default.package.parameters]
 

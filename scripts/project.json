@@ -7,42 +7,28 @@
     "update-version-dashboard-uk-es-stg": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cat versions.json | ./scripts/version_bulk_update.sh --environment=aws-stg-eu00",
+        "command": "npx --yes zx scripts/version_dashboard_update.mjs --environment=aws-stg-eu00",
         "cwd": "."
       }
     },
     "update-version-dashboard-uk-es-prod": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cat versions.json | ./scripts/version_bulk_update.sh --environment=aws-prod-eu00",
-        "cwd": "."
-      }
-    },
-    "update-version-dashboard-na-stg": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "cat versions.json | ./scripts/version_bulk_update.sh --environment=aws-stg-na03",
-        "cwd": "."
-      }
-    },
-    "update-version-dashboard-na-prod": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "cat versions.json | ./scripts/version_bulk_update.sh --environment=aws-prod-na03",
+        "command": "npx --yes zx scripts/version_dashboard_update.mjs --environment=aws-prod-eu00",
         "cwd": "."
       }
     },
     "update-version-dashboard-eu03-stg": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cat versions.json | ./scripts/version_bulk_update.sh --environment=aws-stg-eu03",
+        "command": "npx --yes zx scripts/version_dashboard_update.mjs --environment=aws-stg-eu03",
         "cwd": "."
       }
     },
     "update-version-dashboard-eu03-prod": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "cat versions.json | ./scripts/version_bulk_update.sh --environment=aws-prod-eu03",
+        "command": "npx --yes zx scripts/version_dashboard_update.mjs --environment=aws-prod-eu03",
         "cwd": "."
       }
     },

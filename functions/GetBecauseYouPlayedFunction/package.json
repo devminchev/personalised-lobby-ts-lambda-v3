@@ -1,6 +1,6 @@
 {
   "name": "get-because-you-played",
-  "version": "0.15.13",
+  "version": "0.15.15",
   "description": "Returns games for Because You Played section",
   "main": "app.js",
   "repository": "https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda",

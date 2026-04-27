@@ -2,6 +2,16 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.3.5](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/post-games-payload-handler-0.3.4...post-games-payload-handler-0.3.5) (2026-04-24)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.53.2`
+## [0.3.4](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/post-games-payload-handler-0.3.3...post-games-payload-handler-0.3.4) (2026-04-24)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.53.1`
 ## [0.3.3](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/post-games-payload-handler-0.3.2...post-games-payload-handler-0.3.3) (2026-04-22)
 
 ### Dependency Updates

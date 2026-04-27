@@ -1,6 +1,6 @@
 {
   "name": "get-games",
-  "version": "0.24.5",
+  "version": "0.24.7",
   "description": "Get all the games for a section",
   "main": "app.js",
   "repository": "https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda",

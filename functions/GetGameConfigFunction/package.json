@@ -1,6 +1,6 @@
 {
   "name": "get-gameconfig",
-  "version": "0.20.1",
+  "version": "0.20.3",
   "description": "A GET endpoint that provides game configuration data.",
   "main": "app.js",
   "repository": "https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda",

@@ -1,6 +1,6 @@
 {
   "name": "post-games-payload-handler",
-  "version": "0.3.3",
+  "version": "0.3.5",
   "description": "Triggered by a Contentful webhook and syncs game data to the games-v3 index",
   "main": "app.js",
   "repository": "https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda",

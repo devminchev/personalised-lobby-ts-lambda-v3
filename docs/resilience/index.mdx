@@ -14,7 +14,5 @@ The first piece of this work is a tiering model that classifies every endpoint b
 ## In this section
 
 - [Service tiers](./service-tiers) — how endpoints are grouped into tiers (A / B / C and non-live traffic), the OpenSearch queries each tier depends on, and the order in which they would be shed during a load event.
-- [Circuit-breaker alarms](./circuit-breaker-alarms) — definition of the CloudWatch alarms that drive the global circuit-breaker state: signal tiers, detection timing, missing-data semantics, and the invariants callers can rely on.
-- [Circuit-breaker behaviour](./circuit-breaker-behaviour) — how those alarms interact with the controller state machine under representative load scenarios (slow ramp, short critical peak, low traffic, warning-only pressure).
 
-More resilience topics (load-shedding controls, cache fallbacks, etc.) will be added here as that work lands.
+More resilience topics (load-shedding controls, circuit breakers, cache fallbacks, etc.) will be added here as that work lands.

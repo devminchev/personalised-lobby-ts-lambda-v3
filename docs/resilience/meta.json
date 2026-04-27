@@ -2,8 +2,6 @@
   "title": "Resilience",
   "pages": [
     "index",
-    "service-tiers",
-    "circuit-breaker-alarms",
-    "circuit-breaker-behaviour"
+    "service-tiers"
   ]
 }

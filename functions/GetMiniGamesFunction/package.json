@@ -1,6 +1,6 @@
 {
   "name": "get-minigames",
-  "version": "0.19.1",
+  "version": "0.19.3",
   "description": "Fetch minigames",
   "main": "app.js",
   "repository": "https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda",

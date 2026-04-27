@@ -2,6 +2,16 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.1.7](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-personalised-section-games-0.1.6...get-personalised-section-games-0.1.7) (2026-04-24)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.53.2`
+## [0.1.6](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-personalised-section-games-0.1.5...get-personalised-section-games-0.1.6) (2026-04-24)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.53.1`
 ## [0.1.5](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-personalised-section-games-0.1.4...get-personalised-section-games-0.1.5) (2026-04-22)
 
 ### Dependency Updates

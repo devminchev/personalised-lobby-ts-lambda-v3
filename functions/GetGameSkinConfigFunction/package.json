@@ -1,6 +1,6 @@
 {
   "name": "get-game-skin-config",
-  "version": "0.2.12",
+  "version": "0.2.14",
   "description": "Returns configuration for a game requested by game skin",
   "main": "app.js",
   "repository": "https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3",

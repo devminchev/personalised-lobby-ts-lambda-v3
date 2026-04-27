@@ -2,6 +2,16 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.29.7](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-sections-0.29.6...get-sections-0.29.7) (2026-04-24)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.53.2`
+## [0.29.6](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-sections-0.29.5...get-sections-0.29.6) (2026-04-24)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.53.1`
 ## [0.29.5](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-sections-0.29.4...get-sections-0.29.5) (2026-04-22)
 
 ### Dependency Updates

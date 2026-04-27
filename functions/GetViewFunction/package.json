@@ -1,6 +1,6 @@
 {
   "name": "get-sections",
-  "version": "0.29.5",
+  "version": "0.29.7",
   "description": "Returns sections for the venture",
   "main": "app.js",
   "repository": "https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda",

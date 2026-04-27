@@ -1,6 +1,6 @@
 {
   "name": "get-recommended-games-on-exit",
-  "version": "0.12.1",
+  "version": "0.12.3",
   "description": "get the recommended games on exit to client via Lambda",
   "main": "app.js",
   "repository": "https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda",

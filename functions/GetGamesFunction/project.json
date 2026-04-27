@@ -57,7 +57,7 @@
   },
   "tags": [],
   "implicitDependencies": [],
-  "version": "0.24.5",
+  "version": "0.24.7",
   "dependencies": [
     "os-client"
   ]

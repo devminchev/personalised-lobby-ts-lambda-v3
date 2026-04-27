@@ -8,25 +8,22 @@ All JIRA ticket scripts use the **NJA CLI** (`nja` binary) from the NJA Docker i
 
 ## Version Dashboard Update Targets
 
-The following targets are available to update the version dashboard:
+Version dashboard updates now run through `lbe-version-tracker` via:
 
 ```bash
-# Update EU Staging Dashboard
-nx run scripts:updateVersionDashboardEUSTG
-
-# Update EU Production Dashboard
-nx run scripts:updateVersionDashboardEUPROD
-
-# Update NA Staging Dashboard
-nx run scripts:updateVersionDashboardNASTG
-
-# Update NA Production Dashboard
-nx run scripts:updateVersionDashboardNAPROD
+npx --yes zx scripts/version_dashboard_update.mjs --environment=<aws-env>
 ```
+
+Nx targets call this script for:
+
+- `aws-stg-eu00`
+- `aws-prod-eu00`
+- `aws-stg-eu03`
+- `aws-prod-eu03`
 
 ### Input Format
 
-These targets expect a `versions.txt` file in the root directory with the following format:
+These targets expect a `versions.json` file in the repo root with object-keyed entries:
 
 ```json
 {
@@ -37,17 +34,17 @@ These targets expect a `versions.txt` file in the root directory with the follow
 }
 ```
 
-The script will:
+The updater will:
 
-1. Read the versions.txt file
-2. For each entry, look up the `relComponent` in the specified folder's package.json
-3. Update the version dashboard for the specified environment
+1. Read `versions.json`
+2. Resolve `relComponent` from `functions/<folder>/package.json`
+3. Run `lbe-version-tracker update <environment> <relComponent> <version> --name <packageName>`
 
-### Important Notes
+### CI Notes
 
-- Always verify the contents of versions.txt before running these targets
-- These targets directly affect the version dashboard - use with caution
-- For testing purposes, create a test environment configuration first
+- `lbe-version-tracker` is pre-installed in the `NODE_20` CI image
+- Credentials/region come from GitLab CI variables: `VD_AWS_ACCESS_KEY_ID`, `VD_AWS_SECRET_ACCESS_KEY`, `VD_AWS_DEFAULT_REGION`
+- Legacy bash scripts (`version_bulk_update.sh`, `version_update.sh`, `version_read.sh`, `env.sh`) were removed
 
 ## Jira Ticket Creation
 

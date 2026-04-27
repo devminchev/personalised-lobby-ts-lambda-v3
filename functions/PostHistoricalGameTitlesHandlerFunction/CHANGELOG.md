@@ -2,6 +2,16 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.9.28](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/post-historical-game-title-handler-0.9.27...post-historical-game-title-handler-0.9.28) (2026-04-24)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.53.2`
+## [0.9.27](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/post-historical-game-title-handler-0.9.26...post-historical-game-title-handler-0.9.27) (2026-04-24)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.53.1`
 ## [0.9.26](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/post-historical-game-title-handler-0.9.25...post-historical-game-title-handler-0.9.26) (2026-04-22)
 
 ### Dependency Updates

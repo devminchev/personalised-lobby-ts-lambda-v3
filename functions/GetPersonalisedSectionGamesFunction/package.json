@@ -1,6 +1,6 @@
 {
   "name": "get-personalised-section-games",
-  "version": "0.1.5",
+  "version": "0.1.7",
   "description": "Get personalised section games",
   "main": "app.js",
   "repository": "https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda",
