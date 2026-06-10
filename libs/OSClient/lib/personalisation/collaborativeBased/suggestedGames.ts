@@ -36,6 +36,7 @@ const suggestForYouMapper = createDefaultMapperPicking([
     'representativeColor',
     'videoUrlPattern',
     'animationMedia',
+    'sigCons',
     'foregroundLogoMedia',
     'backgroundMedia',
     'tags',

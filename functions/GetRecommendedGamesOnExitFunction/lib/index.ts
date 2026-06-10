@@ -87,6 +87,7 @@ export const createGamesByGameSkinQuery = (
                                             'game.imgUrlPattern',
                                             'game.animationMedia',
                                             'game.loggedOutAnimationMedia',
+                                            'game.sigCons',
                                             'game.foregroundLogoMedia',
                                             'game.loggedOutForegroundLogoMedia',
                                             'game.backgroundMedia',
@@ -123,7 +124,7 @@ export const getGamebyGameSkin = async (
 ): Promise<IGameRecommendationResponse[]> => {
     const ventureId = await getVentureId(client, siteName, spaceLocale, platform);
 
-    const recsGames = await getRecommendationGamesOnExitData(client, gameSkin, locale);
+    const recsGames = await getRecommendationGamesOnExitData(client, gameSkin, siteName);
 
     const gameSkins = recsGames.map((game) => game.source_game_skin_name);
     if (gameSkins.length === 0) {
@@ -190,6 +191,7 @@ const gameRecommendationResponse = (
             gameData?.loggedOutAnimationMedia,
             null,
         );
+        const sigCons = tryGetValueFromLocalised(localeOverride, spaceLocale, gameData?.sigCons, null);
         const headlessJackpot = tryGetValueFromLocalised(localeOverride, spaceLocale, gameData?.headlessJackpot, null);
 
         const foregroundLogoMediaObj = extractBynderObject(foregroundLogoMedia);
@@ -210,6 +212,7 @@ const gameRecommendationResponse = (
             ...(imgUrlPattern && { imgUrlPattern: imgUrlPattern }),
             ...(animationMedia && { animationMedia }),
             ...(loggedOutAnimationMedia && { loggedOutAnimationMedia }),
+            ...(sigCons && { sigCons }),
             ...(backgroundMediaObj && { backgroundMedia: backgroundMediaObj }),
             ...(loggedOutBackgroundMediaObj && { loggedOutBackgroundMedia: loggedOutBackgroundMediaObj }),
             ...(foregroundLogoMediaObj && { foregroundLogoMedia: foregroundLogoMediaObj }),
@@ -241,8 +244,12 @@ interface IGameRecommendationResponse {
     imgUrlPattern?: string;
     isProgressiveJackpot?: boolean;
     animationMedia?: string;
+    loggedOutAnimationMedia?: string;
+    sigCons?: string;
     backgroundMedia?: SanitizedBynder;
+    loggedOutBackgroundMedia?: SanitizedBynder;
     foregroundLogoMedia?: SanitizedBynder;
+    loggedOutForegroundLogoMedia?: SanitizedBynder;
     tags?: string[];
     headlessJackpot?: IHeadlessJackpot;
 }

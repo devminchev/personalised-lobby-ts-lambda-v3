@@ -18,7 +18,7 @@
         "format": [
           "cjs"
         ],
-        "target": "node20",
+        "target": "node24",
         "skipTypeCheck": false,
         "packageManager": "npm"
       }
@@ -48,5 +48,5 @@
     "type:lib",
     "scope:pl"
   ],
-  "version": "0.53.2"
+  "version": "0.61.0"
 }

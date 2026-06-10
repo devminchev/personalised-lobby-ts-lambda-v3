@@ -1,0 +1,95 @@
+- entryId: "15c7wqRpB1uhyhXfNpiuap"
+  gameId: "4lpZkuydT6HDe1MdBJdfr5"
+  name: "Fishin Frenzy Big Catch"
+  title: "Fishin Frenzy Big Catch"
+  gameSkin: "BP_FISHING_FRENZY_BIG_CATCH_V92"
+  realUrl: "/service/game/play/play-bp-fishin-frenzy-big-catch-92"
+  demoUrl: "/service/game/demo/play-bp-fishin-frenzy-big-catch-92"
+  imgUrlPattern: "/api/content/gametiles/fishin-frenzy-big-catch/scale-s%s/fishin-frenzy-big-catch-tile-r%s-w%s.jpg"
+  loggedOutImgUrlPattern: "/api/content/gametiles/fishin-frenzy-big-catch/scale-s%s/fishin-frenzy-big-catch-logged-out-tile-r%s-w%s.jpg"
+  dfgWeeklyImgUrlPattern: "/api/content/gametiles/fishin-frenzy-big-catch/scale-s%s/fishin-frenzy-big-catch-dfg-r%s-w%s.jpg"
+  videoUrlPattern: "/api/content/videos/fishin-frenzy-big-catch/r%s-w%s.mp4"
+  isProgressiveJackpot: true
+  progressiveBackgroundColor: "#0A0566"
+  representativeColor: "#0A0566"
+  sash: "NEW"
+  animationMedia: "default"
+  loggedOutAnimationMedia: "default"
+  sigCons: "Significant conditions apply. 18+. Please play responsibly."
+  tags:
+    - "slots"
+    - "fishing"
+  bynderDFGWeeklyImage:
+    name: "jackpotjoy-big-bass-bonanza-bynder-1914x1263"
+    type: "image"
+    width: 1914
+    height: 1263
+    orientation: "landscape"
+    original: null
+    tags: []
+    thumbnails:
+      transformBaseUrl: "https://assets.ballys.com/transform/2a1e8a76-409f-4ac4-89d0-946829b57c42/jackpotjoy-big-bass-bonanza-bynder-1914x1263"
+  foregroundLogoMedia:
+    name: "flash-match-on-feb26-25-Marquee-New-3X"
+    type: "image"
+    width: 750
+    height: 372
+    orientation: "landscape"
+    original: null
+    tags: []
+    thumbnails:
+      transformBaseUrl: "https://assets.ballys.com/transform/4c901602-85e2-41b4-99b6-ad7a928a5e6e/flash-match-on-feb26-25-Marquee-New-3X"
+  loggedOutForegroundLogoMedia:
+    name: "flash-match-on-feb26-25-Marquee-New-3X-logged-out"
+    type: "image"
+    width: 750
+    height: 372
+    orientation: "landscape"
+    original: null
+    tags: []
+    thumbnails:
+      transformBaseUrl: "https://assets.ballys.com/transform/4c901602-85e2-41b4-99b6-ad7a928a5e6e/flash-match-on-feb26-25-Marquee-New-3X-logged-out"
+  backgroundMedia:
+    name: "flash-match-on-feb26-25-Marquee-New-3X-bg"
+    type: "image"
+    width: 750
+    height: 372
+    orientation: "landscape"
+    original: null
+    tags: []
+    thumbnails:
+      transformBaseUrl: "https://assets.ballys.com/transform/4c901602-85e2-41b4-99b6-ad7a928a5e6e/flash-match-on-feb26-25-Marquee-New-3X-bg"
+  loggedOutBackgroundMedia:
+    name: "flash-match-on-feb26-25-Marquee-New-3X-bg-logged-out"
+    type: "image"
+    width: 750
+    height: 372
+    orientation: "landscape"
+    original: null
+    tags: []
+    thumbnails:
+      transformBaseUrl: "https://assets.ballys.com/transform/4c901602-85e2-41b4-99b6-ad7a928a5e6e/flash-match-on-feb26-25-Marquee-New-3X-bg-logged-out"
+  headlessJackpot:
+    id: 1234
+    name: "JACKPOT_BLAST"
+  liveHidden: false
+  webComponentData: {}
+
+- entryId: "1SC6Pyl5XFF1w8S4Y2uMzZ"
+  gameId: "4lpZkuydT6HDe1MdBJdfr5"
+  name: "Secrets of the Phoenix"
+  title: "Secrets of the Phoenix"
+  gameSkin: "BP_SECRETS_OF_THE_PHOENIX_V92"
+  realUrl: "/service/game/play/play-bp-secrets-of-the-phoenix-92"
+  demoUrl: "/service/game/demo/play-bp-secrets-of-the-phoenix-92"
+  imgUrlPattern: "/api/content/gametiles/secrets-of-the-phoenix/scale-s%s/secrets-of-the-phoenix-tile-r%s-w%s.jpg"
+  loggedOutImgUrlPattern: "/api/content/gametiles/secrets-of-the-phoenix/scale-s%s/secrets-of-the-phoenix-logged-out-tile-r%s-w%s.jpg"
+  isProgressiveJackpot: false
+  representativeColor: "#FFAA00"
+  sash: "HOT"
+  animationMedia: "default"
+  sigCons: "Significant conditions apply. 18+. Please play responsibly."
+  tags:
+    - "slots"
+    - "adventure"
+  liveHidden: false

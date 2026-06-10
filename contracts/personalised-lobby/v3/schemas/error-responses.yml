@@ -1,0 +1,55 @@
+---
+'400':
+  description: Bad Request
+  content:
+    application/json:
+      schema:
+        $ref: '../schemas/error.yml'
+'401':
+  description: Unauthorized
+  content:
+    application/json:
+      schema:
+        $ref: '../schemas/error.yml'
+'403':
+  description: Not Found
+  content:
+    application/json:
+      schema:
+        $ref: '../schemas/error.yml'
+'404':
+  description: Not Found
+  content:
+    application/json:
+      schema:
+        $ref: '../schemas/error.yml'
+'429':
+  description: Rate Limit
+  content:
+    application/json:
+      schema:
+        $ref: '../schemas/error.yml'
+'500':
+  description: Internal error
+  content:
+    application/json:
+      schema:
+        $ref: '../schemas/error.yml'
+'502':
+  description: Internal error
+  content:
+    application/json:
+      schema:
+        $ref: '../schemas/error.yml'
+'503':
+  description: Service Unavailable
+  content:
+    application/json:
+      schema:
+        $ref: '../schemas/error.yml'
+'504':
+  description: Gateway Timeout
+  content:
+    application/json:
+      schema:
+        $ref: '../schemas/error.yml'

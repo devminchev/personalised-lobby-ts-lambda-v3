@@ -2,6 +2,111 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.23.5](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-gameconfig-0.23.4...get-gameconfig-0.23.5) (2026-06-09)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.61.0`
+## [0.23.4](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-gameconfig-0.23.3...get-gameconfig-0.23.4) (2026-06-09)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.60.2`
+## [0.23.3](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-gameconfig-0.23.2...get-gameconfig-0.23.3) (2026-06-05)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.60.1`
+## [0.23.2](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-gameconfig-0.23.1...get-gameconfig-0.23.2) (2026-06-05)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.60.0`
+## [0.23.1](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-gameconfig-0.23.0...get-gameconfig-0.23.1) (2026-06-04)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.59.0`
+
+### Bug Fixes
+
+* **gtech-1322994:** resolve min and max showing as - when the property does not exist ([c1a8767](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/c1a87676d06e595faf92597de10a780fb6e900a6))
+
+## [0.23.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-gameconfig-0.22.0...get-gameconfig-0.23.0) (2026-06-03)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.59.0`
+
+### Features
+
+* **gtech-1319757:** upgrade lambda node version to lts ([af44b88](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/af44b886b04e87327753f172dd91c67fba5764ab))
+
+## [0.22.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-gameconfig-0.21.2...get-gameconfig-0.22.0) (2026-06-02)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.58.0`
+
+### Features
+
+* **gtech-1320927:** lobby api lambdas to be able to get global breaker state ([a645e28](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/a645e284292ba9076283c26b1c49e133aa1840aa))
+
+## [0.21.2](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-gameconfig-0.21.1...get-gameconfig-0.21.2) (2026-05-20)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.57.1`
+## [0.21.1](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-gameconfig-0.21.0...get-gameconfig-0.21.1) (2026-05-20)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.57.0`
+## [0.21.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-gameconfig-0.20.10...get-gameconfig-0.21.0) (2026-05-20)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.56.1`
+
+### Features
+
+* **gtech-1322384:** add controller lambda component to nightwatch jira automation ([3f30a54](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/3f30a544d01ca2ba3d55851b1e9bd192e4bc5c3f))
+
+## [0.20.10](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-gameconfig-0.20.9...get-gameconfig-0.20.10) (2026-05-14)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.56.1`
+## [0.20.9](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-gameconfig-0.20.8...get-gameconfig-0.20.9) (2026-05-08)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.56.0`
+## [0.20.8](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-gameconfig-0.20.7...get-gameconfig-0.20.8) (2026-05-08)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.55.0`
+## [0.20.7](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-gameconfig-0.20.6...get-gameconfig-0.20.7) (2026-05-01)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.54.1`
+## [0.20.6](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-gameconfig-0.20.5...get-gameconfig-0.20.6) (2026-05-01)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.54.0`
+## [0.20.5](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-gameconfig-0.20.4...get-gameconfig-0.20.5) (2026-04-29)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.53.4`
+## [0.20.4](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-gameconfig-0.20.3...get-gameconfig-0.20.4) (2026-04-28)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.53.3`
 ## [0.20.3](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-gameconfig-0.20.2...get-gameconfig-0.20.3) (2026-04-24)
 
 ### Dependency Updates

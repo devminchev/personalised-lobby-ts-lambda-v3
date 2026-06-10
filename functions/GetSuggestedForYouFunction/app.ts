@@ -43,7 +43,7 @@ export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGat
     const userLocale: string = validateLocaleQuery(event.queryStringParameters?.locale);
 
     try {
-        const client = getClient();
+        const client = getClient({ tier: 'C', enabled: false });
 
         const spaceLocale = handleSpaceLocalization();
         const ventureId = await getVentureId(client, siteName, spaceLocale, platform);

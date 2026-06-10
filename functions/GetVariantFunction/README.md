@@ -19,7 +19,7 @@ The handler:
 - `yarn install` performed at repo root
 - Environment variables set for OpenSearch access (`HOST`, `OS_USER`, `OS_PASS`, `EXECUTION_ENVIRONMENT`)
 
-The runtime depends on the shared `os-client` library exposed through the Lambda layer mount point `/opt/nodejs/node_modules/os-client`. Nx already maps this path for local TypeScript builds; no extra configuration is required unless the layer layout changes.
+The runtime depends on the shared `os-client` workspace library, imported by package name and resolved from source by the nx project graph; no extra path configuration is required.
 
 ### Running tests
 
@@ -32,7 +32,7 @@ Tests mock OpenSearch with `nock` and track log calls to assert both success and
 
 ### Local invocation
 
-SAM builds both the function and the `os-client` layer:
+SAM builds the function (os-client is bundled from source):
 
 ```sh
 # from the repository root

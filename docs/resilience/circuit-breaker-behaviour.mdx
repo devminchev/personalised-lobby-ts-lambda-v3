@@ -1,0 +1,183 @@
+---
+title: Circuit-breaker behaviour
+description: How the breaker state evolves under representative load scenarios — slow ramps, short critical peaks, low traffic, and warning-only pressure — traced alarm-by-alarm through the controller state machine
+---
+
+# Circuit-breaker behaviour
+
+This page walks through representative load scenarios end-to-end: what each alarm does, what signals the controller ends up tracking, and what state consumers see. It is the dynamic companion to [Circuit-breaker alarms](./circuit-breaker-alarms.mdx), which defines the alarms themselves.
+
+For the controller's state-machine source, see `functions/PostCloudWatchController/src/`.
+
+> The scenarios below only trace **signal alarms** (the `breaker:*`-prefixed ones). The controller self-observability alarms — `ControllerErrorsAlarm` and `ControllerDlqDepthAlarm` — are documented in the [self-observability section of the alarms page](./circuit-breaker-alarms.mdx#controller-self-observability-alarms). They do not participate in any of the state transitions shown here; they only tell operators that the controller itself is failing.
+
+## Baseline mechanics
+
+Consumers of the breaker can read `mode`, or the state name directly. The mapping is:
+
+| Breaker state | `mode` | What consumers do |
+|---|---|---|
+| `CLOSED` | `normal` | Normal traffic |
+| `OPEN` | `protect` | Shed non-critical |
+| `HALF_OPEN` | `protect` | Shed non-critical (probe window) |
+
+So `OPEN` and `HALF_OPEN` are functionally identical from the consumer's point of view — only `HALF_OPEN → CLOSED` flips the mode back to `normal`.
+
+Key settings, sourced at runtime from SSM Parameter Store via [`src/settings.ts`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/settings.ts) (see [Configuration store decision](./configuration-store-decision.mdx) for why they live there). Defaults shipped in [`template.yaml`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/template.yaml):
+
+| Setting | Value | Purpose |
+|---|---|---|
+| `openHoldMs` | 60 s | Minimum dwell time in `OPEN` before the tick is allowed to probe. |
+| `halfOpenMaxMs` | 120 s | Max dwell in `HALF_OPEN` before the tick re-evaluates. |
+| `healthyOkEventsToClose` | 2 | Two OK events during `HALF_OPEN` are required before the breaker closes via the probe path. Anti-flap, plus prevents premature close when one of multiple active signals clears. |
+| `staleEventMs` | 10 min | Events older than this are ignored (safety rail against replays). |
+
+These values can be retuned without a redeploy via `aws ssm put-parameter` (changes propagate within ~60 s). See the README for the operator workflow.
+
+The scheduled tick fires every 60 s and only does work when the breaker is not `CLOSED`.
+
+CloudWatch alarms publish EventBridge events **only on state transitions** (`OK ↔ ALARM ↔ INSUFFICIENT_DATA`), never on every evaluation. A 10-minute sustained breach produces two events total (trip + recovery).
+
+> **A note on time markers in the scenarios below.** The `t=N` labels mark the moment a **datapoint registers** or an **alarm transitions** (i.e. when an EventBridge event would fire), not the moment the underlying metric first crossed the threshold. Because each evaluation period is 60 s and CloudWatch publishes a datapoint at the *end* of each period, the underlying condition was already breaching for ~60 s before `t=0` in the traces. With `3-of-5 × 60 s` (warnings) the alarm transitions to ALARM after three bad datapoints register; with `2-of-3 × 60 s` (criticals) after two. Wall-clock detection from start-of-incident is therefore approximately **3 min for warnings** and **2 min for criticals**, matching the alarms-doc detection timing tables.
+
+## Scenario 1 — Slow ramp ending in rejections
+
+Traffic climbs over ~30 minutes: CPU crosses 80 % sustained at t=15, JVM crosses 85 % sustained at t=20, and rejections finally spike to 50/min at t=30.
+
+| Time | Event | Signals | Severity | Breaker | Mode |
+|---|---|---|---|---|---|
+| t=0 – 16 | Calm | `{}` | `all_signals_ok` | CLOSED | normal |
+| t=17 | `cpu-high` ALARM (3-of-5 rule) | `{cpu-high}` | `single_warning:cpu-high` | CLOSED | **normal** |
+| t=18 – 21 | CPU still breaching | `{cpu-high}` | `single_warning` | CLOSED | normal |
+| t=22 | `jvm-pressure` ALARM | `{cpu-high, jvm-pressure}` | `compound_warning` | **OPEN** (holdUntil=t=23) | **protect** |
+| tick @ t=23 | OPEN & holdUntil passed | same | — | HALF_OPEN (holdUntil=t=25) | protect |
+| tick @ t=25 | HALF_OPEN & holdUntil passed; signals active | same | `compound_warning` | OPEN (holdUntil=t=26) | protect |
+| t=26 – 30 | Cycle: OPEN 60 s → HALF_OPEN 120 s → … | same | — | oscillates | protect |
+| t=31 | `os-search-rejections` ALARM (2-of-3 rule) | +`os-search-rejections` | `critical_signal` | OPEN (holdUntil unchanged) | protect |
+
+**What this shows:**
+
+- Warnings trip at t=22, **9 minutes before critical fires at t=31**. That's the tiered-signal design working: early warning catches pressure while there is still time to shed load before hard failure.
+- Under the prior `Period: 300` tuning the warnings would not have tripped until ~t=45 — strictly later than critical — making the warning tier useless.
+- Once OPEN under a sustained incident, the breaker oscillates `OPEN ↔ HALF_OPEN`. Both are `protect` mode, so **consumers see one continuous shed window**, not flapping.
+- `holdUntil` is **not refreshed** when a new signal arrives while already OPEN ([`statemachine.ts`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/statemachine.ts)). That's fine because the oscillation loop keeps us in `protect` anyway.
+
+## Scenario 2 — Short critical peak (2 min)
+
+A sudden rejection burst: `ThreadpoolSearchRejected` counter increments by 50/min at t=0 and t=1, then the rejections stop. DIFF returns 50, 50, 0, 0, 0, ….
+
+| Time | Event | Alarm state change | Signals | Severity | Breaker | Mode |
+|---|---|---|---|---|---|---|
+| t=-1 | counter=N | — | `{}` | `all_signals_ok` | CLOSED | normal |
+| t=0 | First breach datapoint (DIFF=50) | — (1 of 3 bad, not enough) | `{}` | — | CLOSED | normal |
+| t=1 | Second breach (DIFF=50, 2 of 3) | **OK → ALARM** | `{os-search-rejections}` | `critical_signal` | **OPEN** (holdUntil=t=2) | **protect** |
+| t=2 | Metric stops (DIFF=0) | still ALARM (2-of-3 breach in window) | same | — | OPEN | protect |
+| t=3 | DIFF=0 | **ALARM → OK** (only 1 of last 3 breaches) | `{}` (signal removed) | `all_signals_ok`; shouldOpen=false | OPEN → `open_partial_clear` → stays OPEN | protect |
+| tick @ t=3 | OPEN & holdUntil (t=2) passed | — | `{}` | — | HALF_OPEN (holdUntil=t=5) | protect |
+| tick @ t=4 | HALF_OPEN & holdUntil not passed | — | — | — | HALF_OPEN (no-op) | protect |
+| tick @ t=5 | HALF_OPEN & holdUntil passed; pruned signals empty | — | — | — | **CLOSED** | **normal** |
+
+**What this shows:**
+
+- Trip is fast (**~2 min from when the underlying burst starts**) because critical signals run at `2-of-3 × 60 s`. In the trace's marker convention, that is `t=1` — one minute after the first bad datapoint registers (`t=0`), which itself takes ~60 s of bad data to produce.
+- Recovery is cautious: consumers see `protect` for **4 minutes** (t=1 → t=5) for a **2-minute** actual incident. The tail comes from: 1 min alarm recovery lag + 2 min `HALF_OPEN` probe window − overlap.
+- **No false re-opens during recovery.** The OK event at t=3 does not close the breaker directly — `open_partial_clear` keeps us OPEN and lets the tick drive the probe. That avoids the breaker flapping closed the moment a noisy metric dips.
+- **Probe-path note (with `healthyOkEventsToClose = 2`):** an OK event arriving *while* the breaker is already in `HALF_OPEN` does not close it immediately — it bumps `healthyProbeCount` from 0 to 1 and the breaker stays HALF_OPEN. A second OK is required to close via the probe path. In single-alarm incidents like this scenario only one OK event ever fires (the alarm cleared once), so the breaker reliably closes via the **tick path**: at `halfOpenMaxMs` expiry the tick checks `SIGNAL_STATE`, sees no active signals, and closes. That's the t=5 row above. The probe path is mostly relevant in multi-alarm incidents where two distinct alarms each fire one OK as they clear.
+
+## Scenario 3 — Low traffic
+
+"Low traffic" meaning below the count floor used by the API warning alarms — e.g. overnight, scheduled quiet hours, below ~0.33 rps sustained (under 20 requests per 60 s window after the Period 60 retune).
+
+What each signal does at low traffic:
+
+| Signal | Behaviour at low traffic | Consequence |
+|---|---|---|
+| `os-search-rejections` | `DIFF(counter)` ≈ 0 because nothing is causing rejections under low load | OK — correct |
+| `os-write-rejections` | Same | OK — correct |
+| `jvm-pressure` | Independent of request volume; OpenSearch publishes per node regardless | Still fully functional — can still trip if a node is genuinely struggling |
+| `cpu-high` | Same | Still fully functional |
+| `api-p99` | `requestCount < 20` in every 60 s window → expression returns 0 | **Always OK**, regardless of actual p99 |
+| `api-5xx` | `requestCount < 20` → expression returns 0 | **Always OK**, regardless of actual 5xx ratio |
+
+**Three sub-cases:**
+
+### 3a — Low traffic + everything healthy
+Breaker stays CLOSED. Correct.
+
+### 3b — Low traffic + API actually broken
+Example: a Contentful dependency is failing, every request returns 5xx, but only ~10 requests land in a 60 s window.
+
+- `api-5xx` ratio is 1.0 (100 % errors), but `requestCount = 10 < 20` → expression returns 0 → alarm stays OK.
+- Breaker stays CLOSED.
+- **This is intentional.** The compound-warning is a *shedding* signal; shedding 100 % of 0.1 rps accomplishes nothing. The false negative at low traffic is the accepted trade for avoiding the false positives the count floor was added to prevent. If you care about "users seeing errors at any rate", that belongs in a separate *alerting* alarm (not `breaker:*`-prefixed), outside the shedding contract.
+
+### 3c — Low traffic + OpenSearch under pressure
+Example: a noisy-neighbour ES issue or JVM GC thrashing.
+
+- `jvm-pressure` and/or `cpu-high` trip normally — these metrics don't depend on API request volume.
+- One warning → `single_warning` → CLOSED.
+- Two simultaneous warnings → `compound_warning` → OPEN.
+
+OS-side signals remain the source of truth at low traffic, which is exactly the design.
+
+## Scenario 4 — Warning-only ramp (single warning, no compound)
+
+CPU spikes to 90 % for 10 minutes (t=5 – t=15) then recovers. JVM, OS, API all stay healthy.
+
+| Time | Event | Signals | Severity | Breaker | Mode |
+|---|---|---|---|---|---|
+| t=0 – 4 | Calm | `{}` | `all_signals_ok` | CLOSED | normal |
+| t=7 | `cpu-high` ALARM (3-of-5 rule) | `{cpu-high}` | `single_warning:cpu-high` | CLOSED | **normal** |
+| t=8 – 15 | CPU sustained 90 %; no new events emitted | `{cpu-high}` | `single_warning` | CLOSED | normal |
+| tick (any) | State=CLOSED → tick early-returns | `{cpu-high}` | — | CLOSED | normal |
+| t=16 – 17 | Recovering | `{cpu-high}` | `single_warning` | CLOSED | normal |
+| t=18 | `cpu-high` ALARM → OK | `{}` | `all_signals_ok` | CLOSED | normal |
+
+**What this shows:**
+
+- **The breaker never opens.** 10 minutes of sustained 90 % CPU, zero shedding. By design: `single_warning` is informational, not actionable. Only `compound_warning` (2+ simultaneous warnings) or any critical signal opens the breaker.
+- This matches the resilience doctrine in [Service tiers](./service-tiers.mdx): non-critical pressure signals on their own are noise; they are actionable only when they correlate with something else.
+- Tick work during this 11-minute period: zero DDB writes (tick early-returns on `CLOSED`). Total DDB writes for the whole scenario: exactly 2 (one per alarm state change).
+
+### Scenario 4a — Warning-only ramp with a brief compound overlap
+
+Same CPU ramp, but `jvm-pressure` also briefly alarms from t=10 to t=15 (e.g. a GC incident that clears before CPU does).
+
+| Time | Event | Signals | Severity | Breaker | Mode |
+|---|---|---|---|---|---|
+| t=7 | `cpu-high` ALARM | `{cpu-high}` | `single_warning` | CLOSED | normal |
+| t=10 | `jvm-pressure` ALARM | `{cpu-high, jvm-pressure}` | `compound_warning` | **OPEN** (holdUntil=t=11) | **protect** |
+| tick @ t=11 | OPEN & holdUntil passed | same | — | HALF_OPEN (holdUntil=t=13) | protect |
+| tick @ t=13 | HALF_OPEN & passed; signals active | same | `compound_warning` | OPEN (holdUntil=t=14) | protect |
+| tick @ t=14 | OPEN & passed | same | — | HALF_OPEN (holdUntil=t=16) | protect |
+| t=15 | `jvm-pressure` ALARM → OK, while state=HALF_OPEN | `{cpu-high}` | `single_warning` (shouldOpen=false) | `buildHalfOpenProgressTransition` → probeCount=1 < 2 → stays HALF_OPEN | protect |
+| tick @ t=16 | HALF_OPEN & holdUntil passed; signals still active | `{cpu-high}` | — | **OPEN** again (holdUntil=t=17) | protect |
+| tick @ t=17 | OPEN & holdUntil passed | same | — | HALF_OPEN (holdUntil=t=19) | protect |
+| t=18 | `cpu-high` ALARM → OK, while state=HALF_OPEN | `{}` | `all_signals_ok` | `buildHalfOpenProgressTransition` → probeCount=2 ≥ 2 → **CLOSED** | **normal** |
+
+**What this shows:**
+
+- Protection engages during the overlap window AND continues until **all** active signals clear. With `healthyOkEventsToClose=2`, the breaker correctly stays in `protect` from t=10 to t=18 — shedding for the full duration of "any warning is active under partial recovery", not just the overlap. That's a deliberate v1 safety property: the breaker does not flip back to `normal` while a warning is still firing on its own.
+- **Why threshold=2 matters here:** the OK at t=15 only clears `jvm-pressure`; `cpu-high` is still in ALARM with `single_warning` semantics. Under the old `healthyOkEventsToClose=1` the probe path would have closed the breaker at t=15 *despite* `cpu-high` still being active — a known partial-recovery hole. Threshold=2 plus the tick-driven `SIGNAL_STATE` check at t=16 close that hole: the breaker re-OPENs when the tick sees signals still active, then waits for genuine all-clear.
+- Total `protect` window: t=10 to t=18, ≈ 8 min. Total tick writes during this period: 4 transitions (the OPEN↔HALF_OPEN cycle plus the final close). Consumers see **one continuous shed** because OPEN and HALF_OPEN both map to `protect`.
+
+## Summary table — "when does the breaker protect?"
+
+| Scenario | Alarm(s) that trip | Protection window | Notes |
+|---|---|---|---|
+| 1 — slow ramp to critical | cpu+jvm compound, then os-rejections | ~t=22 until well after recovery | Warnings catch pressure 9 min before critical |
+| 2 — 2-min critical peak | os-search-rejections | ~4 min (2-min incident + tail) | Fast trip, cautious close, no false re-opens |
+| 3a — low traffic, healthy | none | none | Correct |
+| 3b — low traffic, broken API | none (count floor suppresses) | none | Intentional false-negative — shedding 0.1 rps is pointless |
+| 3c — low traffic, OS pressure | OS-side only | depends on compound | Still fully functional |
+| 4 — single warning 10 min | cpu-high only | **none** | Informational, not actionable |
+| 4a — brief compound overlap | cpu + jvm for 5 min | ~8 min (overlap + lingering single warning) | Protection extends past the overlap; tick re-OPENs while any signal remains |
+
+## Invariants that hold across all scenarios
+
+1. **Consumers never observe sub-minute state flap.** `openHoldMs = 60 s` + `3-of-5` alarm smoothing (warnings) or `2-of-3` (critical) guarantees this.
+2. **`OPEN` and `HALF_OPEN` are the same mode to consumers.** Sustained incidents can oscillate between them internally without any visible effect.
+3. **The breaker INITIALLY opens only when `shouldOpen` is true** — i.e. critical signal present OR two warnings simultaneously. A single warning by itself does not trip a CLOSED breaker.
+4. **Once OPEN, protection stays engaged until SIGNAL_STATE is empty.** With `healthyOkEventsToClose=2`, a single lingering warning *does* keep protection engaged after the initial trip — the tick re-OPENs from HALF_OPEN whenever any signal is still active, and the probe path requires two OKs (which a single-alarm partial recovery can't supply). This is intentional: it closes the partial-recovery hole where the breaker would otherwise have closed while one of multiple signals was still firing.
+5. **Recovery never short-circuits during an active incident.** An OK event during OPEN stays OPEN (`open_partial_clear`); closing happens only via the tick's `HALF_OPEN` probe (with empty SIGNAL_STATE) OR via accumulating `healthyOkEventsToClose` successful probe OKs while already in `HALF_OPEN`.
+6. **DDB writes are bounded by alarm transitions, not evaluations.** Steady-state cost is proportional to number of state flips, not to the duration of the incident.

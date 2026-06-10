@@ -1,0 +1,26 @@
+title: IG Placeholder Section
+description: Section acting as a placeholder for a feature the FE renders by `placeholderType` (e.g. a loyalty mechanic progress tracker).
+type: object
+required:
+  - entryId
+  - classification
+  - placeholderType
+  - title
+properties:
+  entryId:
+    description: Unique id for the placeholder section
+    type: string
+
+  classification:
+    description: Classification type of the section. `PlaceholderSection` for placeholder sections.
+    type: string
+
+  placeholderType:
+    description: Discriminator the FE uses to decide which feature to render in the placeholder slot.
+    type: string
+    enum:
+      - loyalty-mechanic-progress-tracker
+
+  title:
+    description: Title for the placeholder section (sourced from the CMS entry title).
+    type: string

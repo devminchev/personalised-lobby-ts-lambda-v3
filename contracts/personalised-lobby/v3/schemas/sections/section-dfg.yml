@@ -1,0 +1,38 @@
+title: IG Daily Free Game Section
+description: Section with daily free games
+required:
+  - entryId
+  - classification
+  - layoutType
+  - title
+properties:
+  entryId:
+    description: Unique id for the DFG section
+    type: string
+  classification:
+    description: Classification type of the section
+    type: string
+  title:
+    description: Localized title for the section
+    type: string
+  hasGames:
+    description: Flag to indicate if this section has games
+    type: boolean
+  media:
+    description: The media for the IG DFG Section
+  dynamicBackground:
+    description: dynamic background for the IG DFG Section
+  dynamicLogo:
+    description: dynamic logo for the IG DFG Section
+  bynderMedia:
+    description: Bynder media object
+    $ref: '../bynderImage.yaml'
+  bynderDynamicBackground:
+    description: Bynder Dynamic Background object
+    $ref: '../bynderImage.yaml'
+  bynderDynamicLogo:
+    description: Bynder Dyanmic Logo object
+    $ref: '../bynderImage.yaml'
+  link:
+    description: A link for the media
+    type: string

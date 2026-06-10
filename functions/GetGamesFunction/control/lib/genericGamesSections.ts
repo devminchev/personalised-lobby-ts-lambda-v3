@@ -36,6 +36,7 @@ const sectionGamesMapper = createDefaultMapperPicking([
     'videoUrlPattern',
     'animationMedia',
     'loggedOutAnimationMedia',
+    'sigCons',
     'foregroundLogoMedia',
     'loggedOutForegroundLogoMedia',
     'backgroundMedia',

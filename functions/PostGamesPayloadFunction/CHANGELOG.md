@@ -2,6 +2,106 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.7.4](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/post-games-payload-handler-0.7.3...post-games-payload-handler-0.7.4) (2026-06-09)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.61.0`
+## [0.7.3](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/post-games-payload-handler-0.7.2...post-games-payload-handler-0.7.3) (2026-06-09)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.60.2`
+## [0.7.2](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/post-games-payload-handler-0.7.1...post-games-payload-handler-0.7.2) (2026-06-05)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.60.1`
+## [0.7.1](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/post-games-payload-handler-0.7.0...post-games-payload-handler-0.7.1) (2026-06-05)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.60.0`
+## [0.7.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/post-games-payload-handler-0.6.0...post-games-payload-handler-0.7.0) (2026-06-03)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.59.0`
+
+### Features
+
+* **gtech-1319757:** upgrade lambda node version to lts ([af44b88](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/af44b886b04e87327753f172dd91c67fba5764ab))
+
+## [0.6.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/post-games-payload-handler-0.5.2...post-games-payload-handler-0.6.0) (2026-06-02)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.58.0`
+
+### Features
+
+* **gtech-1320927:** lobby api lambdas to be able to get global breaker state ([a645e28](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/a645e284292ba9076283c26b1c49e133aa1840aa))
+
+## [0.5.2](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/post-games-payload-handler-0.5.1...post-games-payload-handler-0.5.2) (2026-05-20)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.57.1`
+## [0.5.1](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/post-games-payload-handler-0.5.0...post-games-payload-handler-0.5.1) (2026-05-20)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.57.0`
+## [0.5.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/post-games-payload-handler-0.4.4...post-games-payload-handler-0.5.0) (2026-05-20)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.56.1`
+
+### Features
+
+* **gtech-1322384:** add controller lambda component to nightwatch jira automation ([3f30a54](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/3f30a544d01ca2ba3d55851b1e9bd192e4bc5c3f))
+
+## [0.4.4](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/post-games-payload-handler-0.4.3...post-games-payload-handler-0.4.4) (2026-05-14)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.56.1`
+## [0.4.3](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/post-games-payload-handler-0.4.2...post-games-payload-handler-0.4.3) (2026-05-08)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.56.0`
+## [0.4.2](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/post-games-payload-handler-0.4.1...post-games-payload-handler-0.4.2) (2026-05-08)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.55.0`
+## [0.4.1](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/post-games-payload-handler-0.4.0...post-games-payload-handler-0.4.1) (2026-05-01)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.54.1`
+## [0.4.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/post-games-payload-handler-0.3.7...post-games-payload-handler-0.4.0) (2026-05-01)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.54.0`
+
+### Features
+
+* **gtech-1319733:** add sigcons lines to game model and lambda responses ([ac3ef91](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/commit/ac3ef9140a89291c720a5475b95914f582c1a89f))
+
+## [0.3.7](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/post-games-payload-handler-0.3.6...post-games-payload-handler-0.3.7) (2026-04-29)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.53.4`
+## [0.3.6](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/post-games-payload-handler-0.3.5...post-games-payload-handler-0.3.6) (2026-04-28)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.53.3`
 ## [0.3.5](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/post-games-payload-handler-0.3.4...post-games-payload-handler-0.3.5) (2026-04-24)
 
 ### Dependency Updates

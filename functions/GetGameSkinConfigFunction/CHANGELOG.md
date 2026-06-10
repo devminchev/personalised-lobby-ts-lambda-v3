@@ -2,6 +2,96 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.5.4](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-game-skin-config-0.5.3...get-game-skin-config-0.5.4) (2026-06-09)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.61.0`
+## [0.5.3](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-game-skin-config-0.5.2...get-game-skin-config-0.5.3) (2026-06-09)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.60.2`
+## [0.5.2](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-game-skin-config-0.5.1...get-game-skin-config-0.5.2) (2026-06-05)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.60.1`
+## [0.5.1](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-game-skin-config-0.5.0...get-game-skin-config-0.5.1) (2026-06-05)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.60.0`
+## [0.5.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-game-skin-config-0.4.0...get-game-skin-config-0.5.0) (2026-06-03)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.59.0`
+
+### Features
+
+* **gtech-1319757:** upgrade lambda node version to lts ([af44b88](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/af44b886b04e87327753f172dd91c67fba5764ab))
+
+## [0.4.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-game-skin-config-0.3.3...get-game-skin-config-0.4.0) (2026-06-02)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.58.0`
+
+### Features
+
+* **gtech-1320927:** lobby api lambdas to be able to get global breaker state ([a645e28](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/a645e284292ba9076283c26b1c49e133aa1840aa))
+
+## [0.3.3](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-game-skin-config-0.3.2...get-game-skin-config-0.3.3) (2026-05-20)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.57.1`
+## [0.3.2](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-game-skin-config-0.3.1...get-game-skin-config-0.3.2) (2026-05-20)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.57.0`
+## [0.3.1](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-game-skin-config-0.3.0...get-game-skin-config-0.3.1) (2026-05-14)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.56.1`
+## [0.3.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-game-skin-config-0.2.19...get-game-skin-config-0.3.0) (2026-05-08)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.56.0`
+
+### Features
+
+* **gtech-1321876:** include rgs provider code in contentful api for closing game rounds ([60f21e6](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/60f21e6d569bf285801f4f10d26e587c72ec4abd))
+
+## [0.2.19](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-game-skin-config-0.2.18...get-game-skin-config-0.2.19) (2026-05-08)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.55.0`
+## [0.2.18](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-game-skin-config-0.2.17...get-game-skin-config-0.2.18) (2026-05-01)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.54.1`
+## [0.2.17](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-game-skin-config-0.2.16...get-game-skin-config-0.2.17) (2026-05-01)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.54.0`
+## [0.2.16](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-game-skin-config-0.2.15...get-game-skin-config-0.2.16) (2026-04-29)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.53.4`
+## [0.2.15](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-game-skin-config-0.2.14...get-game-skin-config-0.2.15) (2026-04-28)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.53.3`
 ## [0.2.14](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-game-skin-config-0.2.13...get-game-skin-config-0.2.14) (2026-04-24)
 
 ### Dependency Updates

@@ -1,0 +1,40 @@
+links:
+  - entryId: "123"
+    label: "Instants & Slingo"
+    viewSlug: "slots"
+
+  - entryId: "345"
+    label: "Play Responsibly"
+    internalUrl: "/responsible-gaming"
+
+  - entryId: "789"
+    label: "Gamble Aware"
+    externalUrl: "https://www.gambleaware.org/"
+    liveHidden: true
+bottomNavLinks:
+  - entryId: "321"
+    label: "Instants & Slingo"
+    viewSlug: "new-games"
+    image: "/api/content/JPJ-Unicorn-Background/background/scale-1/jpj-desktop-background.jpg"
+    bynderImage:
+      name: "flash-match-on-feb26-25-Marquee-New-3X"
+      type: "image"
+      width: 750
+      height: 372
+      orientation: "landscape"
+      original: null
+      tags: []
+      thumbnails:
+        transformBaseUrl: "https://assets.ballys.com/transform/4c901602-85e2-41b4-99b6-ad7a928a5e6e/flash-match-on-feb26-25-Marquee-New-3X"
+
+  - entryId: "243"
+    label: "Play Responsibly"
+    internalUrl: "/responsible-gaming"
+    image: "/api/content/JPJ-Unicorn-Background/background/scale-1/jpj-desktop-background.jpg"
+
+  - entryId: "123"
+    label: "Gamble Aware"
+    externalUrl: "https://www.gambleaware.org/"
+    image: "/api/content/JPJ-Unicorn-Background/background/scale-1/jpj-desktop-background.jpg"
+    bynderImage: {}
+    liveHidden: true

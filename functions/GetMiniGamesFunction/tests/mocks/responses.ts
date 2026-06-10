@@ -1,3 +1,6 @@
+import { FullApiResponse } from 'os-client';
+import { IMinigameSectionInfo } from '../../app';
+
 type VentureSuccessResp = {
     hits: {
         hits: Array<{
@@ -626,3 +629,37 @@ export const NOT_FOUND_RESPONSE: any = {
         hits: [],
     },
 };
+
+// --- sigCons propagation ---
+// One game with a localised `sigCons` value, one without — used to assert that the
+// field is forwarded for the former and omitted for the latter.
+
+const buildMiniGameHit = (siteGameId: string, sigCons?: Record<string, string>): FullApiResponse =>
+    ({
+        hit: { siteGame: { id: siteGameId, sash: { 'en-GB': '' } } },
+        innerHit: {
+            game: {
+                id: `${siteGameId}-game`,
+                gameName: siteGameId,
+                gameSkin: siteGameId,
+                gamePlatformConfig: { realUrl: '', demoUrl: '' },
+                title: { 'en-GB': siteGameId },
+                ...(sigCons ? { sigCons } : {}),
+            },
+        },
+    }) as unknown as FullApiResponse;
+
+export const SIG_CONS_SECTION_DATA: IMinigameSectionInfo[] = [
+    {
+        entryId: 'section-1',
+        title: 'Section',
+        name: 'name',
+        layoutType: 'grid',
+        games: ['site-with', 'site-without'],
+    },
+];
+
+export const SIG_CONS_MINIGAMES: FullApiResponse[] = [
+    buildMiniGameHit('site-with', { 'en-GB': 'sig-cons-en' }),
+    buildMiniGameHit('site-without'),
+];

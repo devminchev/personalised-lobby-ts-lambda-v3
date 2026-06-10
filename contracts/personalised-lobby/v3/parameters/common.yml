@@ -1,0 +1,31 @@
+- name: sitename
+  description: venture name
+  schema:
+    type: string
+  in: path
+  required: true
+- name: layoutname
+  description: layoutName name, corresponds to category name_id
+  schema:
+    type: string
+  in: path
+  required: true
+- name: platform
+  description: Platform device type. Accepted values 'web', 'ios' and 'android'.
+  schema:
+    type: string
+    enum: [desktop, tablet, phone]
+  in: path
+  required: true
+- name: memberid
+  in: query
+  description: ID of the member
+  schema:
+    type: string
+  required: false
+- name: auth
+  in: query
+  description: Indicator if the user is loggedin or not. If true - user is considered loggedin. If it's missing or any value different than true, backend considers the user to be logged out.
+  schema:
+    type: string
+  required: false

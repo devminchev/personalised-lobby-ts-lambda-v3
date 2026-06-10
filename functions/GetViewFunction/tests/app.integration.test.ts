@@ -14,6 +14,7 @@ import {
     NOT_FOUND_RESPONSE,
     VENTURE_SUCCESS_RESP,
     THEME_SUCCESS_RESP,
+    PLACEHOLDER_SECTION_OS_MOCK,
 } from './mocks/responses';
 import { mockApiEvent } from './mocks/gatewayMocks';
 import {
@@ -37,6 +38,7 @@ import {
     buildJackpotSectionsBlock,
     buildMarketingSection,
     buildPersonalisedSection,
+    buildPlaceholderSection,
     buildQuickLinksSection,
     buildSearchResultsSection,
 } from '../control/lib/sectionBuilders';
@@ -383,6 +385,19 @@ describe('sectionBuilders', () => {
                 title: 'Search',
                 layoutType: 'search',
             });
+        });
+    });
+
+    describe('buildPlaceholderSection', () => {
+        it('returns a populated placeholderType and classification', () => {
+            const result = buildPlaceholderSection({ section: PLACEHOLDER_SECTION_OS_MOCK, spaceLocale });
+            expect(result.placeholderType).toBeTruthy();
+            expect(result.classification).toBeTruthy();
+        });
+
+        it('returns a populated title from entryTitle', () => {
+            const result = buildPlaceholderSection({ section: PLACEHOLDER_SECTION_OS_MOCK, spaceLocale });
+            expect(result.title).toBeTruthy();
         });
     });
 });

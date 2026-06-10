@@ -1,0 +1,93 @@
+---
+parameters:
+  - name: X-LOBBY-VARIANT
+    description: Custom header for AB testing. Accepted (treatment, control, unaffected) defaults to unaffected.
+    schema:
+      type: string
+    in: header
+    required: false
+  - name: sitename
+    description: Venture name
+    schema:
+      type: string
+    in: path
+    required: true
+  - name: platform
+    description: Platform device type. Accepted values 'web', 'ios' and 'android'.
+    schema:
+      type: string
+    in: path
+    required: true
+  - name: viewslug
+    description: The slug of the view the section belongs to. When set to `bingo` or `bingo-native` the response will include `webComponentData` for the games.
+    schema:
+      type: string
+    in: path
+    required: true
+  - name: sectionid
+    description: Section id. The section MUST be an ML personalised section (e.g. `personal-suggested-games`, `because-you-played`, `recently-played`). Non-personalised sections will return a 400.
+    schema:
+      type: string
+    in: path
+    required: true
+  - name: memberid
+    in: query
+    description: Member ID of the logged-in user. Required to retrieve personalised recommendations.
+    schema:
+      type: string
+    required: true
+  - name: locale
+    in: query
+    description: Used for localization. Values are set in Contentful. Accepted values "en-GB", "en-CA", "en-US", "es-ES"
+    schema:
+      type: string
+    required: false
+  - name: offset
+    in: query
+    description: Offset for pagination. Must be a non-negative integer.
+    schema:
+      type: number
+    required: false
+  - name: limit
+    in: query
+    description: Limit for pagination. Must be a non-negative integer.
+    schema:
+      type: number
+    required: false
+get:
+  summary: Games for an ML Personalised Section
+  description: >-
+    Returns a list of games for an ML personalised section (for example `personal-suggested-games`,
+    `because-you-played`, `recently-played`). The games are ordered by the section's configured
+    `sortCriteria` (defaults to `margin_rank`). If no ML recommendations are available for the
+    user, a fallback list is returned (see `handleMissingMLRecommendations`). The section MUST
+    be of an ML personalised type; requesting this endpoint for a non-personalised section results
+    in a 400.
+  x-controller: getPersonalisedSectionGames
+  tags:
+    - PersonalisedSectionGames
+  responses:
+    "200":
+      description: A list of personalised games for the requested section.
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/personalised-section-games.yml'
+    '400':
+      $ref: '../schemas/error-responses.yml'
+    '401':
+      $ref: '../schemas/error-responses.yml'
+    '403':
+      $ref: '../schemas/error-responses.yml'
+    '404':
+      $ref: '../schemas/error-responses.yml'
+    '429':
+      $ref: '../schemas/error-responses.yml'
+    '500':
+      $ref: '../schemas/error-responses.yml'
+    '502':
+      $ref: '../schemas/error-responses.yml'
+    '503':
+      $ref: '../schemas/error-responses.yml'
+    '504':
+      $ref: '../schemas/error-responses.yml'

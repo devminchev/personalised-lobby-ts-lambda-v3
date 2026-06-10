@@ -1,4 +1,10 @@
 export { getClient, IClient, IBucket } from './lib/osClient';
+export type { BreakerConfig } from './lib/osClient';
+export { BreakerClient, BreakerOpenError, SlowOsCallError, NonTrippableError } from './lib/breakerClient';
+export type { BreakerServiceConfig, GlobalBreakerState, ServiceTier } from './lib/breakerClient';
+// getEntities is provided by libs/dynamoClient but re-exported here for backward-compat
+// with consumers that import it from 'os-client'.
+export { getEntities } from 'dynamoClient';
 export {
     errorResponseHandler,
     EmptyNavResponse,
@@ -19,7 +25,6 @@ export {
     GAMES_INDEX_ALIAS,
     GAMES_V2_INDEX,
     GAMES_V2_INDEX_ALIAS,
-    ML_BECAUSE_YOU_PLAYED_INDEX_ALIAS,
     ML_GAMES_RECOMMENDER_INDEX_ALIAS,
     ML_GAME_SHUFFLE_ALIAS,
     SECTIONS_INDEX_ALIAS,

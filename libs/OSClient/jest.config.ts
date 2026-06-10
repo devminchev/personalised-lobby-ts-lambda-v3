@@ -14,4 +14,9 @@ export default {
     coverageProvider: 'v8',
     testEnvironment: 'node',
     testMatch: ['**/tests/*.test.ts'],
+    moduleNameMapper: {
+        '^dynamoClient$': '<rootDir>/../dynamoClient/index.ts',
+        '^@contentful/node-apps-toolkit$': '<rootDir>/tests/__mocks__/emptyModule.ts',
+        '^contentful-management$': '<rootDir>/tests/__mocks__/emptyModule.ts',
+    },
 };

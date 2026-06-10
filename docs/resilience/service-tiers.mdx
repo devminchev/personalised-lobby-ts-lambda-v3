@@ -19,9 +19,28 @@ Everything else — personalisation, recommendations, search, mini-games — is 
 
 Tiers are shed in reverse order of importance:
 
-1. **Tier C** is disabled first.
+1. **Tier C** is disabled first. And it should be the LAST one to recover as pressure eases.
 2. **Tier B** is disabled next if pressure persists.
 3. **Tier A** is the last line of defence — the smallest set of endpoints that still satisfies the core user journey.
+
+**If Global Breaker Posture is `Open` all tiers return 500, the tier difference is in the recovery time and behaviour when Global Breaker Posture = `HALF_OPEN`.**
+
+Example:
+**Global Breaker Posture = `OPEN`**
+ - `Tiers A/B/C` -> all return 500
+ - `Tier A` tries to recover 1st and move in to `HALF_OPEN` (30-60s)
+ - `Tier B` tries to recover next and move in to `HALF_OPEN` (60s-90s)
+ - `Tier C` is last -> recovery attempt after (90s-120s)
+
+**Global Breaker Posture = `HALF_OPEN`**
+- `Tiers B/C` -> return 500
+- `Tier A` applies default result limit to the lambdas that support it (pagination on `/sitegames` to return limited number of results).
+- `Tier B` tries to recover and move in to `Open` (30s-60s), possibly limit number of requests it lets trough.
+- `Tier C` is last -> recovery attempt after (90s)
+
+**Global Breaker Posture = `CLOSED`**
+- -> All tiers serve data normally
+
 
 Non-live traffic does not run on the live request path and is not part of the shedding sequence; it is governed separately.
 
@@ -31,11 +50,11 @@ Endpoints required for the core user journey (browse the lobby, see a game, laun
 
 ### Endpoints
 
-- `/navigation`
-- `/view`
-- `/sitegames` (anonymous, **not** personalised)
-- `/game-config`
-- `/game-info`
+- `/navigation` — `personalisation-lobby-navigation` (GetNavigationFunction)
+- `/view` — `personalisation-lobby-view` (GetViewFunction)
+- `/sitegames` (anonymous, **not** personalised) — `personalisation-lobby-section-games` (GetGamesFunction)
+- `/game-config` — `personalisation-lobby-game-config` (GetGameConfigFunction)
+- `/game-info` — `personalisation-lobby-game-info` (GetGameInfoFunction; API path is `/games/{gamename}`)
 
 ### OpenSearch queries
 
@@ -51,9 +70,9 @@ Endpoints that improve the lobby experience (personalised lists, skin config) bu
 
 ### Endpoints
 
-- `/sectionview`
-- `/sitegames/personalised`
-- `/game-skin-config`
+- `/sectionview` — `personalisation-lobby-section-view` (GetSectionViewFunction; API path is `/section/{sectionslug}`)
+- `/sitegames/personalised` — `personalisation-lobby-personalised-section-games` (GetPersonalisedSectionGamesFunction)
+- `/game-skin-config` — `personalisation-lobby-game-skin-config` (GetGameSkinConfigFunction)
 
 ### OpenSearch queries
 
@@ -66,11 +85,13 @@ Discovery, recommendation, and personalised-extra surfaces. First to be shed und
 
 ### Endpoints
 
-- `/minigames`
-- `/search`
-- `/suggested-for-you`
-- `/personalised-extra-data`
-- `/recommended-games-on-exit`
+- `/minigames` — `personalisation-lobby-get-mini-games` (GetMiniGamesFunction)
+- `/search` — `personalisation-lobby-get-all-games-search` (GetAllGamesSearchFunction)
+- `/suggested-for-you` — `personalisation-lobby-suggested-for-you` (GetSuggestedForYouFunction)
+- `/personalised-extra-data` — `personalisation-lobby-personalised-extra-data` (GetPersonalisedExtraDataFunction)
+- `/recommended-games-on-exit` — `personalisation-lobby-recommended-games-on-exit` (GetRecommendedGamesOnExitFunction)
+- `/recently-played` — `personalisation-lobby-recently-played` (GetRecentlyPlayedFunction)
+- `/variant` — `personalisation-lobby-variant` (GetVariantFunction; API path is `/sites/{sitename}/memberid/{memberid}/variant`)
 
 ### OpenSearch queries
 
@@ -83,5 +104,7 @@ Discovery, recommendation, and personalised-extra surfaces. First to be shed und
 
 These endpoints do not serve live user traffic and are not part of the tier-based shedding model. They run for backoffice / data sync purposes only.
 
-- `/historical-game-titles`
-- `/bulk-game-data`
+- `/historical-game-titles` — GetHistoricalGameTitlesFunction (no explicit `FunctionName` in `template.yaml`; CloudFormation generates one; API path is `/sites/{sitename}/game-historical-titles`)
+- `/bulk-game-data` — `personalisation-lobby-get-bulk-game-data` (GetBulkGameDataFunction; API path is `/sites/{sitename}/platform/{platform}/get-bulk-game-data`)
+- `/historical-game-titles-handler` — PostHistoricalGameTitlesHandlerFunction (POST, on `LobbyPostApi`; no explicit `FunctionName` in `template.yaml`; CloudFormation generates one)
+- `/sync-games-payload` — `personalisation-lobby-games-payload-handler` (PostGamesPayloadFunction; POST, on `LobbyPostApi`)

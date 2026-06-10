@@ -1,0 +1,57 @@
+---
+parameters:
+  - name: sitename
+    description: Venture name
+    schema:
+      type: string
+    in: path
+    required: true
+  - name: platform
+    description: Platform device type. Accepted values 'web', 'ios' and 'android'.
+    schema:
+      type: string
+    in: path
+    required: true
+  - name: memberid
+    in: query
+    description: Member ID
+    schema:
+      type: string
+    required: true
+  - name: locale
+    in: query
+    description: Used for localization. Values are set in Contentful. Accepted values "en-GB", "en-CA", "en-US", "es-ES"
+    schema:
+      type: string
+    required: false
+get:
+  summary: Games for the ML Personalised Because You Played Section
+  description: This endpoint is for the future when we may need to show "Because You Played" games in a separate flow, and not when loading the lobby.
+  x-controller: BecauseYouPlayedGames
+  tags:
+    - BecauseYouPlayedGames
+  responses:
+    "200":
+      description: A list of Because You Played games for the user. The suggestions come either from Machine Learning or if there are no ML suggestions for the user an empty array is returned.
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/because-you-played-games.yml'
+    '400':
+      $ref: '../schemas/error-responses.yml'
+    '401':
+      $ref: '../schemas/error-responses.yml'
+    '403':
+      $ref: '../schemas/error-responses.yml'
+    '404':
+      $ref: '../schemas/error-responses.yml'
+    '429':
+      $ref: '../schemas/error-responses.yml'
+    '500':
+      $ref: '../schemas/error-responses.yml'
+    '502':
+      $ref: '../schemas/error-responses.yml'
+    '503':
+      $ref: '../schemas/error-responses.yml'
+    '504':
+      $ref: '../schemas/error-responses.yml'

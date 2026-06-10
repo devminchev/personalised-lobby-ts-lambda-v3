@@ -1,0 +1,39 @@
+---
+parameters:
+  - name: sitename
+    description: The name of the Venture
+    schema:
+      type: string
+    in: path
+    required: true
+  - name: platform
+    description: Platform device type. Accepted values 'web', 'ios' and 'android'.
+    schema:
+      type: string
+    in: path
+    required: true
+  - name: locale
+    in: query
+    description: Used for localisation. Values are set in Contentful. Accepted values "en-GB", "es-ES"
+    schema:
+      type: string
+    required: false
+get:
+  summary: Game Shuffle
+  description: Returns 3 lists of games based on rtp requirements. TileOne games with <= 93% rtp, TileTwo and TileThree has games with < 96% rtp.
+  x-controller: GetGameShuffle
+  tags:
+    - GameShuffle
+  responses:
+    "200":
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/game-shuffle.yml'
+      description: A JSON object of game config data
+    '400':
+      $ref: '../schemas/error-responses.yml'
+    '404':
+      $ref: '../schemas/error-responses.yml'
+    '500':
+      $ref: '../schemas/error-responses.yml'

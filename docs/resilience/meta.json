@@ -2,6 +2,17 @@
   "title": "Resilience",
   "pages": [
     "index",
-    "service-tiers"
+    "service-tiers",
+    "circuit-breaker-overview",
+    "circuit-breaker-state-machine",
+    "circuit-breaker-alarms",
+    "circuit-breaker-behaviour",
+    "circuit-breaker-data-model",
+    "circuit-breaker-consumer-integration",
+    "consistency-and-concurrency",
+    "circuit-breaker-runbook",
+    "glossary",
+    "configuration-store-decision",
+    "adr"
   ]
 }

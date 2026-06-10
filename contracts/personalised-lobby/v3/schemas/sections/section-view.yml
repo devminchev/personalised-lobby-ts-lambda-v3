@@ -1,0 +1,23 @@
+title: SectionViewResponse
+description: Response for expanded section view as per sectionSlug
+type: object
+required:
+  - classification
+  - title
+  - layoutType
+  - games
+properties:
+  title:
+    type: string
+    description: Title of the section view
+  classification:
+    type: string
+    description: Classification for the section view. Can be, but not limited to, [`GameSection`, `JackpotSection`]
+  layoutType:
+    type: string
+    description: >
+      Layout type for the section view. Can be one of
+      [`grid-a`, `grid-e`, `grid-a-expanded-jackpot`, `grid-e-expanded-jackpot`].
+      `grid-a-expanded-jackpot` and `grid-e-expanded-jackpot` are a special case only for jackpot section view showing all games.
+  games:
+    $ref: "../section-games-auth.yml"

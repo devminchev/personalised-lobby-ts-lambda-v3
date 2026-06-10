@@ -2,6 +2,95 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.61.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/os-client-0.60.2...os-client-0.61.0) (2026-06-09)
+
+
+### Features
+
+* **gtech-1322058:** circuit breaker global posture setup testing on stg infra with prod load ([8093a29](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/8093a294e2c3f1d7406b15aba7e4e132c270c676))
+
+## [0.60.2](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/os-client-0.60.1...os-client-0.60.2) (2026-06-09)
+
+
+### Bug Fixes
+
+* **gtech-1320927:** default to tier c if no tier specified ([3d819b5](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/3d819b5eb226db63ad850f324087e4b697417497))
+
+## [0.60.1](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/os-client-0.60.0...os-client-0.60.1) (2026-06-05)
+
+
+### Bug Fixes
+
+* **gtech-1322058:** circuit breaker global posture setup testing on stg infra with prod load ([be30a01](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/be30a01c58ad551b9d141bf398b1a396f0d89f3c))
+
+## [0.60.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/os-client-0.59.0...os-client-0.60.0) (2026-06-05)
+
+### Dependency Updates
+
+* `dynamoClient` updated to version `0.1.0`
+
+### Features
+
+* **gtech-1322058:** circuit breaker global posture setup testing on stg infra with prod load ([d07fd7a](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/d07fd7a700dfb545dd8d6ab6663e2ad33ccaf9ce))
+
+## [0.59.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/os-client-0.58.0...os-client-0.59.0) (2026-06-03)
+
+### Dependency Updates
+
+* `dynamoClient` updated to version `0.1.0`
+
+### Features
+
+* **gtech-1319757:** upgrade lambda node version to lts ([af44b88](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/af44b886b04e87327753f172dd91c67fba5764ab))
+
+## [0.58.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/os-client-0.57.1...os-client-0.58.0) (2026-06-02)
+
+### Dependency Updates
+
+* `dynamoClient` updated to version `0.1.0`
+
+### Features
+
+* **gtech-1320927:** lobby api lambdas to be able to get global breaker state ([a645e28](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/a645e284292ba9076283c26b1c49e133aa1840aa))
+
+## [0.57.1](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/os-client-0.57.0...os-client-0.57.1) (2026-05-20)
+
+## [0.57.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/os-client-0.56.1...os-client-0.57.0) (2026-05-20)
+
+
+### Features
+
+* **gtech-1322515:** remove deprecated because you played function ([9ab19bc](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/9ab19bc9bc4f7c464e4d6ce18b9295d32f5f737c))
+
+## [0.56.1](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/os-client-0.56.0...os-client-0.56.1) (2026-05-14)
+
+## [0.56.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/os-client-0.55.0...os-client-0.56.0) (2026-05-08)
+
+
+### Features
+
+* **gtech-1321876:** include rgs provider code in contentful api for closing game rounds ([60f21e6](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/60f21e6d569bf285801f4f10d26e587c72ec4abd))
+
+## [0.55.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/os-client-0.54.1...os-client-0.55.0) (2026-05-08)
+
+
+### Features
+
+* **gtech-1322103:** add sigcons to game info endpoint ([07754ff](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/07754ffa50af0d795f90739a724ea503fe0f1f99))
+
+## [0.54.1](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/os-client-0.54.0...os-client-0.54.1) (2026-05-01)
+
+## [0.54.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/os-client-0.53.4...os-client-0.54.0) (2026-05-01)
+
+
+### Features
+
+* **gtech-1319733:** add sigcons lines to game model and lambda responses ([ac3ef91](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/ac3ef9140a89291c720a5475b95914f582c1a89f))
+
+## [0.53.4](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/os-client-0.53.3...os-client-0.53.4) (2026-04-29)
+
+## [0.53.3](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/os-client-0.53.2...os-client-0.53.3) (2026-04-28)
+
 ## [0.53.2](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/os-client-0.53.1...os-client-0.53.2) (2026-04-24)
 
 ## [0.53.1](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/os-client-0.53.0...os-client-0.53.1) (2026-04-24)

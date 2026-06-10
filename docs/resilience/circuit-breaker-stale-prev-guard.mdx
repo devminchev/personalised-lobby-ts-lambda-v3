@@ -1,0 +1,66 @@
+---
+title: Circuit-breaker stale prev guard
+description: How the controller and the consumer client guard against acting on DynamoDB records whose holdUntil has already elapsed — the resolveEffectivePrev write-time guard and the fetchGlobalState read-time promotion
+---
+
+# Circuit Breaker — Stale `prev` State Guard
+
+## Problem
+
+The `PostCloudWatchController` alarm-event path reads the current breaker state from DynamoDB (`prev`), evaluates the incoming alarm, and writes a new state item. The scheduled tick is the only mechanism that promotes `OPEN → HALF_OPEN` — it runs on a schedule and explicitly checks whether `holdUntil` has elapsed before writing the transition.
+
+If the tick fires but the Lambda is cold, or if a burst of alarms arrives before the tick can run, `prev.state` in DDB may still be `'OPEN'` even though `holdUntil` has already passed. Without a guard, the alarm-event path branches on `prev.state === 'OPEN'` and takes the `open_partial_clear` path, which re-writes `holdUntil: prev.holdUntil` (the already-expired timestamp) back to DDB. The next alarm event hits the same branch, writing the same expired value again. **The breaker is permanently stuck OPEN.**
+
+## Fix — `resolveEffectivePrev`
+
+```typescript
+function resolveEffectivePrev(
+    prev: BreakerStateItem | undefined,
+    now: string,
+): BreakerStateItem | undefined {
+    if (prev?.holdUntil && prev.holdUntil < now) return undefined;
+    return prev;
+}
+```
+
+Called at the top of `determineNextState` before any state branching. Any `prev` record whose `holdUntil` has already elapsed is discarded — treated as if there is no prior record. The alarm event then re-evaluates from a clean baseline.
+
+- `CLOSED` has no `holdUntil` and always passes through unchanged.
+- `OPEN` or `HALF_OPEN` with elapsed `holdUntil` → `undefined` → fresh evaluation.
+- Valid `OPEN` or `HALF_OPEN` (holdUntil in the future) → passed through unchanged.
+
+## Invariant
+
+> No state item written by `determineNextState` may have a `holdUntil` value in the past.
+
+Because `resolveEffectivePrev` discards stale records before branching, the `open_partial_clear` branch can only be reached when `prev.holdUntil` is guaranteed to be in the future. The re-written `holdUntil` is therefore always valid.
+
+## Relationship to `fetchGlobalState`
+
+`breakerClient.ts` independently applies the same principle on the consumer side. `fetchGlobalState` checks `holdUntil` on the DDB record before caching the global posture in `this.globalState`:
+
+| Stored state | `holdUntil` condition | Cached as |
+|---|---|---|
+| `OPEN` | elapsed (`< now`) | `HALF_OPEN` — cooldown expired; Tier A probe allowed |
+| `HALF_OPEN` | elapsed (`< now`) | `CLOSED` — probe window expired; fail-open |
+| Any state | in future or absent | unchanged |
+
+This prevents a Lambda cold-starting hours after an incident from caching a stale `OPEN` or `HALF_OPEN` and blocking traffic indefinitely if the scheduled tick was delayed or missed. `resolveEffectivePrev` is a write-time guard in the controller; `fetchGlobalState` is a read-time guard in the consumer. Both enforce the same `holdUntil` invariant from their respective positions in the system.
+
+## Reason string format
+
+The `reason` field on every written state item uses `ControllerAction` as its prefix:
+
+```
+<ControllerAction>:<severityReason>        // alarm-event path
+<ControllerAction>                         // tick path (no severity suffix)
+```
+
+Examples:
+- `opened:critical_signal:os-search-rejections`
+- `open_partial_clear:single_warning:api-5xx`
+- `closed:breaker:GLOBAL:os-search-rejections`
+- `cooldown_expired_probe`
+- `half_open_timeout`
+
+This keeps `action` and `reason` consistent by construction — the prefix of `reason` is always the string value of the `action` field on the same record.

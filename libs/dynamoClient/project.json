@@ -1,0 +1,40 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "name": "dynamoClient",
+  "sourceRoot": "libs/dynamoClient",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nx/esbuild:esbuild",
+      "outputs": [
+        "{options.outputPath}"
+      ],
+      "options": {
+        "outputPath": "dist/libs/dynamoClient",
+        "main": "libs/dynamoClient/index.ts",
+        "tsConfig": "libs/dynamoClient/tsconfig.json",
+        "platform": "node",
+        "bundle": true,
+        "format": [
+          "cjs"
+        ],
+        "target": "node24",
+        "skipTypeCheck": false,
+        "packageManager": "npm"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "options": {
+        "lintFilePatterns": [
+          "libs/dynamoClient/**/*.ts"
+        ]
+      }
+    }
+  },
+  "tags": [
+    "type:lib",
+    "scope:pl"
+  ],
+  "version": "0.1.0"
+}

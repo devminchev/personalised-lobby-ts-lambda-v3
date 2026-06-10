@@ -1,0 +1,32 @@
+title: IG Grid C Section
+description: Section with grid C
+required:
+  - entryId
+  - classification
+  - layoutType
+  - title
+properties:
+  entryId:
+    description: Unique id for the IG Grid C section
+    type: string
+  classification:
+    description: Classification type of the section
+    type: string
+  title:
+    description: Localized title for the section
+    type: string
+  hasGames:
+    description: Flag to indicate if this section has games
+    type: boolean
+  layoutType:
+    description: Layout type (fixed to grid-c)
+    type: string
+  media:
+    description: Media url
+    type: string
+  bynderMedia:
+    description: Bynder media object
+    $ref: '../bynderImage.yaml'
+  viewAll:
+    type: object
+    $ref: '../view-all-action.yml'

@@ -1,0 +1,170 @@
+---
+title: Circuit-breaker state machine
+description: Formal spec for the CLOSED / OPEN / HALF_OPEN state machine — states, transitions, transition guards, mode mapping, and the persisted fields that drive each
+---
+
+# Circuit-breaker state machine
+
+The controller is a finite-state machine over three states: **CLOSED**, **OPEN**, and **HALF_OPEN**. Every alarm event and every scheduled tick maps to at most one transition. This page is the formal spec — the type definitions live in [`functions/PostCloudWatchController/src/types.ts`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/types.ts) and the transition logic lives in [`functions/PostCloudWatchController/src/statemachine.ts`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/statemachine.ts).
+
+For scenario walk-throughs of these transitions firing under realistic load, see [Circuit-breaker behaviour](./circuit-breaker-behaviour.mdx).
+
+## States
+
+| State | Meaning | Consumer mode |
+|---|---|---|
+| `CLOSED` | Healthy. The lobby is serving normal traffic. | `normal` |
+| `OPEN` | Tripped. Compound severity says the stack is under pressure; consumers should shed non-critical traffic. | `protect` |
+| `HALF_OPEN` | Probing. Cooldown has elapsed; we are letting the stack recover but still holding consumers in the shed mode until we have evidence of recovery. | `protect` |
+
+`OPEN` and `HALF_OPEN` map to the **same** consumer-visible `mode` (`protect`). That is deliberate: consumers should not see sub-minute flapping between two protect-shaped states. See [Consumer integration](./circuit-breaker-consumer-integration.mdx) for what to read.
+
+## Persisted fields driving the machine
+
+Each transition writes a fresh `BreakerStateItem` ([types.ts](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/types.ts)). The fields that participate in subsequent transitions:
+
+| Field | Type | Role |
+|---|---|---|
+| `state` | `'CLOSED' \| 'OPEN' \| 'HALF_OPEN'` | The current state. |
+| `mode` | `'normal' \| 'protect'` | Consumer-visible derivative of `state`. |
+| `version` | `number`, monotonically incremented on every write | Optimistic-concurrency token (see [Consistency and concurrency](./consistency-and-concurrency.mdx)). |
+| `holdUntil` | ISO 8601 string, optional | Earliest time the next state-evolving transition is permitted. Used by the tick to gate OPEN→HALF_OPEN and the two HALF_OPEN exits (→CLOSED or →OPEN). |
+| `healthyProbeCount` | `number` | Counts consecutive OK alarm events received while in HALF_OPEN. Closes the breaker when ≥ `healthyOkEventsToClose`. Reset to 0 on `CLOSED` or a fresh `OPEN`. |
+| `tripCount` | `number`, monotonic | Increments only on a *new* trip (`prev.state !== 'OPEN' && next.state === 'OPEN'`). Stays put on OPEN→OPEN sustains. Useful for "how many times has this breaker tripped historically". |
+| `openedByAlarm` | `{ alarmName, fromState, toState }`, optional | The alarm whose state change drove the most recent OPEN transition. **Overwritten on every OPEN write** (fresh trip, OPEN→OPEN sustain, HALF_OPEN→OPEN re-trip — see [`buildOpenTransition`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/statemachine.ts)). Preserved unchanged through OPEN→HALF_OPEN and HALF_OPEN→HALF_OPEN; cleared when the breaker reaches CLOSED. So at any moment in OPEN/HALF_OPEN it identifies *the latest alarm that drove an OPEN evaluation*, not necessarily the first one of the incident. |
+| `reason` | string, written every transition | Human-readable + machine-parseable label for *why* this transition fired. Format: `<action>:<severityDetail>` for alarm-event transitions, `<action>` alone for tick transitions (e.g. `opened:critical_signal:os-search-rejections`, `half_open_timeout`, `open_partial_clear:single_warning:cpu-high`). |
+| `updatedAt` | ISO 8601 string | When this state row was written. |
+| `updatedBy` | `'controller'` for automatic transitions, `<actor>` for manual override | Audit trail. |
+
+The auxiliary `SignalStateItem` ([types.ts](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/types.ts)) holds the **set of currently-active alarm signals**, keyed by signal name. Severity is computed across this whole set, not just the alarm that triggered the current invocation. See [Data model](./circuit-breaker-data-model.mdx) for the persisted shape.
+
+## Compound severity scoring
+
+Before any transition the controller computes a `SeverityResult` from the active-signals snapshot ([index.ts](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/index.ts)):
+
+| Active signals | Score | `shouldOpen` | Resulting `reason` segment |
+|---|---|---|---|
+| Any `CRITICAL_SIGNALS` member | `HIGH` | `true` | `critical_signal:<csv>` |
+| 2+ `WARNING_SIGNALS` members | `MEDIUM_HIGH` | `true` | `compound_warning:<csv>` |
+| 1 `WARNING_SIGNALS` member | `LOW` | `false` | `single_warning:<name>` |
+| Empty | `NONE` | `false` | `all_signals_ok` |
+
+The signal-set membership is defined in [`src/config.ts`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/config.ts):
+
+```ts
+export const CRITICAL_SIGNALS = new Set(['os-search-rejections', 'os-write-rejections']);
+export const WARNING_SIGNALS  = new Set(['api-p99', 'api-5xx', 'jvm-pressure', 'cpu-high']);
+```
+
+> The `score` field is computed but **not currently persisted** on `BreakerStateItem`. Persisting it is on the roadmap — it would let consumers do tier-aware shedding ("HIGH → drop Tier B+C; MEDIUM_HIGH → drop only C") rather than the binary protect/normal split today. See [Consumer integration](./circuit-breaker-consumer-integration.mdx#future-tier-aware-shedding).
+
+## Transitions
+
+There are two trigger types: **alarm events** (CloudWatch alarm state-change events delivered via EventBridge) and **tick events** (the 1-minute scheduled invocation). The transition tables below are the spec; the implementation lives in [`statemachine.ts`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/statemachine.ts) (alarm path) and [`index.ts`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/index.ts) (tick path).
+
+### Alarm-event transitions
+
+Triggered by any state change of a `breaker:*` CloudWatch alarm (ALARM, OK, or INSUFFICIENT_DATA).
+
+The active-signals snapshot is mutated first: if the incoming event's `state.value === 'ALARM'` the signal is added (or refreshed); otherwise (OK or INSUFFICIENT_DATA) it is removed. Then the snapshot is pruned for stale entries (see "Zombie pruning" below) before severity is recomputed.
+
+The `action` column below is the label returned to the Lambda caller (used for logging / metrics) — it is **not** persisted on `BreakerStateItem`. The persisted `reason` and the returned `action` are distinct fields; both are listed because runbooks and audit queries reference both.
+
+| Current state | `shouldOpen` | Incoming alarm value | Next state | `action` (returned) | `reason` (persisted) | Notes |
+|---|---|---|---|---|---|---|
+| `CLOSED` / `HALF_OPEN` | `true` | any | `OPEN` | `opened` | `opened:<severity_reason>` | Sets `holdUntil = now + openHoldMs`. |
+| `OPEN` | `true` | any | `OPEN` | `open_sustained` | `open_sustained:<severity_reason>` | The existing `holdUntil` is preserved (not extended on re-fire). |
+| `HALF_OPEN` | `false` | `ALARM` | `OPEN` | `half_open_retripped` | `half_open_retripped:<severity_reason>` | Any new ALARM during a probe re-trips the breaker, even if compound severity alone says don't open. |
+| `HALF_OPEN` | `false` | non-ALARM (OK, INSUFFICIENT_DATA) | `HALF_OPEN` (probe) or `CLOSED` (close) | `half_open_progress` or `closed` | `half_open_progress:<alarmName>` or `closed:<alarmName>` | `healthyProbeCount + 1`; close when `≥ healthyOkEventsToClose` (default 2). |
+| `OPEN` | `false` | any | `OPEN` | `open_partial_clear` | `open_partial_clear:<severity_reason>` | An OK arriving while OPEN never closes the breaker directly — the tick drives the close via HALF_OPEN. |
+| `CLOSED` | `false` | any | `CLOSED` | `closed_no_change` (or `initialized_closed` on first-ever write) | `closed_no_change:<severity_reason>` (or `initialized_closed:<severity_reason>`) | Steady-state. |
+
+### Tick-event transitions
+
+Triggered every 60 s by EventBridge Scheduler. The tick is a no-op when the breaker is already CLOSED ([index.ts](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/index.ts)). Otherwise:
+
+Each tick outcome carries its own `action` value: `cooldown_expired_probe` for the OPEN→HALF_OPEN promotion, `half_open_timeout` for either HALF_OPEN exit, and `scheduled_recovery_tick` for no-op ticks. For state-changing ticks the persisted `reason` equals the `action` string (no severity suffix); no-op ticks do not write to DynamoDB.
+
+| Current state | Guard | Next state | `action` (returned) | `reason` (persisted) |
+|---|---|---|---|---|
+| `CLOSED` | — | `CLOSED` (no read) | `scheduled_recovery_tick` | — (no write) |
+| `OPEN` | `now ≥ holdUntil` | `HALF_OPEN` | `cooldown_expired_probe` | `cooldown_expired_probe`. Sets `holdUntil = now + halfOpenMaxMs`. |
+| `OPEN` | `now < holdUntil` | `OPEN` (no write) | `scheduled_recovery_tick` | — (no write) |
+| `HALF_OPEN` | `now ≥ holdUntil` AND pruned signals empty | `CLOSED` | `half_open_timeout` | `half_open_timeout`. Clears `holdUntil`. |
+| `HALF_OPEN` | `now ≥ holdUntil` AND pruned signals not empty | `OPEN` | `half_open_timeout` | `half_open_timeout`. Sets `holdUntil = now + openHoldMs`. |
+| `HALF_OPEN` | `now < holdUntil` | `HALF_OPEN` (no write) | `scheduled_recovery_tick` | — (no write) |
+
+The `holdUntil` semantics differ between the two HALF_OPEN exits: closing via the **probe path** (alarm-event) requires `healthyOkEventsToClose` consecutive OKs and ignores `holdUntil`; closing via the **timeout path** (tick) requires `now ≥ holdUntil` AND an empty pruned-signal set. The two paths exist because alarms are edge-triggered (see [ADR-005](./adr/005-edge-triggered-with-tick.mdx)).
+
+The HALF_OPEN-expiry tick (the bottom two rows above) also persists the pruned `SIGNAL_STATE#CURRENT` item atomically alongside the state transition — see [`handleScheduledTick`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/index.ts). The OPEN→HALF_OPEN tick (the first OPEN row) and an alarm event with `holdUntil` not yet expired do not need to touch the signal item. This means a tick that recovers the breaker from a stuck-with-zombies state cleans both `STATE#CURRENT` and `SIGNAL_STATE#CURRENT` in the same transaction, rather than leaving the DB signal item dirty until the next alarm event happens to overwrite it.
+
+
+## Tunable knobs
+
+The four timing knobs that participate in transitions are all sourced from [SSM Parameter Store](./configuration-store-decision.mdx) and can be tuned without a redeploy. Defaults in `template.yaml`:
+
+| SSM leaf | TS field | Default | Effect |
+|---|---|---|---|
+| `OPEN_HOLD_MS` | `openHoldMs` | 60000 (60 s) | Minimum dwell in OPEN before the tick can probe. Gate against rapid OPEN/HALF_OPEN flap. |
+| `HALF_OPEN_MAX_MS` | `halfOpenMaxMs` | 120000 (120 s) | Maximum dwell in HALF_OPEN before the tick re-evaluates against `SIGNAL_STATE`. |
+| `HEALTHY_OK_EVENTS_TO_CLOSE` | `healthyOkEventsToClose` | 2 | Consecutive OK alarm events during HALF_OPEN required to close via the probe path. |
+| `STALE_EVENT_MS` | `staleEventMs` | 600000 (10 min) | Alarm events older than this are dropped on receipt (`isExpired`). Set to 0 in tests/local. |
+
+Two derived values are not independently tunable:
+
+- `signalMaxAgeMs` defaults to `2 × staleEventMs` and is overrideable only via the `SIGNAL_MAX_AGE_MS` env var. Used by zombie pruning (below).
+- `holdUntil` is computed at write time from `now + openHoldMs` (or `+ halfOpenMaxMs`). It is not stored as a duration.
+
+## Zombie pruning
+
+The active-signals map can accumulate orphan entries: a signal whose closing OK event never arrived (EventBridge drop, signal renamed without cleanup, the OK event arrived too old and got rejected by the freshness guard). Without protection these orphans would force `hasActiveSignals === true` on every HALF_OPEN expiry tick and pin the breaker OPEN forever.
+
+[`pruneStaleSignals`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/helpers.ts) drops any signal whose `updatedAt` is older than `signalMaxAgeMs` (default = 2× `staleEventMs` = 20 min). Pruning runs on two paths, and on both the cleaned snapshot is **persisted back to DynamoDB** in the same transaction as the state write — so a zombie cleared in memory is also cleared on disk:
+
+1. Inside `handleAlarmEvent`, after merging the incoming signal and before computing severity ([index.ts](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/index.ts)). The result is written via `transactWriteEvaluation`, which always includes the `SIGNAL_STATE#CURRENT` Put.
+2. Inside `handleScheduledTick`'s HALF_OPEN-expiry branch, before the `hasActiveSignals` check ([index.ts](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/index.ts)). The result is written via `putStateAndHistory`'s optional `signalState` parameter ([index.ts](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/index.ts)) — the same atomic transaction that flips the breaker state, so an entry that was stale enough to recover the breaker via the timeout path is also removed from the DB at the same instant.
+
+Pruning is **disabled** when `signalMaxAgeMs <= 0` — used by tests that turn off the freshness guard entirely. Production code paths always have it on.
+
+## Manual override
+
+`setBreakerStateManually` ([index.ts](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/index.ts)) is the operator escape hatch. It accepts any service name (the `parseAlarmName` `GLOBAL`-collapse does not apply here — the function takes `service` as an argument and writes to `BREAKER#<service>` directly), forces a target state, and writes with the same optimistic-concurrency guard as the automatic paths. The `updatedBy` field is set to the actor argument so the audit trail distinguishes operator overrides from automatic transitions.
+
+The override does **not** mutate `SIGNAL_STATE#CURRENT`. If the underlying signals still indicate trouble, a subsequent automatic alarm event or tick will re-evaluate and may flip the state back. The override is therefore "set the posture for the next ~minute"; if you need it to stick, you also need to address whatever is keeping the signals active.
+
+See the [Runbook](./circuit-breaker-runbook.mdx#manual-override) for the operator workflow.
+
+## `action` and `reason` fields
+
+Every state item written to DynamoDB carries two diagnostic fields.
+
+**`action`** is a `ControllerAction` enum value that names the categorical outcome of the transition (e.g. `opened`, `open_partial_clear`, `half_open_timeout`). The full set of values is documented in [`types.ts`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/types.ts).
+
+**`reason`** is a structured string built as `<action>:<severityDetail>` for alarm-event transitions, and just `<action>` for tick transitions. The prefix of `reason` is always the string value of `action` on the same record — the two fields are consistent by construction.
+
+Examples:
+
+| `action` | `reason` |
+|---|---|
+| `opened` | `opened:critical_signal:os-search-rejections` |
+| `open_partial_clear` | `open_partial_clear:single_warning:api-5xx` |
+| `closed` | `closed:breaker:GLOBAL:os-search-rejections` |
+| `cooldown_expired_probe` | `cooldown_expired_probe` |
+| `half_open_timeout` | `half_open_timeout` |
+
+The `severityDetail` suffix mirrors the `SeverityResult.reason` computed in `computeSeverityScore` — it identifies the signal category and the specific alarm names that drove the score.
+
+For the stale-`prev` guard that ensures expired DDB records cannot influence transitions, see [Stale prev guard](./circuit-breaker-stale-prev-guard.mdx).
+
+## Invariants
+
+The behaviour doc lists six [observable invariants](./circuit-breaker-behaviour.mdx#invariants-that-hold-across-all-scenarios). Restated as state-machine guarantees they are:
+
+1. **`version` is monotonically increasing.** Every transition writes `prev.version + 1` ([statemachine.ts](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/statemachine.ts)). A consumer that observes a decrease has read across an unsupported rollback.
+2. **`tripCount` is monotonic and counts only fresh trips.** OPEN→OPEN does not increment ([statemachine.ts](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/statemachine.ts)).
+3. **`mode` only flips back to `normal` via a HALF_OPEN→CLOSED transition.** OPEN→HALF_OPEN and HALF_OPEN→OPEN both stay `protect`.
+4. **`healthyProbeCount` is bounded by `healthyOkEventsToClose`.** It is reset to 0 on CLOSED and on every fresh OPEN, and reaching the threshold immediately closes the breaker.
+5. **`openedByAlarm` is set (or overwritten) on every OPEN write, preserved through OPEN→HALF_OPEN and HALF_OPEN→HALF_OPEN, cleared on CLOSED.** Consumers can read it as "the most recent alarm that drove an OPEN transition during this incident" — not "the first alarm that opened the breaker", because OPEN→OPEN sustains overwrite it with the new alarm's details.
+6. **`holdUntil` is always in the future on OPEN/HALF_OPEN, undefined on CLOSED.** The tick never advances time backward.
+
+Any violation of these is a controller bug; the unit tests in [`tests/app.test.ts`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/tests/app.test.ts) assert on each.

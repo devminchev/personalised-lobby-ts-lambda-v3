@@ -1,0 +1,5 @@
+title: Live Dealer
+description: Game type
+properties:
+  type:
+    type: string

@@ -1,0 +1,44 @@
+---
+parameters:
+  - name: sitename
+    description: Venture name
+    schema:
+      type: string
+    in: path
+    required: true
+  - name: locale
+    in: query
+    description: Used for localization. Values are set in Contentful. Accepted values "en-GB", "en-CA", "en-US", "es-ES"
+    schema:
+      type: string
+    required: false
+get:
+  summary: Historical Game titles (Internal API)
+  x-controller: getHistoricalGameTitles
+  tags:
+    - HistoricalGameTitles
+  responses:
+    "200":
+      description: List of historical game titles for a specified venture
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/historical-game-titles-list.yml'
+    '400':
+      $ref: '../schemas/error-responses.yml'
+    '401':
+      $ref: '../schemas/error-responses.yml'
+    '403':
+      $ref: '../schemas/error-responses.yml'
+    '404':
+      $ref: '../schemas/error-responses.yml'
+    '429':
+      $ref: '../schemas/error-responses.yml'
+    '500':
+      $ref: '../schemas/error-responses.yml'
+    '502':
+      $ref: '../schemas/error-responses.yml'
+    '503':
+      $ref: '../schemas/error-responses.yml'
+    '504':
+      $ref: '../schemas/error-responses.yml'

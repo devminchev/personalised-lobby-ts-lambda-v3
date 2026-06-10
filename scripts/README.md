@@ -42,7 +42,7 @@ The updater will:
 
 ### CI Notes
 
-- `lbe-version-tracker` is pre-installed in the `NODE_20` CI image
+- `lbe-version-tracker` is pre-installed in the `NODE_24` CI image
 - Credentials/region come from GitLab CI variables: `VD_AWS_ACCESS_KEY_ID`, `VD_AWS_SECRET_ACCESS_KEY`, `VD_AWS_DEFAULT_REGION`
 - Legacy bash scripts (`version_bulk_update.sh`, `version_update.sh`, `version_read.sh`, `env.sh`) were removed
 

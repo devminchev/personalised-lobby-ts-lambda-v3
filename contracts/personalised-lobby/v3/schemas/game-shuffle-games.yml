@@ -1,0 +1,67 @@
+title: games
+type: object
+required:
+    - entryId
+    - gameId
+    - name
+    - title
+    - gameSkin
+properties:
+  entryId:
+    type: string
+    description: The unique id of the sitegame
+  gameId:
+    type: string
+    description: The unique id of the game
+  name:
+    type: string
+    description: Name for the site game
+  title:
+    type: string
+    description: Title for the site game
+  gameSkin:
+    type: string
+    description: The skin used for the game presentation
+  demoUrl:
+    type: string
+    description: URL for the demo version of the game
+  realUrl:
+    type: string
+    description: URL for the real game play
+  imgUrlPattern:
+    type: string
+    description: URL pattern for image of the site game
+  loggedOutImgUrlPattern:
+    type: string
+    description: Pattern for generating game images when logged out
+  representativeColor:
+    type: string
+    description: The representative color for the game, usually a hex code
+  headlessJackpot:
+    type: object
+    description: Object containing headless jackpot details
+    properties:
+      name:
+        type: string
+        description: Name of the headless jackpot
+      id:
+        type: integer
+        description: Identifier for the headless jackpot
+  animationMedia:
+    description: Type of animation (animated or default).
+    type: string
+  loggedOutAnimationMedia:
+    description: Type of animation (animated or default).
+    type: string
+  foregroundLogoMedia:
+    description: Bynder image object.
+    $ref: './bynderImage.yaml'
+  loggedOutForegroundLogoMedia:
+    description: Bynder image object.
+    $ref: './bynderImage.yaml'
+  backgroundMedia:
+    description: Bynder image object.
+    $ref: './bynderImage.yaml'
+  loggedOutBackgroundMedia:
+    description: Bynder image object.
+    $ref: './bynderImage.yaml'

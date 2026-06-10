@@ -1,7 +1,7 @@
 {
   "body": "",
-  "resource": "/sites/{sitename}/platform/{platform}/view/{viewslug}/sections/{sectionid}/sitegames?memberid={memberId}",
-  "path": "/sites/ballybeton/platform/web/view/homepage/sections/7zmX9bl8f05ZdeaHBqPkyD/sitegames?memberid=21252525&locale=en-GB",
+  "resource": "/sites/{sitename}/platform/{platform}/view/{viewslug}/sections/{sectionid}/sitegames",
+  "path": "/sites/ballybeton/platform/web/view/homepage/sections/7zmX9bl8f05ZdeaHBqPkyD/sitegames?locale=en-GB",
   "httpMethod": "GET",
   "isBase64Encoded": false,
   "pathParameters": {
@@ -11,7 +11,6 @@
     "platform": "web"
   },
   "queryStringParameters": {
-    "memberid": "21252525",
     "locale": "en-US"
   },
   "stageVariables": {},
@@ -55,8 +54,8 @@
       "userAgent": "Custom User Agent String",
       "user": null
     },
-    "path": "/sites/ballybeton/platform/web/view/homepage/sections/7zmX9bl8f05ZdeaHBqPkyD/sitegames?member=21252525",
-    "resourcePath": "/sites/{sitename}/platform/{platform}/view/{viewslug}/sections/{sectionid}/sitegames?member={memberId}",
+    "path": "/sites/ballybeton/platform/web/view/homepage/sections/7zmX9bl8f05ZdeaHBqPkyD/sitegames",
+    "resourcePath": "/sites/{sitename}/platform/{platform}/view/{viewslug}/sections/{sectionid}/sitegames",
     "httpMethod": "get",
     "apiId": "13267801567890",
     "protocol": "HTTP/1.1"

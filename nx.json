@@ -1,11 +1,11 @@
 {
   "installation": {
-    "version": "20.7.0",
+    "version": "20.8.4",
     "plugins": {
-      "@nx/eslint": "20.7.0",
-      "@nx/jest": "20.7.0",
-      "@nx/js": "20.7.0",
-      "@nx/node": "20.7.0"
+      "@nx/eslint": "20.8.4",
+      "@nx/jest": "20.8.4",
+      "@nx/js": "20.8.4",
+      "@nx/node": "20.8.4"
     }
   },
   "affected": {
@@ -45,7 +45,7 @@
         "format": [
           "cjs"
         ],
-        "target": "node20",
+        "target": "node24",
         "sourcemap": true,
         "minify": true,
         "outputFileName": "app.cjs",

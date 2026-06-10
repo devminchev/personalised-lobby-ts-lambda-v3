@@ -1,0 +1,225 @@
+summary: "View Example"
+value:
+  name: "Poker"
+  viewSlug: "poker"
+  classification: "general"
+  topContent:
+    - entryId: "123"
+      classification: "QuickLinksSection"
+      layoutType: "carousel-pill"
+      links:
+        - label: "New Games"
+          viewSlug: "new-games"
+          url: "test-data"
+          image: "test-data"
+        - label: "Slots"
+          viewSlug: "slots"
+          url: "test-data"
+          bynderImage: { ...}
+    - entryId: "123"
+      classification: "PersonalisedSection"
+      title: "Because you played X"
+      hasGames: true
+      layoutType: "carousel-a"
+      type: "because-you-played-x"
+      viewAll:
+        viewAllActionSlug: "because-you-played"
+        viewAllActionType: "section"
+        viewAllActionText: "View All"
+
+    - entryId: "123"
+      classification: "PersonalisedSection"
+      title: "Recently Played Games"
+      hasGames: true
+      layoutType: "carousel-a"
+      type: "recently-played"
+
+    - entryId: "123"
+      classification: "MarketingSection"
+      title: "Your Promotions"
+      displayType: "full"
+      elements:
+        - entryId: "124"
+          title: "Box Bonanza Game"
+          image: "https://example.com/banner1.jpg"
+          bannerLink: "https://example.com/promo1"
+        - entryId: "256"
+          title: "Second Promxwo Banner"
+          video: "https://example.com/banner2.mp4"
+          bannerLink: "https://example.com/promo2"
+        - entryId: "145"
+          title: "Boost Daily"
+          image: "https://example.com/banner1.jpg"
+          bynderMedia:
+            name: "spring-banner"
+            type: "image"
+            width: 750
+            height: 372
+            orientation: "landscape"
+            original: null
+            tags: []
+            thumbnails:
+              transformBaseUrl: "https://assets.example.com/transform/4c901602-85e2-41b4-99b6-ad7a928a5e6e/spring-banner"
+          bannerLink: "https://example.com/promo1"
+      viewAll:
+        viewAllActionSlug: "bonanza-promos"
+        viewAllActionType: "view"
+        viewAllActionText: "Go to page"
+
+    - entryId: "456"
+      classification: "BrazePromosSection"
+
+  primaryContent:
+    - entryId: "123"
+      classification: "GameSection"
+      title: "Bally's Favorites"
+      hasGames: true
+      layoutType: "grid-a"
+      viewAll:
+        viewAllActionSlug: "bally-favorites"
+        viewAllActionType: "view"
+        viewAllActionText: "Go to page"
+
+    - entryId: "123"
+      classification: "PersonalisedSection"
+      title: "Recently Played Games"
+      hasGames: true
+      layoutType: "carousel-a"
+      type: "recently-played"
+
+    - entryId: "789"
+      classification: "PlaceholderSection"
+      placeholderType: "loyalty-mechanic-progress-tracker"
+      title: "Loyalty tracker"
+
+    - entryId: "123"
+      classification: "GameSection"
+      title: "New Games"
+      hasGames: true
+      layoutType: "grid-b"
+      viewAll:
+        viewAllActionSlug: "new-games"
+        viewAllActionType: "section"
+        viewAllActionText: "View All"
+
+    - entryId: "123"
+      classification: "JackpotSection"
+      title: "Jackpot"
+      type: "blueprint-jackpots"
+      hasGames: true
+      headerImage: "https://example.com/header-blueprint.jpg"
+      backgroundImage: "https://example.com/background-blueprint.jpg"
+      pot1Image: "https://example.com/pot1-blueprint.jpg"
+      pot2Image: "https://example.com/pot2-blueprint.jpg"
+      pot3Image: "https://example.com/pot3-blueprint.jpg"
+      viewAll:
+        viewAllActionSlug: "blueprint-jackpots"
+        viewAllActionType: "section"
+        viewAllActionText: "View All"
+
+
+    - entryId: "123"
+      classification: "DFGSection"
+      title: "Daily Free Games"
+      hasGames: true
+      media: ""
+      dynamicBackground: ""
+      dynamicLogo: ""
+      bynderMedia: { ...}
+      bynderDynamicBackground: { ...}
+      bynderDynamicLogo: { ...}
+      link: ""
+
+    - entryId: "123"
+      classification: "JackpotSectionsBlock"
+      title: "Jackpot"
+      jackpots:
+        - entryId: "1234"
+          type: "blueprint-jackpots"
+          hasGames: true
+          classification: "JackpotSection"
+          headerImage: "https://example.com/header-blueprint.jpg"
+          bynderHeaderImage: { ...}
+          backgroundImage: "https://example.com/background-blueprint.jpg"
+          bynderBackgroundImage:
+            name: "flash-match-on-feb26-25-Marquee-New-3X"
+            type: "image"
+            width: 750
+            height: 372
+            orientation: "landscape"
+            original: null
+            tags: []
+            thumbnails:
+              transformBaseUrl: "https://assets.ballys.com/transform/4c901602-85e2-41b4-99b6-ad7a928a5e6e/flash-match-on-feb26-25-Marquee-New-3X"
+          pot1Image: "https://example.com/pot1-blueprint.jpg"
+          bynderPot1Image: { ...}
+          pot2Image: "https://example.com/pot2-blueprint.jpg"
+          byndePot2Image: { ...}
+          pot3Image: "https://example.com/pot3-blueprint.jpg"
+          byndePot3Image: { ...}
+          viewAll:
+            viewAllActionSlug: "blueprint-jackpots"
+            viewAllActionType: "section"
+            viewAllActionText: "View All"
+
+        - entryId: "1235"
+          type: "red-tiger-jackpots"
+          hasGames: true
+          classification: "JackpotSection"
+          headerImage: "https://example.com/header-redtiger.jpg"
+          backgroundImage: "https://example.com/background-redtiger.jpg"
+          pot1Image: "https://example.com/pot1-redtiger.jpg"
+          pot2Image: "https://example.com/pot2-redtiger.jpg"
+          pot3Image: "https://example.com/pot3-redtiger.jpg"
+          byndePot3Image:
+            id: "bynder6"
+            url: "https://example.com/bynder-pot3-redtiger.jpg"
+          viewAll:
+            viewAllActionSlug: "red-tiger-jackpots"
+            viewAllActionType: "section"
+            viewAllActionText: "View All"
+
+        - entryId: "1236"
+          type: "headless-jackpots"
+          hasGames: true
+          headlessJackpot:
+            id: 1236
+            name: "JACKPOT_BLAST"
+          headerImage: "https://example.com/header-headless.jpg"
+          backgroundImage: "https://example.com/background-headless.jpg"
+          pot1Image: "https://example.com/pot1-headless.jpg"
+          pot2Image: "https://example.com/pot2-headless.jpg"
+          pot3Image: "https://example.com/pot3-headless.jpg"
+          viewAll:
+            viewAllActionSlug: "headless-jackpots"
+            viewAllActionType: "section"
+            viewAllActionText: "View All"
+
+    - entryId: "123"
+      classification: "GameShuffleSection"
+      title: "game-shuffle-widget"
+      name: "game-shuffle-widget"
+
+    - entryId: "145"
+      classification: "BannerSection"
+      title: "Box Bonanza Game"
+      image: "https://example.com/banner1.jpg"
+      bannerLink: "https://example.com/promo1"
+      displaySize: 'medium'
+      bannerType: media
+
+  theme:
+  - primaryColor: "#hd123"
+    secondaryColor: "hd123"
+    image:
+      name: "flash-match-on-feb26-25-Marquee-New-3X"
+      type: "image"
+      width: 750
+      height: 372
+      orientation: "landscape"
+      original: null
+      tags: []
+      thumbnails:
+        transformBaseUrl: "https://assets.ballys.com/transform/4c901602-85e2-41b4-99b6-ad7a928a5e6e/flash-match-on-feb26-25-Marquee-New-3X"
+
+  liveHidden: false

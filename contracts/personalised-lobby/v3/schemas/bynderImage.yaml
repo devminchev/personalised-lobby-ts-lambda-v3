@@ -1,0 +1,33 @@
+---
+title: Bynder Image
+description: Sanitized Bynder asset properties returned by the API.
+type: object
+required:
+  - thumbnails
+properties:
+  name:
+    type: string
+  type:
+    type: string
+  width:
+    type: integer
+  height:
+    type: integer
+  orientation:
+    type: string
+  original:
+    type: string
+  tags:
+    type: array
+    items:
+      type: string
+  thumbnails:
+    type: object
+    description: Rendered URLs for the asset. `transformBaseUrl` is populated for images, `original` for videos.
+    properties:
+      transformBaseUrl:
+        type: string
+        description: Base transform URL for image assets.
+      original:
+        type: string
+        description: Original source URL for video assets.

@@ -1,7 +1,26 @@
 import { jest, describe, beforeEach, it, expect } from '@jest/globals';
-import { ErrorCode, GAME_V2_TYPE, getErrorMessage, logError } from 'os-client';
-import { IncomingPayload, modifyEventGamePayload } from '../lib/gamesPayload';
+import { ErrorCode, GAME_V2_TYPE, LocalizedField, getErrorMessage, logError } from 'os-client';
+import { GamePayloadFields, IncomingGamePayload, IncomingPayload, modifyEventGamePayload } from '../lib/gamesPayload';
 import { WebhookFlowError } from '../lib/errorResolution';
+
+// Localized string fields that are forwarded as-is from input to output when truthy
+// and dropped on null/undefined/empty-string. The `satisfies` clause anchors each name
+// to both interfaces, so renaming or removing a field on either side breaks the build.
+const PASS_THROUGH_LOCALIZED_STRING_FIELDS = [
+    'title',
+    'howToPlayContent',
+    'introductionContent',
+    'infoDetails',
+    'loggedOutAnimationMedia',
+    'sigCons',
+    'animationMedia',
+    'dfgWeeklyImgUrlPattern',
+    'videoUrlPattern',
+    'imgUrlPattern',
+    'infoImgUrlPattern',
+    'loggedOutImgUrlPattern',
+    'representativeColor',
+] as const satisfies ReadonlyArray<keyof IncomingGamePayload & keyof GamePayloadFields>;
 
 jest.mock('os-client', () => {
     const actual = jest.requireActual<typeof import('os-client')>('os-client');
@@ -104,6 +123,40 @@ describe('modifyEventGamePayload', () => {
 
         const result = modifyEventGamePayload(incomingPayload, 'en-GB');
         expect(result).not.toHaveProperty('showGameName');
+    });
+
+    it('forwards every pass-through localized string field when populated on the input', () => {
+        const incomingPayload = makeIncomingPayload();
+        const game = incomingPayload.game as unknown as Record<string, unknown>;
+        const expected: Partial<Record<(typeof PASS_THROUGH_LOCALIZED_STRING_FIELDS)[number], LocalizedField<string>>> =
+            {};
+        for (const field of PASS_THROUGH_LOCALIZED_STRING_FIELDS) {
+            const value: LocalizedField<string> = { 'en-GB': `${field}-value` };
+            game[field] = value;
+            expected[field] = value;
+        }
+
+        const result = modifyEventGamePayload(incomingPayload, 'en-GB');
+
+        expect(result).toMatchObject(expected);
+    });
+
+    it.each([
+        ['undefined', undefined],
+        ['empty string', ''],
+        ['null', null],
+    ])('omits every pass-through localized string field when value is %s', (_label, value) => {
+        const incomingPayload = makeIncomingPayload();
+        const game = incomingPayload.game as unknown as Record<string, unknown>;
+        for (const field of PASS_THROUGH_LOCALIZED_STRING_FIELDS) {
+            game[field] = value;
+        }
+
+        const result = modifyEventGamePayload(incomingPayload, 'en-GB');
+
+        for (const field of PASS_THROUGH_LOCALIZED_STRING_FIELDS) {
+            expect(result).not.toHaveProperty(field);
+        }
     });
 
     it('sanitizes localized Bynder media fields for all locales and array items', () => {

@@ -29,7 +29,7 @@ cat <<EOF
 ${env}:aws_credentials:
   stage: credentials
   image:
-    name: gamesys-native-docker-build.artifactory.gamesys.co.uk/native-node-20:latest
+    name: gamesys-native-docker-build.artifactory.gamesys.co.uk/native-node-24:latest
   environment: ${env}
   script:
     - . ci-scripts/gitlab-ci-hcv.sh
@@ -50,7 +50,7 @@ cat <<EOF
 '${resource}:sam_build':
   stage: build
   image:
-    name: gamesys-native-docker-build.artifactory.gamesys.co.uk/native-node-20:latest
+    name: gamesys-native-docker-build.artifactory.gamesys.co.uk/native-node-24:latest
   when:
     on_success
   before_script:
@@ -75,7 +75,7 @@ cat <<EOF
 '${env}:${resource}:package':
   stage: package
   image:
-    name: gamesys-native-docker-build.artifactory.gamesys.co.uk/native-node-20:latest
+    name: gamesys-native-docker-build.artifactory.gamesys.co.uk/native-node-24:latest
   environment: ${env}
   when:
     on_success
@@ -105,7 +105,7 @@ cat <<EOF
 '${env}:${resource}:deploy':
   stage: deploy_lambda
   image:
-    name: gamesys-native-docker-build.artifactory.gamesys.co.uk/native-node-20:latest
+    name: gamesys-native-docker-build.artifactory.gamesys.co.uk/native-node-24:latest
   environment: ${env}
   variables:
     LAMBDA_FN_NAME: ${LAMBDA_NAME}
@@ -151,7 +151,7 @@ cat <<EOF
 '${env}:${resource}:deploy':
   stage: deploy_layer
   image:
-    name: gamesys-native-docker-build.artifactory.gamesys.co.uk/native-node-20:latest
+    name: gamesys-native-docker-build.artifactory.gamesys.co.uk/native-node-24:latest
   environment: ${env}
   variables:
     LAYER_NAME: ${LAYER_NAME}

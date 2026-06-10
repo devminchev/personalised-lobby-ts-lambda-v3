@@ -1,0 +1,15 @@
+title: BecauseYouPlayedResponse
+description: Response for suggested-for-you games grouped by reasons (e.g., because-you-played-x). Can be an empty array, contain one object, or multiple objects.
+type: array
+items:
+  type: object
+  properties:
+    because-you-played-:
+      description: The reason why these games are grouped together (e.g., "Because you played Double Bubble").
+      type: string
+    games:
+      description: List of games grouped under this reason.
+      $ref:  "./section-games-auth.yml"
+
+example:
+  $ref: '../examples/because-you-played-games.yml'

@@ -19,6 +19,19 @@ export enum LogCode {
     RpGamesLimitNotMet = 'RP_GAMES_LIMIT_NOT_MET',
     VariantUsed = 'AB_TEST_VARIANT',
     VariantDefaulting = 'AB_TEST_VARIANT_DEFAULT',
+    BreakerInitFailed = 'BREAKER_INIT_FAILED',
+    BreakerInitSuccess = 'BREAKER_INIT_OK',
+    BreakerTripped = 'BREAKER_TRIPPED',
+    BreakerProbeSuccess = 'BREAKER_PROBE_OK',
+    BreakerProbeFailure = 'BREAKER_PROBE_FAIL',
+    BreakerBlocked = 'BREAKER_BLOCKED',
+    ControllerAlarmReceived = 'CTRL_ALARM_RECEIVED',
+    ControllerAlarmStale = 'CTRL_ALARM_STALE',
+    ControllerAlarmTransition = 'CTRL_ALARM_TRANSITION',
+    ControllerTickNoOp = 'CTRL_TICK_NOOP',
+    ControllerTickTransition = 'CTRL_TICK_TRANSITION',
+    ControllerManualOverride = 'CTRL_MANUAL_OVERRIDE',
+    ControllerOptimisticRetry = 'CTRL_OPTIMISTIC_RETRY',
 }
 
 const logMessages: Record<LogCode, string> = {
@@ -41,6 +54,19 @@ const logMessages: Record<LogCode, string> = {
     [LogCode.RpGamesLimitNotMet]: 'RECENTLY PLAYED GAMES SIZE IS BELOW THE LIMIT OF 3 ',
     [LogCode.VariantUsed]: 'Lambda received header using variant: ',
     [LogCode.VariantDefaulting]: 'No header passed default to unaffected variant',
+    [LogCode.BreakerInitFailed]: 'Circuit breaker failed to initialise from DynamoDB — failing open',
+    [LogCode.BreakerInitSuccess]: 'Circuit breaker initialised',
+    [LogCode.BreakerTripped]: 'Local circuit breaker tripped OPEN',
+    [LogCode.BreakerProbeSuccess]: 'Local circuit breaker closed — probe succeeded',
+    [LogCode.BreakerProbeFailure]: 'Local circuit breaker re-opened — probe failed',
+    [LogCode.BreakerBlocked]: 'Circuit breaker blocked call',
+    [LogCode.ControllerAlarmReceived]: 'CloudWatch alarm event received',
+    [LogCode.ControllerAlarmStale]: 'CloudWatch alarm event ignored — stale',
+    [LogCode.ControllerAlarmTransition]: 'Breaker state transition from alarm event',
+    [LogCode.ControllerTickNoOp]: 'Scheduled tick — no transition required',
+    [LogCode.ControllerTickTransition]: 'Scheduled tick — state transition applied',
+    [LogCode.ControllerManualOverride]: 'Breaker state set manually',
+    [LogCode.ControllerOptimisticRetry]: 'Optimistic-concurrency conflict — retrying',
 };
 
 export const getLogMessage = (code: LogCode | ErrorCode): string => {

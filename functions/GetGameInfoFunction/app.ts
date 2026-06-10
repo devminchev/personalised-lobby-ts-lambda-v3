@@ -130,8 +130,8 @@ const createResponseObject = async (
 ): Promise<IGameInfoResponse> => {
     const { siteGame, game } = games;
 
-    const minBet: LocalizedField<string> = overrideGameLocaleValues<string>(siteGame.minBet, game.minBet, '-');
-    const maxBet: LocalizedField<string> = overrideGameLocaleValues<string>(siteGame.maxBet, game.maxBet, '-');
+    const minBet: LocalizedField<string> = overrideGameLocaleValues<string>(siteGame.minBet, game.minBet, '');
+    const maxBet: LocalizedField<string> = overrideGameLocaleValues<string>(siteGame.maxBet, game.maxBet, '');
     const howToPlayContent: LocalizedField<string> = overrideGameLocaleValues<string>(
         siteGame.howToPlayContent,
         game.howToPlayContent,
@@ -189,6 +189,7 @@ const createResponseObject = async (
     const loggedOutBackgroundMediaObj = extractBynderObject(loggedOutBackgroundMedia);
     const backgroundImage = resolveGameProp(game.funPanelBackgroundImage, defaultLocale, '');
     const liveHidden = siteGame.liveHidden?.[defaultLocale];
+    const sigCons = tryGetValueFromLocalised(userLocale, defaultLocale, game?.sigCons, null);
 
     const gameInfo: IGameInfoResponse = {
         entryId: siteGame.id,
@@ -201,6 +202,7 @@ const createResponseObject = async (
         introductionContent: tryGetValueFromLocalised(userLocale, defaultLocale, game.introductionContent, ''),
         maxBet: tryGetValueFromLocalised(userLocale, defaultLocale, maxBet, ''),
         minBet: tryGetValueFromLocalised(userLocale, defaultLocale, minBet, ''),
+        ...(sigCons && { sigCons }),
         name: (isMobile ? game.mobileGameName : game.gameName) ?? '',
         realUrl: (isMobile ? platformConfig.mobileRealUrl : platformConfig.realUrl) || '',
         representativeColor: tryGetValueFromLocalised(userLocale, defaultLocale, game.representativeColor, ''),

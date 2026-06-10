@@ -1,0 +1,35 @@
+title: IG Marketing Section
+description: Marketing Section. This section is for accommodating EU Banner Carousels.
+type: object
+required:
+  - entryId
+  - classification
+  - title
+  - displayType
+  - elements
+properties:
+  entryId:
+    description: Unique id for the marketing section
+    type: string
+
+  classification:
+    description: Classification type of the section
+    type: string
+
+  title:
+    description: Localized title for the marketing section
+    type: string
+
+  displayType:
+    description: Determines if one banner or two banners should be shown on one carousel pane (can be split, full)
+    type: string
+
+  elements:
+    type: array
+    description: A list of banners or promotion items for the section
+    items:
+      $ref: './banner.yml'
+
+  viewAll:
+    type: object
+    $ref: '../view-all-action.yml'

@@ -1,0 +1,51 @@
+id: "12345"
+title: "Gum Bubbles"
+maxBet: null
+minBet: null
+gameSkin: "GUM_BUBBLES"
+gameStudio: null
+gameProvider: "Pragmatic"
+mobileDemoUrl: null
+demoUrl: "/service/game/demo/play-gum-bubbles"
+realUrl: "/service/game/play/play-gum-bubbles"
+mobileRealUrl: null
+mobileName: null
+name: "play-gum-bubbles"
+launchCode: null
+gameType:
+  winLineType: "L2R"
+  maxMultiplier: "10000"
+  type: "Slots"
+  isJackpotFixedPrize: false
+  isJackpotInGameProgressive: false
+  features:
+    - "Free Spins"
+    - "Expanding Wilds"
+    - "Other Wilds"
+    - "Respins"
+    - "Multipliers (With or without wilds)"
+    - "Bonus Game"
+    - "Cash Collect"
+  themes:
+    - "Fantasy"
+    - "Sweets"
+    - "Bubbles"
+  waysToWin: "Other"
+  symbolCount: "12"
+  winLines: 20
+  isJackpot: false
+  symbolType: ["Suits"]
+  reel: "5-4"
+  isPersistence: false
+  brand: null
+  isJackpotPlatformProgressive: false
+entryTitle: "PP_GUM_BUBBLES"
+mobileGameSkin: "GUM_BUBBLES_MOBILE"
+gameLoaderFileName: "play-gum-bubbles"
+mobileGameLoaderFileName: "play-gum-bubbles-mobile"
+contentType: "gameV2"
+vendor: "infinity"
+platform:
+  - "web"
+  - "ios"
+  - "android"

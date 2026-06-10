@@ -1,0 +1,77 @@
+title: GameSearch
+description: Response of searched games defined for a particular venture
+type: array
+required:
+  - entryId
+  - name
+  - title
+items:
+  type: object
+  properties:
+    entryId:
+      type: string
+      description: The unique id of the sitegame
+    gameId:
+      type: string
+      description: The unique id of the game
+    name:
+      type: string
+      description: Name for the site game
+    title:
+      type: string
+      description: Title for the site game
+    gameSkin:
+      type: string
+      description: The skin used for the game presentation
+    demoUrl:
+      type: string
+      description: URL for the demo version of the game
+    realUrl:
+      type: string
+      description: URL for the real game play
+    imgUrlPattern:
+      type: string
+      description: URL pattern for image of the site game
+    sash:
+      type: string
+      description: Sash or badge information of the game
+    representativeColor:
+      type: string
+      description: The representative color for the game, usually a hex code
+    headlessJackpot:
+      type: object
+      description: Object containing headless jackpot details
+      properties:
+        name:
+          type: string
+          description: Name of the headless jackpot
+        id:
+          type: integer
+          description: Identifier for the headless jackpot
+    animationMedia:
+      description: Type of animation (animated or default).
+      type: string
+    sigCons:
+      description: Significant Conditions for the game (localised text). Optional — omitted from the response when the game has no Significant Conditions.
+      type: string
+    foregroundLogoMedia:
+      description: Bynder image object.
+      $ref: './bynderImage.yaml'
+    backgroundMedia:
+      description: Bynder image object.
+      $ref: './bynderImage.yaml'
+    navigation:
+      type: array
+      description: On which pages or views does the game appear on the site.
+      items:
+        type: string
+    tags:
+      description: Tags
+      type: array
+      items:
+        type: string
+    liveHidden:
+      description: If the link will be visible on live
+      type: boolean
+example:
+  $ref: '../examples/games-search.yml'

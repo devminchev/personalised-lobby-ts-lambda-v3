@@ -1,18 +1,18 @@
 ---
 title: Personalised Lobby Ts Lambda V3
-description: AWS Lambda functions and layers powering iGaming API for the frontend
+description: AWS Lambda functions powering iGaming API for the frontend
 ---
 
 # Personalised Lobby Ts Lambda V3
 
-A collection of AWS Lambda functions and shared layers that provide the backend functionality required by the frontend for lobby personalisation. Lambdas are organised as independent packages, built with TypeScript, and deployed via AWS SAM on dev and as docker images on STG and PROD.
+A collection of AWS Lambda functions and shared libraries that provide the backend functionality required by the frontend for lobby personalisation. Lambdas are organised as independent packages, built with TypeScript, and deployed via AWS SAM on dev and as docker images on STG and PROD.
 
 ## Repository Structure
 
 ```
 personalised-lobby-ts-lambda-v3/
   functions/        Individual lambda packages (one per API endpoint)
-  libs/             Shared libraries packaged as lambda layers (e.g. OSClient)
+  libs/             Shared workspace libraries consumed from source (e.g. OSClient, dynamoClient)
   events/           Sample invocation events for local testing
   template.yaml     SAM template defining all AWS resources
   scripts/          Build, deploy, and CI helper scripts
@@ -22,17 +22,17 @@ Each lambda under `functions/` is a self-contained package with its own `package
 
 ## Tech Stack
 
-- **Runtime:** Node.js 20 on AWS Lambda (arm64 by default, x86_64 supported)
+- **Runtime:** Node.js 24 on AWS Lambda (arm64 by default, x86_64 supported)
 - **Language:** TypeScript, bundled with esbuild
 - **Infrastructure:** AWS SAM (CloudFormation) with API Gateway
 - **Monorepo orchestration:** NX
 - **Testing:** Jest (per-lambda `tests/` folders)
-- **Containers:** Multi-stage Docker builds (Node.js builder + RHEL9 Node.js 20 runtime)
-- **Search backend:** OpenSearch via the shared `OSClient` layer
+- **Containers:** Multi-stage Docker builds (Node.js builder + RHEL9 Node.js 24 runtime)
+- **Search backend:** OpenSearch via the shared `os-client` library
 
 ## Getting Started
 
-The top-level [README](../README.md) covers the full setup: installing the AWS CLI, SAM CLI, Node.js 20, and Docker; configuring AWS SSO against the `lobby-playground` profile; and scaffolding a new lambda from the shared `kickstart` template.
+The top-level [README](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/README.md) covers the full setup: installing the AWS CLI, SAM CLI, Node.js 24, and Docker; configuring AWS SSO against the `lobby-playground` profile; and scaffolding a new lambda from the shared `kickstart` template.
 
 Once dependencies are installed, the typical local workflow is:
 
@@ -43,21 +43,27 @@ sam local invoke "GetNavigationFunction" \
   --env-vars env.json
 ```
 
-For a single function or layer, scope the build with `--parameter-overrides "FunctionName=... LayerName=... LambdaArchitecture=..."`.
+For a single function, scope the build with `--parameter-overrides "FunctionName=... LambdaArchitecture=..."`.
 
 ## API Design
 
-The conventions every endpoint follows — URL structure, member identification, and how personalised variants of a resource are modelled — are documented under [API Design](./api-design):
+The conventions every endpoint follows — URL structure, member identification, and how personalised variants of a resource are modelled — are documented under [API Design](./api-design/index.mdx):
 
-- [URL structure](./api-design/url-structure)
-- [Member identification](./api-design/member-identification)
-- [Personalised sub-resources](./api-design/personalised-resources)
+- [URL structure](./api-design/url-structure.mdx)
+- [Member identification](./api-design/member-identification.mdx)
+- [Personalised sub-resources](./api-design/personalised-resources.mdx)
+
+The versioned OpenAPI contract for the Personalised Lobby API is published under [API Reference](./api-reference/personalised-lobby/v3), generated from the contract files in `contracts/personalised-lobby/v3/`.
 
 ## Resilience
 
-Ongoing work to keep the service serving traffic under high or critical load — starting with a tiered classification of endpoints that drives load shedding. See [Resilience](./resilience):
+Ongoing work to keep the service serving traffic under high or critical load — a tiered classification of endpoints that drives load shedding, plus a global circuit breaker that decides when to shed. See [Resilience](./resilience/index.mdx):
 
-- [Service tiers](./resilience/service-tiers)
+- [Service tiers](./resilience/service-tiers.mdx) — endpoint tiers and shedding order
+- [Circuit-breaker overview](./resilience/circuit-breaker-overview.mdx) — system context for the `PostCloudWatchController`
+- [State machine](./resilience/circuit-breaker-state-machine.mdx), [alarms](./resilience/circuit-breaker-alarms.mdx), [behaviour](./resilience/circuit-breaker-behaviour.mdx), [data model](./resilience/circuit-breaker-data-model.mdx)
+- [Consumer integration](./resilience/circuit-breaker-consumer-integration.mdx), [consistency and concurrency](./resilience/consistency-and-concurrency.mdx), [runbook](./resilience/circuit-breaker-runbook.mdx), [glossary](./resilience/glossary.mdx)
+- [Architecture decisions (ADRs)](./resilience/adr/index.mdx)
 
 ## Docker
 
@@ -65,7 +71,7 @@ Lambda images can be built and run locally through NX targets (`yarn docker:buil
 
 ## Deployment & CI
 
-Deployments go through the GitLab CI pipeline (Pipelines → Run Pipeline) using the `CHANGES` and `ENVS` variables to target specific lambdas/layers and environments (e.g. `stg_eu00`, `prod_eu00`). Commits follow the [Conventional Commits](https://www.conventionalcommits.org/) spec, enforced by commitlint pre-commit hooks, which also drives semantic versioning per lambda.
+Deployments go through the GitLab CI pipeline (Pipelines → Run Pipeline) using the `CHANGES` and `ENVS` variables to target specific lambdas and environments (e.g. `stg_eu00`, `prod_eu00`). Commits follow the [Conventional Commits](https://www.conventionalcommits.org/) spec, enforced by commitlint pre-commit hooks, which also drives semantic versioning per lambda.
 
 ## External Resources
 

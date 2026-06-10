@@ -1,0 +1,18 @@
+title: IG Search Results Section
+description: Section that will hold the games returned by the `/search` endpoint
+required:
+  - classification
+  - layoutType
+properties:
+  entryId:
+    description: Unique id for the IG Grid A section
+    type: string
+  classification:
+    description: Classification type of the section (fixed to `SearchResultsSection`)
+    type: string
+  title:
+    description: Localized title for the section
+    type: string
+  layoutType:
+    description: Layout type (fixed to `grid-a`)
+    type: string

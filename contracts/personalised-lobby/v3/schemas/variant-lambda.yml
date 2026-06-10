@@ -1,0 +1,13 @@
+
+title: Variant Lambda
+description: Response of the variant lambda
+type: object
+required:
+    - variant
+properties:
+  variant:
+    description: Type of variant (treatment, control, unaffected)
+    type: string
+
+example:
+  $ref: '../examples/variant-lambda.yml'

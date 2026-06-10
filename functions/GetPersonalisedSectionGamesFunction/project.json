@@ -11,7 +11,7 @@
         "main": "functions/GetPersonalisedSectionGamesFunction/app.ts",
         "tsConfig": "functions/GetPersonalisedSectionGamesFunction/tsconfig.json",
         "platform": "node",
-        "target": "node20",
+        "target": "node24",
         "bundle": true,
         "sourcemap": true,
         "minify": true,
@@ -57,7 +57,7 @@
   },
   "tags": [],
   "implicitDependencies": [],
-  "version": "0.1.7",
+  "version": "0.4.4",
   "dependencies": [
     "os-client"
   ]

@@ -1,0 +1,258 @@
+---
+title: Circuit-breaker data model
+description: DynamoDB single-table schema for the breaker — partitions, sort-key prefixes, item shapes, TTL, version semantics, and access patterns
+---
+
+# Circuit-breaker data model
+
+The breaker persists every meaningful piece of state into one DynamoDB table: `CircuitControl-${StageName}`. This page is the schema spec — the type definitions live in [`functions/PostCloudWatchController/src/types.ts`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/types.ts) and the table itself is declared in [`template.yaml`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/template.yaml).
+
+For the access patterns that drive this shape see "Access patterns" below; for the consistency story (strong reads, conditional writes) see [Consistency and concurrency](./consistency-and-concurrency.mdx).
+
+## Table
+
+| Property | Value |
+|---|---|
+| Name | `CircuitControl-${StageName}` |
+| Billing mode | `PAY_PER_REQUEST` |
+| Partition key | `PK: String` |
+| Sort key | `SK: String` |
+| Secondary indexes | None (intentional — see "No GSIs" below) |
+| TTL attribute | `ttl` (Unix epoch seconds) |
+| Point-in-time recovery | Enabled (35-day window) |
+| Deletion protection | Enabled |
+| Server-side encryption | KMS, AWS-managed `aws/dynamodb` key |
+| Tags | `Service=${ServiceName}`, `Component=circuit-breaker` |
+
+PITR, deletion protection, and KMS SSE are turned on because the table is load-bearing for the breaker's audit trail; the data volume is tiny so the cost of these features is negligible. AWS docs:
+
+- [Point-in-time recovery for DynamoDB](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/PointInTimeRecovery.html)
+- [Deletion protection for tables](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/WorkingWithTables.Basics.html#WorkingWithTables.Basics.DeletionProtection)
+- [Encryption at rest](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/EncryptionAtRest.html)
+- [TTL](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/TTL.html)
+
+## Key design
+
+Every item shares the partition key shape `BREAKER#<service>`, where `service` is `GLOBAL` for everything the controller writes automatically. Operator overrides via `setBreakerStateManually` may write to other partitions ([state machine — manual override](./circuit-breaker-state-machine.mdx#manual-override)).
+
+The sort-key prefix selects the entity family:
+
+| SK pattern | Entity family | Cardinality per partition |
+|---|---|---|
+| `STATE#CURRENT` | Live breaker posture | 1 |
+| `STATE#<isoTs>` | Historical state-transition snapshot | TTL-bounded |
+| `SIGNAL_STATE#CURRENT` | Currently-active alarm signals (single map) | 1 |
+| `EVENT#<isoTs>#<alarmName>` | Raw alarm-event audit | TTL-bounded |
+
+The single-table design (one table, multiple entity families distinguished by sort key) is the canonical NoSQL pattern. Reference: [Best practices for designing and using partition keys](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/bp-partition-key-design.html) and [the single-table guide](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/best-practices-modeling-nosql-B.html).
+
+### Why a single partition (`BREAKER#GLOBAL`) for all automatic writes
+
+The controller intentionally collapses all signals onto one partition. The full reasoning is in [ADR-002: Single GLOBAL partition](./adr/002-global-only-partition.mdx); the short version is that "any critical or compound stress in the lobby stack should shed at the same gate" matches a single-partition breaker, and that the alternative (per-service partitions) was already half-implemented and silently broken on the incoming branch.
+
+### No GSIs
+
+There are no secondary indexes. The controller's access patterns are all keyed on `PK = BREAKER#<service>` directly:
+
+- Live read: `GetItem` or `BatchGetItem` against `(PK, STATE#CURRENT)` and `(PK, SIGNAL_STATE#CURRENT)`.
+- History scan: `Query` on `PK` with `SK begins_with "STATE#"` (operator/forensic only — not in the hot path).
+- Audit scan: `Query` on `PK` with `SK begins_with "EVENT#"` (operator/forensic only).
+
+A GSI was removed in commit `a2c631d4` together with per-service routing — neither was needed under the GLOBAL-only design. Reintroducing one would only make sense if per-service routing came back; see [ADR-002](./adr/002-global-only-partition.mdx).
+
+## Entity families
+
+### `STATE#CURRENT` — live breaker posture
+
+The single source of truth for the breaker's current state. Read on every Lambda invocation; written on every transition.
+
+```ts
+interface BreakerStateItem {
+    PK: string;                // "BREAKER#<service>"
+    SK: "STATE#CURRENT";
+    entityType: "BREAKER_STATE";
+    service: string;           // "GLOBAL" for automatic writes
+    state: 'CLOSED' | 'OPEN' | 'HALF_OPEN';
+    mode: 'normal' | 'protect';
+    updatedAt: string;         // ISO 8601
+    updatedBy: string;         // "controller" or operator actor
+    reason: string;            // e.g. "compound_open:critical_signal:os-search-rejections"
+    holdUntil?: string;        // ISO 8601, only set on OPEN/HALF_OPEN
+    version: number;           // monotonically incremented on every write
+    tripCount: number;         // monotonic; only increments on a fresh trip
+    healthyProbeCount: number; // 0 unless in HALF_OPEN mid-probe
+    openedByAlarm?: { alarmName: string; fromState: string; toState: string };
+    alarmConfig?: { periodSec?: number; evaluationPeriods?: number; datapointsToAlarm?: number };
+}
+```
+
+The full field semantics are in the [state machine spec](./circuit-breaker-state-machine.mdx#persisted-fields-driving-the-machine).
+
+**No TTL.** This row is the live posture and must not be evicted.
+
+**Optimistic-concurrency guard.** Every write to this item carries a `ConditionExpression`: either `attribute_not_exists(PK)` (first-ever write) or `version = :prevVersion` (subsequent writes). See [Consistency and concurrency](./consistency-and-concurrency.mdx).
+
+### `STATE#<isoTs>` — state-transition history
+
+A snapshot of `BreakerStateItem` written on every transition, keyed by the transition timestamp. Used for forensic queries ("how many times did the breaker open last week?").
+
+```ts
+interface BreakerHistoryItem extends Omit<BreakerStateItem, 'SK' | 'entityType'> {
+    SK: string;                // "STATE#<isoTs>" — the full ISO timestamp
+    entityType: "BREAKER_STATE_HISTORY";
+    ttl?: number;              // Unix epoch seconds
+}
+```
+
+**TTL: 30 days** by default (`STATE_HISTORY_TTL_SEC = 2592000`, see [`template.yaml`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/template.yaml)). Tunable via SSM.
+
+History writes are **not** condition-guarded individually — they go in the same `TransactWriteItems` as the `STATE#CURRENT` write, and the transaction is atomic. If the current-row guard fails, the history row is rolled back along with it.
+
+### `SIGNAL_STATE#CURRENT` — active-signals snapshot
+
+A single item containing a map of all currently-active alarm signals for the partition. Held in one item rather than one-item-per-signal so the controller can read the whole snapshot in a single `BatchGetItem` round-trip alongside `STATE#CURRENT`.
+
+```ts
+interface ActiveSignalEntry {
+    updatedAt: string;         // ISO 8601 — when this signal last refreshed
+}
+
+interface SignalStateItem {
+    PK: string;                // "BREAKER#<service>"
+    SK: "SIGNAL_STATE#CURRENT";
+    entityType: "SIGNAL_STATE";
+    service: string;
+    signals: Record<string, ActiveSignalEntry>;   // keyed by signal name (e.g. "api-p99")
+    updatedAt: string;
+}
+```
+
+**No TTL on the item.** The map can grow and shrink as signals trip and clear.
+
+**Per-entry pruning** — see [Zombie pruning](./circuit-breaker-state-machine.mdx#zombie-pruning). Entries unrefreshed within `signalMaxAgeMs` (default = 2× `staleEventMs` = 20 min) are dropped on the next evaluation. Without this, a lost OK event would pin the breaker OPEN forever. Pruning happens on two paths and **both persist the pruned snapshot back to this item**: the alarm path always (via `transactWriteEvaluation`), and the HALF_OPEN-expiry tick path (added in [`putStateAndHistory`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/index.ts)'s optional `signalState` parameter). The OPEN→HALF_OPEN tick and the manual-override path do not write this item — their compute does not need to.
+
+**Why one item not many.** A per-signal item layout would let DDB's table-level TTL evict individual signals, but it would also make the read path two-pass (`Query` instead of `BatchGet`). The single-item layout with in-handler pruning trades read simplicity for the explicit pruning helper, which is a small file.
+
+### `EVENT#<isoTs>#<alarmName>` — raw alarm-event audit
+
+One item per consumed alarm event. Written in the same transaction as the state update so the audit trail and the state row are consistent.
+
+```ts
+interface AlarmEventItem {
+    PK: string;                // "BREAKER#<service>"
+    SK: string;                // "EVENT#<isoTs>#<alarmName>"
+    entityType: "ALARM_EVENT";
+    service: string;
+    alarmName: string;
+    previousState: string;     // "OK" | "ALARM" | "INSUFFICIENT_DATA" | "UNKNOWN"
+    currentState: string;
+    stateChangeTime: string;   // ISO 8601
+    reason?: string;
+    rawEvent: unknown;         // the full EventBridge payload
+    ttl?: number;              // Unix epoch seconds
+}
+```
+
+**TTL: 14 days** by default (`EVENT_HISTORY_TTL_SEC = 1209600`, see [`template.yaml`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/template.yaml)). Tunable via SSM.
+
+The `SK` uses the change-time + alarm-name combination so two alarms transitioning at the same instant are distinct items. The audit row is **not** written by the tick — only by alarm events — because the tick has nothing to audit (no externally-generated input).
+
+## Field-by-field reference
+
+### `version` (optimistic-concurrency token)
+
+Set to `(prev?.version ?? 0) + 1` on every state write ([statemachine.ts](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/statemachine.ts)). It is purely a write-coordination primitive — not a timestamp, not a monotonic clock — and only guarantees ordering between writes that observed the same predecessor: writer A and writer B both reading `version=5` will both attempt to write `version=6`, but only one succeeds — the other gets `ConditionalCheckFailed` and retries against the fresh state. See [ADR-003](./adr/003-optimistic-concurrency.mdx).
+
+Consumers reading `version` can use it to detect "the posture I cached is still current" (compare against the latest `version`), but the field is not currently exposed on a publishable channel — consumers read the state row directly. See [Consumer integration](./circuit-breaker-consumer-integration.mdx).
+
+### `tripCount`
+
+Incremented only on a *fresh* trip, defined as `prev.state !== 'OPEN' && next.state === 'OPEN'`. The OPEN→OPEN sustained case (`open_sustained`) preserves the count. So a single 30-minute incident with five OPEN/HALF_OPEN oscillations contributes **one** to the trip count, not five.
+
+Useful for "is the breaker chronically unstable?" dashboards. The controller has **no path that resets `tripCount`**: `buildStateItem` always computes the next value as `(prev?.tripCount ?? 0) + (isNewTrip ? 1 : 0)` ([statemachine.ts](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/statemachine.ts)), and `setBreakerStateManually` also goes through `buildStateItem` with `prev` ([index.ts](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/index.ts)) so manual overrides also inherit the count. Resetting requires deleting the `STATE#CURRENT` item out-of-band (or restoring from PITR) — typically only done if the count is so old it has lost meaning.
+
+### `holdUntil`
+
+Set on entry into OPEN to `now + openHoldMs`; on entry into HALF_OPEN to `now + halfOpenMaxMs`; cleared on CLOSED. On OPEN→OPEN sustains the existing `holdUntil` is preserved ([statemachine.ts](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/statemachine.ts)) so a steady stream of new alarms during cooldown does not extend the cooldown indefinitely.
+
+### `healthyProbeCount`
+
+Bumped by 1 on every OK alarm event during HALF_OPEN ([`buildHalfOpenProgressTransition`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/statemachine.ts)). Closes the breaker when it reaches `healthyOkEventsToClose` (default 2). Reset to 0 on `CLOSED` and on every fresh OPEN.
+
+### `openedByAlarm`
+
+Captures *what* drove the most recent OPEN transition — the alarm name, the previous alarm state, and the new alarm state. Set on every OPEN write by [`buildOpenTransition`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/statemachine.ts), so on OPEN→OPEN sustains it is **overwritten** with the alarm whose state change drove the latest evaluation. Preserved unchanged on OPEN→HALF_OPEN (the tick passes no `openedByAlarm`, so `buildStateItem` falls back to `prev.openedByAlarm` — [statemachine.ts](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/statemachine.ts)) and on HALF_OPEN→HALF_OPEN progress. Cleared on CLOSED. Useful in incident postmortems to answer "which alarm last drove an OPEN transition" — the alarm-event audit rows (`EVENT#*`) are the canonical source if you need the *first* alarm of the incident.
+
+### `reason`
+
+Free-form string written on every transition. The exact prefixes the controller emits today (defined in [`statemachine.ts`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/statemachine.ts) and [`index.ts`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/index.ts)):
+
+| Prefix | Where it comes from | Example |
+|---|---|---|
+| `compound_open:<severity_reason>` | Alarm event with `shouldOpen=true` | `compound_open:compound_warning:api-p99,api-5xx` |
+| `half_open_retrip:<severity_reason>` | HALF_OPEN + incoming ALARM (no compound trip) | `half_open_retrip:single_warning:cpu-high` |
+| `recovered:<alarmName>` | HALF_OPEN closed via the probe path (`healthyOkEventsToClose` reached) | `recovered:breaker:GLOBAL:os-search-rejections` |
+| `half_open_progress:<alarmName>` | HALF_OPEN OK arrived, more probes still required | `half_open_progress:breaker:GLOBAL:cpu-high` |
+| `open_partial_clear:<severity_reason>` | OPEN + non-trip alarm event | `open_partial_clear:single_warning:cpu-high` |
+| `all_clear:<severity_reason>` | CLOSED stays CLOSED | `all_clear:all_signals_ok` |
+| `cooldown_expired_probe` | Tick: OPEN → HALF_OPEN | (fixed string) |
+| `half_open_timeout_no_signals` | Tick: HALF_OPEN → CLOSED via empty pruned signals | (fixed string) |
+| `half_open_timeout_reopen` | Tick: HALF_OPEN → OPEN with signals still active | (fixed string) |
+| `manual:<actor-supplied>` | `setBreakerStateManually` | `manual:on-call rolled forward post-incident` |
+
+The `<severity_reason>` itself is one of `critical_signal:<csv>`, `compound_warning:<csv>`, `single_warning:<name>`, or `all_signals_ok`, computed by [`computeSeverityScore`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/index.ts).
+
+### `ttl`
+
+Unix epoch seconds. DynamoDB's TTL service deletes items "typically within a few days" of the timestamp; it is best-effort and not strongly bounded — see [TTL background](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/howitworks-ttl.html). Consumers that want a hard retention should not rely on TTL alone.
+
+## Access patterns
+
+| Caller | Pattern | Operation |
+|---|---|---|
+| Controller (every invocation) | "Read the live posture and active signals for `BREAKER#GLOBAL`" | `BatchGetItem` on `(PK, STATE#CURRENT)` + `(PK, SIGNAL_STATE#CURRENT)`, `ConsistentRead: true` |
+| Controller (alarm path) | "Atomically write new posture, history, signals, audit" | `TransactWriteItems` on 3-4 items (always includes `SIGNAL_STATE#CURRENT`) with `ConditionExpression` on `STATE#CURRENT` |
+| Controller (tick, OPEN→HALF_OPEN) | "Atomically write new posture + history" | `TransactWriteItems` on 2 items with `ConditionExpression` on `STATE#CURRENT`. Does **not** touch `SIGNAL_STATE#CURRENT`. |
+| Controller (tick, HALF_OPEN expiry) | "Atomically write new posture, history, and pruned signals" | `TransactWriteItems` on 3 items — the third Put is the in-memory-pruned `SIGNAL_STATE#CURRENT`, persisted so zombie signals are removed from the DB at the same instant the breaker transitions to CLOSED or re-OPEN ([index.ts](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/index.ts)). `ConditionExpression` on `STATE#CURRENT` only. |
+| Operator (manual override) | "Force-set posture for a specific service" | `TransactWriteItems` on 2 items, scoped to `BREAKER#<service>` (any service). Does **not** touch `SIGNAL_STATE#CURRENT`. |
+| Operator (forensic) | "Show the last N transitions" | `Query` on `PK = BREAKER#GLOBAL`, `SK begins_with "STATE#"`, `ScanIndexForward: false`, `Limit: N` |
+| Operator (forensic) | "Show every alarm event in the last hour" | `Query` on `PK = BREAKER#GLOBAL`, `SK begins_with "EVENT#"`, with a timestamp filter |
+| Future consumer | "What's the current breaker mode?" | `GetItem` on `(PK = BREAKER#GLOBAL, SK = STATE#CURRENT)`, with consumer-side caching — see [Consumer integration](./circuit-breaker-consumer-integration.mdx) |
+
+The `ConsistentRead: true` on the controller's batch read is intentional — see [Consistency and concurrency](./consistency-and-concurrency.mdx#strongly-consistent-reads). Consumer reads can use eventually-consistent reads; the breaker state changes slowly enough relative to typical caller-side caching.
+
+## Invariants the data model preserves
+
+1. **Exactly one `STATE#CURRENT` per partition.** Enforced by the partition+sort key shape and the `attribute_not_exists(PK)` guard on the first-ever write.
+2. **Every state transition has a corresponding history row.** Enforced by writing both inside one `TransactWriteItems`.
+3. **Every alarm-driven transition has a corresponding audit row.** Same mechanism. Tick-driven transitions deliberately do not write an audit row — there is no external event to audit.
+4. **`version` is monotonically increasing per partition.** Enforced by the `ConditionExpression` on every state write.
+5. **`STATE#CURRENT` and `SIGNAL_STATE#CURRENT` are coherent.** The compound-severity score that drove the state transition was computed from the signals that get written in the same transaction. A reader that observes one without the other (across a partial update) cannot happen because both are in the same atomic write.
+
+## Inspecting the table
+
+### Locally, with DynamoDB Local
+
+The function README has full instructions — see [Local development](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/README.md#local-development). Quick reference:
+
+```bash
+AWS_ACCESS_KEY_ID=local AWS_SECRET_ACCESS_KEY=local AWS_REGION=eu-west-1 \
+  aws dynamodb query \
+    --table-name CircuitControl-v2 \
+    --key-condition-expression "PK = :pk" \
+    --expression-attribute-values '{":pk":{"S":"BREAKER#GLOBAL"}}' \
+    --endpoint-url http://localhost:8000
+```
+
+### Against a deployed stack
+
+```bash
+aws dynamodb query \
+  --table-name CircuitControl-${StageName} \
+  --key-condition-expression "PK = :pk AND begins_with(SK, :sk)" \
+  --expression-attribute-values '{":pk":{"S":"BREAKER#GLOBAL"},":sk":{"S":"STATE#"}}' \
+  --scan-index-forward false \
+  --max-items 20
+```
+
+That returns the live `STATE#CURRENT` plus the most recent state-history rows in reverse chronological order. Equivalent forensic queries for `EVENT#` are in the [Runbook](./circuit-breaker-runbook.mdx).

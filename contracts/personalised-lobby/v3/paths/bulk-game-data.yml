@@ -1,0 +1,39 @@
+---
+parameters:
+  - name: sitename
+    description: The name of the Venture
+    schema:
+      type: string
+    in: path
+    required: true
+  - name: platform
+    description: Platform device type. Accepted values 'web', 'ios' and 'android'.
+    schema:
+      type: string
+    in: path
+    required: true
+  - name: locale
+    in: query
+    description: Used for localisation. Values are set in Contentful. Accepted values "en-GB", "en-CA", "en-US", "es-ES"
+    schema:
+      type: string
+    required: false
+get:
+  summary: Bulk Game Data (Internal API)
+  description: Returns bulk response of game data that is visible to users on sites
+  x-controller: getBulkGameData
+  tags:
+    - BulkGameData
+  responses:
+    "200":
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/bulk-game-data.yml'
+      description: A JSON object of game config data
+    '400':
+      $ref: '../schemas/error-responses.yml'
+    '404':
+      $ref: '../schemas/error-responses.yml'
+    '500':
+      $ref: '../schemas/error-responses.yml'

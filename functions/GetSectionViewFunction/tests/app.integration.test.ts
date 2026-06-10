@@ -409,4 +409,19 @@ describe('mapSectionGames – foreground/background media fallback', () => {
         expect(loggedOutResult).not.toHaveProperty('foregroundLogoMedia');
         expect(loggedOutResult).not.toHaveProperty('backgroundMedia');
     });
+
+    it('forwards sigCons from the requested locale and omits it when missing', () => {
+        const withSigCons = SECTION_GAME_HITS_BOTH_MEDIA.map((hit) => ({
+            ...hit,
+            innerHit: {
+                ...hit.innerHit,
+                game: { ...hit.innerHit.game, sigCons: { 'en-GB': 'sig-cons-en' } },
+            },
+        }));
+        const [withResult] = mapSectionGames(withSigCons, localeOverride, spaceLocale, true);
+        const [withoutResult] = mapSectionGames(SECTION_GAME_HITS_BOTH_MEDIA, localeOverride, spaceLocale, true);
+
+        expect(withResult.sigCons).toBe('sig-cons-en');
+        expect(withoutResult).not.toHaveProperty('sigCons');
+    });
 });

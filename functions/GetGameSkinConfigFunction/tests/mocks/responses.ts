@@ -25,6 +25,34 @@ export const SUCCESSFUL_GAME_RESPONSE: any = {
                             gameType: {
                                 type: 'Slots',
                             },
+                            gameAggregator: 'Microgaming',
+                        },
+                    },
+                },
+            },
+        ],
+    },
+};
+
+/* --------------------------------- GAME RESPONSE WITHOUT AGGREGATOR ------------------------------------------- */
+export const GAME_RESPONSE_NO_AGGREGATOR: any = {
+    hits: {
+        total: {
+            value: 1,
+            relation: 'eq',
+        },
+        hits: [
+            {
+                _index: 'games',
+                _id: '4SyNbkt0IMFdqhWb41Gki',
+                _source: {
+                    game: {
+                        gameSkin: 'MGSD_GOLD_BLITZ',
+                        gameName: 'play-micro-gold-blitz',
+                        gamePlatformConfig: {
+                            gameType: {
+                                type: 'Slots',
+                            },
                         },
                     },
                 },

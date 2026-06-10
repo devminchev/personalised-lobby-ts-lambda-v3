@@ -1,0 +1,76 @@
+- entryId: "1SC6Pyl5XFF1w8S4Y2uMzZ"
+  name: "mobile-test-data"
+  gameSkin: "mobile-skin-data"
+  realUrl: "mobile-url-data"
+  demoUrl: "mobile-demo-url-data"
+  gameId: "4lpZkuydT6HDe1MdBJdfr5"
+  title: "mobile-title-data"
+  imgUrlPattern: "mobile-img-url-pattern"
+  isProgressiveJackpot: true
+  animationMedia: default
+  sigCons: "Significant conditions apply. 18+. Please play responsibly."
+  backgroundMedia:
+    name: "jackpotjoy-big-bass-bonanza-bynder-1914x1263"
+    type: "image"
+    width: 1914
+    height: 1263
+    orientation: "landscape"
+    original: null
+    tags: []
+    thumbnails:
+      transformBaseUrl: "https://assets.ballys.com/transform/2a1e8a76-409f-4ac4-89d0-946829b57c42/jackpotjoy-big-bass-bonanza-bynder-1914x1263"
+  foregroundLogoMedia:
+    name: "jackpotjoy-big-bass-bonanza-bynder-1914x1263"
+    type: "image"
+    width: 1914
+    height: 1263
+    orientation: "landscape"
+    original: null
+    tags: []
+    thumbnails:
+      transformBaseUrl: "https://assets.ballys.com/transform/2a1e8a76-409f-4ac4-89d0-946829b57c42/jackpotjoy-big-bass-bonanza-bynder-1914x1263"
+  tags:
+    - "mobile-tag1"
+    - "mobile-tag2"
+  headlessJackpot:
+    id: 1
+    name: "headless jackpot mobile"
+
+
+- entryId: "1SC6Pyl5XFF1w8S4Y2uMzZ"
+  name: "desktop-test-data"
+  gameSkin: "desktop-skin-data"
+  realUrl: "desktop-url-data"
+  demoUrl: "desktop-demo-url-data"
+  gameId: "4lpZkuydT6HDe1MdBJdfr5"
+  title: "desktop-title-data"
+  imgUrlPattern: "desktop-img-url-pattern"
+  isProgressiveJackpot: true
+  animationMedia: default
+  sigCons: "Significant conditions apply. 18+. Please play responsibly."
+  backgroundMedia:
+    name: "jackpotjoy-big-bass-bonanza-bynder-1914x1263"
+    type: "image"
+    width: 1914
+    height: 1263
+    orientation: "landscape"
+    original: null
+    tags: []
+    thumbnails:
+      transformBaseUrl: "https://assets.ballys.com/transform/2a1e8a76-409f-4ac4-89d0-946829b57c42/jackpotjoy-big-bass-bonanza-bynder-1914x1263"
+  foregroundLogoMedia:
+    name: "jackpotjoy-big-bass-bonanza-bynder-1914x1263"
+    type: "image"
+    width: 1914
+    height: 1263
+    orientation: "landscape"
+    original: null
+    tags: []
+    thumbnails:
+      transformBaseUrl: "https://assets.ballys.com/transform/2a1e8a76-409f-4ac4-89d0-946829b57c42/jackpotjoy-big-bass-bonanza-bynder-1914x1263"
+  tags:
+    - "desktop-tag1"
+    - "desktop-tag2"
+  headlessJackpot:
+    id: 2,
+    name: "headless jackpot name desktop"

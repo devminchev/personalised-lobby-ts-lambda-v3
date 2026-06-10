@@ -1,7 +1,7 @@
 {
   "body": "",
   "resource": "/sites/{sitename}/platform/{platform}/view/{viewslug}?auth={auth}",
-  "path": "/sites/virgingames/platform/web/platform/view/homepage",
+  "path": "/sites/virgingames/platform/web/view/homepage",
   "httpMethod": "GET",
   "isBase64Encoded": false,
   "pathParameters": {
@@ -54,7 +54,7 @@
       "userAgent": "Custom User Agent String",
       "user": null
     },
-    "path": "/sites/virgingames/platform/web/platform/view/homepage?auth=true",
+    "path": "/sites/virgingames/platform/web/view/homepage?auth=true",
     "resourcePath": "/sites/{sitename}/platform/{platform}/view/{viewslug}?auth={auth}",
     "httpMethod": "GET",
     "apiId": "1234567890",

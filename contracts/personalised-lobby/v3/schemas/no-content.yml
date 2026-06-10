@@ -1,0 +1,6 @@
+---
+description: No Content response. Returned when the request parameters were valid, but no records were found.
+type: string
+minLength: 0
+maxLength: 0
+example: ''

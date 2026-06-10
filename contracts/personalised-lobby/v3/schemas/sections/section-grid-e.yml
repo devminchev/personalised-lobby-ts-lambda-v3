@@ -1,0 +1,29 @@
+title: IG Grid E Section
+description: Section with grid E
+required:
+  - entryId
+  - classification
+  - layoutType
+  - title
+properties:
+  entryId:
+    description: Unique id for the IG Grid E section
+    type: string
+  classification:
+    description: Classification type of the section
+    type: string
+  title:
+    description: Localized title for the section
+    type: string
+  hasGames:
+    description: Flag to indicate if this section has games
+    type: boolean
+  layoutType:
+    description: Layout type (fixed to grid-e)
+    type: string
+  neverTruncate:
+    description: If this is present the grid should never be truncated and all games must be shown. This property is only applicable to `grid-a` and `grid-e`.
+    type: boolean
+  viewAll:
+    type: object
+    $ref: '../view-all-action.yml'

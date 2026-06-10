@@ -1,0 +1,14 @@
+title: HistoricalGameTitle
+description: Historical Game Title
+required:
+  - title
+  - gameSkin
+properties:
+  title:
+    type: string
+    description: Title of game
+  gameSkin:
+    type: string
+    description: Unique identifier of the game.
+example:
+  $ref: '../examples/game-titles.yml'

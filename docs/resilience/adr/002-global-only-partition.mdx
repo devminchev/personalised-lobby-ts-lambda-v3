@@ -1,0 +1,81 @@
+---
+title: "ADR-002: Single GLOBAL partition"
+description: Why every alarm routes to BREAKER#GLOBAL — the per-service breaker design was already half-removed and silently broken; we collapse to a single partition and treat it as the primary breaker
+---
+
+# ADR-002: Single GLOBAL partition
+
+- **Status:** Accepted (2026-04-23)
+- **Supersedes:** an earlier per-service breaker design (partially-removed by commit `a2c631d4`, never fully consistent)
+- **Implementation:** [`parseAlarmName`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/index.ts), [`handleScheduledTick`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/index.ts)
+
+## Context
+
+Two pieces of the controller disagreed about routing on the incoming branch:
+
+- The **write path** (`parseAlarmName`) extracted `service = parts[1]` from the alarm name `breaker:<service>:<signal>`. So a CloudWatch alarm named `breaker:lobby-v2:api-p99` was routed to the DynamoDB partition `BREAKER#lobby-v2`.
+- The **scheduled tick** (`handleScheduledTick`) hardcoded `const service = 'GLOBAL'` and only ever read from `BREAKER#GLOBAL`.
+
+The combination produced a stuck-OPEN bug. A compound-warning incident on the `lobby-v2` API would:
+
+1. Open `BREAKER#lobby-v2` via the alarm path (write side wrote per-service).
+2. Wait for cooldown.
+3. **Never** transition out of OPEN — the tick only consulted `BREAKER#GLOBAL` and was blind to `BREAKER#lobby-v2`.
+
+This was reproducible end-to-end against DynamoDB Local: firing the template-emitted `breaker:lobby-v2:api-p99` + `breaker:lobby-v2:api-5xx` produced a `BREAKER#lobby-v2` partition with `state=OPEN`, and a subsequent tick past `holdUntil` returned `transitioned: 0` because it only looked at `BREAKER#GLOBAL`.
+
+The earlier per-service design depended on a GSI that had already been removed in commit `a2c631d4` (so the tick had no efficient way to enumerate all non-CLOSED partitions). Whoever made that commit took out half the per-service routing and left the other half referencing partitions nothing read.
+
+## Decision
+
+Collapse to a single global breaker.
+
+- `parseAlarmName` always returns `service: 'GLOBAL'`, regardless of the parsed alarm name. The signal is taken from the trailing segment of the name; the optional middle segment (`<label>`) is preserved for human readability but ignored by the routing.
+- The scheduled tick's hardcoded `'GLOBAL'` stays as-is.
+- `setBreakerStateManually` remains the intentional escape hatch for operators who need to write to an arbitrary partition (e.g. a forensic exercise on a per-service partition that got created before the collapse).
+- Alarm names are still allowed to carry a `<label>` segment — `breaker:GLOBAL:lobby-v2:api-p99` — for searchability in the CloudWatch console; the controller treats it as decoration only.
+
+The product framing that made this decision easy: "any critical or compound stress in the lobby stack should shed at the same gate" matches a single-partition breaker exactly.
+
+## Consequences
+
+### Positive
+
+- **Routing is now self-consistent.** Whatever the alarm name says, the controller writes to the same partition the tick reads from. The stuck-OPEN bug cannot happen on automatic transitions.
+- **Consumer integration becomes a single read.** Future Lambdas read one item: `(BREAKER#GLOBAL, STATE#CURRENT)`. No fan-out across N service partitions, no "which breaker do I trust" decision.
+- **Drift protection.** A future template typo like `breaker:lobbyv2:api-p99` (missing the GLOBAL segment) still routes to `BREAKER#GLOBAL` rather than silently creating an orphan partition that nothing reads.
+- **Less coordination machinery.** No GSI, no "active services" index item, no fan-out tick. Single partition + optimistic concurrency on one row (see [ADR-003](./003-optimistic-concurrency.mdx)).
+
+### Negative
+
+- **No per-service shedding.** A single misbehaving endpoint cannot shed independently of the others; everything trips together. Acceptable today because the lobby stack is a single product surface; would need to be revisited if the lobby ever splits into separately-shed-able domains.
+- **Higher contention on `BREAKER#GLOBAL`.** Every alarm and every tick writes to the same partition. Mitigated by [ADR-003](./003-optimistic-concurrency.mdx)'s optimistic concurrency + reserved concurrency cap of 5.
+- **Pre-existing per-service partitions become orphans.** Tables already deployed before this change may have `BREAKER#<service>` rows for older alarm names. They stay on disk:
+  - History (`STATE#<isoTs>`) and audit (`EVENT#*`) rows TTL out within 14–30 days.
+  - Live (`STATE#CURRENT`, `SIGNAL_STATE#CURRENT`) rows have no TTL and need manual deletion if you want a clean table. The controller never reads or writes them again, so leaving them is harmless apart from the tidiness.
+
+### Neutral / observable
+
+- The defensive collapse means **alarm names are no longer the source of truth for routing.** The trailing signal segment matters; everything before it is decoration. A reader of the alarm name in a runbook still gets the right intuition (the signal is the recognisable suffix), but the routing-correctness no longer depends on the label being right.
+
+## Considered alternatives
+
+### A. Restore per-service routing
+
+Re-add the GSI (or a small "active breakers" index item), make the tick iterate across all non-CLOSED partitions. Per-service shedding becomes possible.
+
+**Why we rejected it.** More moving parts (the index, the iteration, the GSI consistency model). The product direction at this point is a single load-shedding gate; the per-service capability would be unused for the foreseeable future. We can re-add it later if the product splits — the surface area of the change is bounded (alter `parseAlarmName`, alter the tick to fan out, add the index).
+
+### B. Keep the original alarm-name-driven routing and only fix the tick
+
+Make the tick discover non-CLOSED partitions and recover them. Same end-state correctness as A but without GSI churn.
+
+**Why we rejected it.** Same reason as A — adds unused capability. Also retains the partition-explosion failure mode where a future template typo creates a stuck orphan partition (because the tick *would* recover it, but operators wouldn't realise it existed).
+
+## References
+
+- [Source: `parseAlarmName` and the defensive-collapse rationale](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/index.ts)
+- [Source: `handleScheduledTick` reads only `BREAKER#GLOBAL`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/index.ts)
+- [Source: `setBreakerStateManually` escape hatch](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/index.ts)
+- [DynamoDB single-table design](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/best-practices-modeling-nosql-B.html)
+- [Data model — entity families](./../circuit-breaker-data-model.mdx#entity-families)

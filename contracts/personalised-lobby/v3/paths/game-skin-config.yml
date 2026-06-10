@@ -1,0 +1,45 @@
+---
+parameters:
+  - name: all
+    description: param to keep endpoints site agnostic
+    schema:
+      type: string
+    in: path
+    required: true
+  - name: gameskin
+    description: Unique identifier of the game.
+    schema:
+      type: string
+    in: path
+    required: true
+get:
+  summary: Game Config Data by Game Skin
+  description: Returns configuration for a game requested by game skin.
+  x-controller: getGameSkinConfig
+  tags:
+    - GameSkinConfig
+  responses:
+    "200":
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/game-skin-config.yml'
+      description: A JSON object of game config data
+    '400':
+      $ref: '../schemas/error-responses.yml'
+    '401':
+      $ref: '../schemas/error-responses.yml'
+    '403':
+      $ref: '../schemas/error-responses.yml'
+    '404':
+      $ref: '../schemas/error-responses.yml'
+    '429':
+      $ref: '../schemas/error-responses.yml'
+    '500':
+      $ref: '../schemas/error-responses.yml'
+    '502':
+      $ref: '../schemas/error-responses.yml'
+    '503':
+      $ref: '../schemas/error-responses.yml'
+    '504':
+      $ref: '../schemas/error-responses.yml'

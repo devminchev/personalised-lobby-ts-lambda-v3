@@ -158,7 +158,7 @@ The monorepo uses Nx for builds and SAM for local invocation.
 
 ### Prerequisites
 
-- Node.js 20, Yarn
+- Node.js 24, Yarn
 - AWS CLI + SAM CLI
 - Container runtime: Podman (preferred locally) or Docker
 

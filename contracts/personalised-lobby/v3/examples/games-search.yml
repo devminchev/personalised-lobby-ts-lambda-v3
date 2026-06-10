@@ -1,0 +1,41 @@
+- entryId: "7ls5kwzlsvZT02twxziwTw"
+  gameId: "5YnCwTuaHcdyYw31kj3J9z"
+  name: play-bp-dond-jk
+  title: "Deal or No Deal: What's In Your Box Jackpot King"
+  gameSkin: "PP_BIG_BASS_SPLASH"
+  demoUrl: "/service/game/demo/play-big-bass-splash"
+  realUrl: "/service/game/play/play-big-bass-splash"
+  imgUrlPattern: "/api/content/gametiles/dond-whats-in-your-box-logged-out/scale-s%s/dond-whats-in-your-box-tile-r%s-w%s.jpg"
+  sash: "DROPS & WINS"
+  representativeColor: "#163850"
+  animationMedia: "default"
+  sigCons: "Significant conditions apply. 18+. Please play responsibly."
+  foregroundLogoMedia:
+    name: "flash-match-on-feb26-25-Marquee-New-3X"
+    type: "image"
+    width: 750
+    height: 372
+    orientation: "landscape"
+    original: null
+    tags: []
+    thumbnails:
+      transformBaseUrl: "https://assets.ballys.com/transform/4c901602-85e2-41b4-99b6-ad7a928a5e6e/flash-match-on-feb26-25-Marquee-New-3X"
+  backgroundMedia:
+    name: "flash-match-on-feb26-25-Marquee-New-3X"
+    type: "image"
+    width: 750
+    height: 372
+    orientation: "landscape"
+    original: null
+    tags: []
+    thumbnails:
+      transformBaseUrl: "https://assets.ballys.com/transform/4c901602-85e2-41b4-99b6-ad7a928a5e6e/flash-match-on-feb26-25-Marquee-New-3X"
+  headlessJackpot:
+    name: "JACKPOT_BLAST"
+    id: 1
+  navigation:
+    - jackpots
+    - slots
+  tags:
+    - "tag1"
+    - "tag2"

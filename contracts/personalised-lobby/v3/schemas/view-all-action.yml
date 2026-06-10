@@ -1,0 +1,11 @@
+
+  properties:
+    viewAllActionSlug:
+      description: Slug to direct where the view all action leads to.
+      type: string
+    viewAllActionType:
+      description: Describes if the following view is an expanded section or a complete view
+      type: string
+    viewAllActionText:
+      description: Text for view all action button
+      type: string

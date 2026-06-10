@@ -1,0 +1,13 @@
+{
+  "name": "dynamoClient",
+  "version": "0.1.0",
+  "description": "Shared DynamoDB client and entity builders for personalised-lobby lambdas",
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "license": "MIT",
+  "scripts": {
+    "clean": "rm -rf node_modules coverage"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

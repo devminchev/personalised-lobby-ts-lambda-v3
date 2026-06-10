@@ -18,10 +18,7 @@ GetViewFunction:
     Properties:
         CodeUri: ./lambdas/GetViewFunction/ # Folder of the lambda function
         Handler: app.lambdaHandler # Adjust the handler path to dist/app.lambdaHandler
-        Runtime: nodejs20.x
-        Layers:
-            # - !ImportValue OSClientLayerArn
-            - !Ref OSClientLayer
+        Runtime: nodejs24.x
         Environment:
             Variables:
                 HOST: https://search-lobby-opsearch-oc5o7t2piau33hcu5ej3ortis4.eu-west-1.es.amazonaws.com/
@@ -42,12 +39,11 @@ GetViewFunction:
         BuildMethod: esbuild
         BuildProperties:
             Minify: true
-            Target: es2020
+            Target: es2022
             EntryPoints:
                 - app.ts
             External:
                 - os-client
-                - /opt/nodejs/node_modules/os-client
 
 GetSectionsApi:
     Type: AWS::Serverless::Api
@@ -98,7 +94,7 @@ _Note: Outputs are needed for deployments to AWS. If we switch to terraform in t
 
 ### Local invoke with sam
 
-Neither the lambdas nor the layers need to be build locally before building with sam as `sam build` itself will take care of that.
+The lambdas do not need to be built locally before building with sam as `sam build` itself will take care of that.
 
 To build the lambda locally run `sam build` from top level.
 

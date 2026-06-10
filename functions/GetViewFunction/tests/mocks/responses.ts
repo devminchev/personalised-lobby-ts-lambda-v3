@@ -1,4 +1,13 @@
 import { IBynderAsset } from 'os-client';
+import { IPlaceholderSectionOS } from '../../control/lib/types';
+
+export const PLACEHOLDER_SECTION_OS_MOCK: IPlaceholderSectionOS = {
+    id: 'WYUVMp1DgZpa2qoUvUeuH',
+    contentType: 'igContentPlaceholder',
+    classification: { 'en-GB': 'PlaceholderSection' },
+    placeholderType: { 'en-GB': 'loyalty-mechanic-progress-tracker' },
+    entryTitle: { 'en-GB': 'Loyalty tracker test' },
+};
 
 export const VENTURE_SUCCESS_RESP: any = {
     hits: {

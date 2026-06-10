@@ -1,0 +1,17 @@
+---
+GameInfoResponse:
+  summary: sample
+  value:
+    $ref: './game-info.yml'
+SectionGamesResponse:
+  summary: sample
+  value:
+    $ref: './section-games.yml'
+GameTitlesResponse:
+  summary: sample
+  value:
+    $ref: './game-titles.yml'
+GameConfigResponse:
+  summary: sample
+  value:
+    $ref: './game-config.yml'

@@ -1,0 +1,29 @@
+{
+    "version": "0",
+    "id": "abc12345-0000-1111-2222-def678901235",
+    "source": "aws.cloudwatch",
+    "account": "123456789012",
+    "time": "2026-03-30T17:30:00Z",
+    "region": "eu-west-1",
+    "resources": [
+        "arn:aws:cloudwatch:eu-west-1:123456789012:alarm:breaker:GLOBAL:os-search-rejections"
+    ],
+    "detail-type": "CloudWatch Alarm State Change",
+    "detail": {
+        "alarmName": "breaker:GLOBAL:os-search-rejections",
+        "previousState": {
+            "value": "ALARM",
+            "timestamp": "2026-03-30T16:10:00Z",
+            "reason": "Threshold Crossed: 3 datapoints were all greater than the threshold."
+        },
+        "state": {
+            "value": "OK",
+            "timestamp": "2026-03-30T17:30:00Z",
+            "reason": "Threshold Crossed: 1 datapoint [0.0] was not greater than the threshold [1.0]."
+        },
+        "configuration": {
+            "description": "os-search-rejections",
+            "metrics": []
+        }
+    }
+}

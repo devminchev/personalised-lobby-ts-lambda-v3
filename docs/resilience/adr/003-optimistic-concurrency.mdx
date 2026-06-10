@@ -1,0 +1,109 @@
+---
+title: "ADR-003: Optimistic concurrency with one-shot retry"
+description: Why every state write is guarded by a version-based ConditionExpression, retried at most once, and otherwise routed to the DLQ — instead of using a queue or a leadership lock
+---
+
+# ADR-003: Optimistic concurrency with one-shot retry
+
+- **Status:** Accepted (2026-04-23)
+- **Implementation:** [`breakerStateCondition`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/index.ts), [`withOptimisticRetry`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/index.ts), [`isConditionalCheckFailure`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/index.ts)
+
+## Context
+
+Every alarm event and every tick writes to the same DynamoDB partition (`BREAKER#GLOBAL`). Real incidents fan out multiple alarm transitions inside a few seconds, and EventBridge delivers them in parallel. The controller's hot path is read-compute-write inside that shared partition. Without coordination, two concurrent invocations can lose each other's work:
+
+```
+T0  Writer A:  BatchGet → signals={},  version=5
+T0  Writer B:  BatchGet → signals={},  version=5    (same snapshot)
+T1  Writer A:  TransactWrite → signals={A}, version=6   ✓
+T2  Writer B:  TransactWrite → signals={B}, version=6   ✓ (overwrites A)
+```
+
+Writer A's signal silently disappears from the active-signals map, and the breaker can under-trip on a real compound-warning incident. The signal-snapshot map is shared mutable state; the lost-update class of bugs needs an explicit fix.
+
+A second axis: under sustained pressure (alarm storm) the contention on `BREAKER#GLOBAL` grows and the probability of any single writer winning the race drops. Whatever coordination model we pick has to behave well at zero contention and degrade gracefully under storm.
+
+## Decision
+
+**Optimistic concurrency on a monotonic version, retried exactly once.**
+
+Three pieces:
+
+### 1. Conditional writes guarded by `version`
+
+Every write to `STATE#CURRENT` carries one of two `ConditionExpression`s:
+
+- `attribute_not_exists(PK)` for the first-ever write to a fresh partition. Blocks two simultaneous first-writes from both succeeding.
+- `version = :prevVersion` for subsequent writes, using the version we observed during the BatchGet. Any racing writer that committed in between has advanced the stored `version`, so our condition fails and the transaction rolls back.
+
+The version is a monotonic counter set to `prev.version + 1` on every state write ([statemachine.ts](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/statemachine.ts)). It is not a clock and does not encode time; it is purely a write-coordination primitive.
+
+We guard `STATE#CURRENT` only, not `SIGNAL_STATE#CURRENT`, audit, or history. DynamoDB transactions are atomic — if the breaker-state Put's condition fails, the rest of the transaction rolls back too. One guard on the version protects all four items with less code.
+
+### 2. One-shot retry
+
+[`withOptimisticRetry`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/index.ts) wraps every entry-point handler. It runs the read-compute-write op once; on a `ConditionalCheckFailed`-shaped error it runs the op once more — re-reading the post-race state — then propagates whatever happens.
+
+The retry predicate ([`isConditionalCheckFailure`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/index.ts)) matches:
+
+- `ConditionalCheckFailedException` (in case of a future refactor to a plain `PutCommand`)
+- `TransactionCanceledException` whose `CancellationReasons` includes `Code: 'ConditionalCheckFailed'`
+
+Other transaction failures (`ThrottlingError`, `ItemCollectionSizeLimit`, etc.) are not retried — retrying them in a tight loop compounds the problem.
+
+### 3. The DLQ as the release valve
+
+If both the initial attempt and the retry lose, the handler throws. EventBridge invokes the Lambda asynchronously, so Lambda's async-invocation framework applies its own retry policy (initial + 2 = 3 total attempts, see [Lambda async invocation](https://docs.aws.amazon.com/lambda/latest/dg/invocation-async.html)) before sending the event to the configured destination — in our case the SQS DLQ. `ControllerDlqDepthAlarm` fires immediately on the first message.
+
+## Consequences
+
+### Positive
+
+- **Zero contention is zero overhead.** Single-writer invocations pay only the `ConditionExpression` evaluation, which is part of the standard DynamoDB write path. No locks, no queue.
+- **Lost-update class of bugs is closed.** Every `STATE#CURRENT` write either succeeds against the version it observed, or rolls back the entire transaction (state + signal + history + audit). Partial writes are impossible.
+- **Storm behaviour is observable.** Failed-after-retry events go to the DLQ, which fires `ControllerDlqDepthAlarm` immediately. Operators see "the breaker is overloaded" loudly, rather than "the breaker is silently undercounting signals."
+- **Self-healing on event-driven workloads.** A single dropped invocation under contention does not strand the breaker — the next alarm event re-observes the world and produces the correct posture.
+
+### Negative
+
+- **One retry is the cap.** Three-way races leak to the DLQ. Acceptable because three-way races are rare in practice and the DLQ is designed for exactly this kind of release valve. The trade is between "noisy DLQ during an alarm storm" and "tight retry loop amplifying the storm" — we picked the former.
+- **Audit row idempotency caveat.** A retried event re-uses the same `EVENT#<isoTs>#<alarmName>` SK on the second attempt, so the row is overwritten. State and history rows are correct (written from the post-race read), but the audit row reflects only the successful attempt. Acceptable for a forensic record.
+
+### Neutral / observable
+
+- **The `version` field is exposed on `BreakerStateItem`.** Consumers can use it for "has the posture changed since I last read?" comparisons (see [Consumer integration](./../circuit-breaker-consumer-integration.mdx)). This was not the primary purpose but is a free side-effect of the design.
+
+## Considered alternatives
+
+### A. Pessimistic locking via a DynamoDB lock item
+
+A separate `LOCK#<service>` item with a TTL, taken before any read-compute-write and released at the end. Every contender waits for the lock.
+
+**Why we rejected it.** Two extra DDB writes per invocation (acquire + release), a recovery path for orphaned locks (Lambda crash mid-write leaves the lock held until TTL), and a hard ceiling on throughput equal to one in-flight writer at a time. Optimistic concurrency wins when contention is low and writes are commutative-or-recomputable; both are true here.
+
+### B. Queue-serialised processing
+
+Front the controller with an SQS FIFO queue, set a single in-flight Lambda. Alarm events are processed in arrival order, one at a time.
+
+**Why we rejected it.** Loses parallelism we don't actually need to lose — a single alarm event takes 50–100 ms; we can afford two of them in flight as long as the last-write-wins case is fixed. The FIFO queue would also need a partition-key strategy and would couple the invocation latency to the slowest event. Mostly, it's strictly more machinery for less throughput.
+
+### C. Unbounded retry loop on `ConditionalCheckFailed`
+
+Loop until the write wins, or a timeout fires. Same correctness as the bounded version under low contention.
+
+**Why we rejected it.** Under storm the retry loop amplifies contention rather than draining it — every losing writer immediately tries again, increasing the chance of further collisions. The bounded retry + DLQ pairing makes the storm visible (via the DLQ alarm) and gives operators a knob to react rather than masking the storm in the controller's own retry rate.
+
+### D. Single writer via reserved concurrency = 1
+
+Set `ReservedConcurrentExecutions: 1` so only one invocation runs at a time. No race, no retry needed.
+
+**Why we rejected it.** Same trade as B: serialisation throughput cost. Worst case during a storm: events queue up, the per-event latency stacks, and the queue depth alarm fires for a different reason. We keep `ReservedConcurrentExecutions: 5` as a contention bound (not a serialiser) and let optimistic concurrency handle the rest.
+
+## References
+
+- [DynamoDB conditional writes](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.ConditionExpressions.html#Expressions.ConditionExpressions.PreventingOverwrites) — the canonical primitive
+- [DynamoDB transactions — TransactWriteItems](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/transaction-apis.html#transaction-apis-txwriteitems)
+- [DynamoDB read consistency](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.ReadConsistency.html) — companion to this ADR; we use strong reads on the BatchGet
+- [Lambda asynchronous invocation](https://docs.aws.amazon.com/lambda/latest/dg/invocation-async.html) — the retry / DLQ semantics that turn the post-retry throw into a recoverable event
+- [Source: lost-update narrative on `transactWriteEvaluation`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/index.ts)
+- [Consistency and concurrency](./../consistency-and-concurrency.mdx) — narrative form of this ADR

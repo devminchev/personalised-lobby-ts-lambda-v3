@@ -37,7 +37,7 @@ export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGat
     try {
         checkRequestParams([siteNameFromParams, validators.siteName], [platform, validators.platform]);
 
-        const client = getClient();
+        const client = getClient({ tier: 'C', enabled: false });
         const spaceLocale = handleSpaceLocalization();
 
         const ventureId = await getVentureId(client, siteName, spaceLocale, platform);

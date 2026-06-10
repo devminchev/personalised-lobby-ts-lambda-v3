@@ -1,0 +1,15 @@
+---
+'204':
+  description: Request params were valid but there is no content
+  headers:
+    Cache-Control:
+      description: Response is never cached
+      schema:
+        type: string
+        enum:
+          - no-cache
+      example: no-cache
+  content:
+    application/json:
+      schema:
+        $ref: '../schemas/no-content.yml'

@@ -16,6 +16,9 @@ export default {
     testMatch: ['**/tests/*.test.ts'],
     setupFilesAfterEnv: ['<rootDir>/setupTests.js'],
     moduleNameMapper: {
-        '/opt/nodejs/node_modules/os-client$': '<rootDir>/../../layers/OSClientLayer',
+        '^os-client$': '<rootDir>/../../libs/OSClient/index.ts',
+        '^os-client/lib/(.*)$': '<rootDir>/../../libs/OSClient/lib/$1',
+        '^@contentful/node-apps-toolkit$': '<rootDir>/tests/__mocks__/emptyModule.ts',
+        '^contentful-management$': '<rootDir>/tests/__mocks__/emptyModule.ts',
     },
 };

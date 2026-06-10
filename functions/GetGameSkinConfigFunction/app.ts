@@ -31,7 +31,12 @@ import {
 export const getGameByGameSkin = async (client: IClient, gameSkin: string): Promise<{ game: IGameConfig }> => {
     const query = {
         size: 2, // gameskins should be unique but increased size to 2 for possible edge cases with mutliple of the same gameskin
-        _source: [`game.gamePlatformConfig.gameType.type`, `game.gameName`, `game.gameSkin`],
+        _source: [
+            `game.gamePlatformConfig.gameType.type`,
+            `game.gameName`,
+            `game.gameSkin`,
+            `game.gamePlatformConfig.gameAggregator`,
+        ],
         query: {
             constant_score: {
                 filter: {
@@ -56,6 +61,7 @@ const createResponseObject = async (gameData: { game: IGameConfig }): Promise<IG
     return {
         gameName: gameData.game.gameName,
         gameType: platformConfig.gameType.type,
+        gameAggregator: platformConfig?.gameAggregator || null,
     };
 };
 
@@ -68,7 +74,7 @@ export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGat
     try {
         checkRequestParams([siteName, validators.allSiteName]);
 
-        const client = getClient();
+        const client = getClient({ tier: 'B', enabled: false });
         checkRequestParams(gameSkin);
 
         const models = await getGameByGameSkin(client, gameSkin);

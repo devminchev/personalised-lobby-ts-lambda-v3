@@ -1,0 +1,31 @@
+title: IG Jackpot Sections Block
+description: Section block holding multiple Jackpot sections that are to be displayed inline.
+type: object
+required:
+  - entryId
+  - classification
+  - title
+  - layoutType
+  - elements
+properties:
+  entryId:
+    description: Unique id for the marketing section
+    type: string
+
+  classification:
+    description: Classification type of the section. `JackpotSectionsBlock` for the sections containing multiple jackpot sections, displayed one next to another.
+    type: string
+
+  title:
+    description: Localized title for the marketing section
+    type: string
+
+  layoutType:
+    description: Layout type (can be carousel-a)
+    type: string
+
+  jackpots:
+    type: array
+    description: A list of jackpot sections for the section
+    items:
+      $ref: './section-jackpot.yml'

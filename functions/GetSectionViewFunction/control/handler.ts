@@ -227,6 +227,7 @@ const getSectionViewGames = async (
                                             `game.webComponentData`,
                                             'game.animationMedia',
                                             'game.loggedOutAnimationMedia',
+                                            'game.sigCons',
                                             'game.foregroundLogoMedia',
                                             'game.loggedOutForegroundLogoMedia',
                                             'game.backgroundMedia',
@@ -312,6 +313,8 @@ export const mapSectionGames = (
             ? tryGetValueFromLocalised(locale, spaceLocale, game?.animationMedia, null)
             : tryGetValueFromLocalised(locale, spaceLocale, game?.loggedOutAnimationMedia, null);
 
+        const sigCons = tryGetValueFromLocalised(locale, spaceLocale, game?.sigCons, null);
+
         const foregroundLogoMedia = getPreferredOrFallbackLocalised(
             locale,
             spaceLocale,
@@ -352,6 +355,7 @@ export const mapSectionGames = (
             ...(tags && { tags: tags }),
             ...(sash && { sash: sash }),
             ...(animationMedia && { animationMedia }),
+            ...(sigCons && { sigCons }),
             ...(foregroundLogoMediaObj && { foregroundLogoMedia: foregroundLogoMediaObj }),
             ...(backgroundMediaObj && { backgroundMedia: backgroundMediaObj }),
             ...(webComponentData && { webComponentData }),
@@ -478,7 +482,7 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
     const userLocale: string = validateLocaleQuery(event.queryStringParameters?.locale);
 
     try {
-        const client = getClient();
+        const client = getClient({ tier: 'B', enabled: false });
 
         const spaceLocale = handleSpaceLocalization();
         checkRequestParams(

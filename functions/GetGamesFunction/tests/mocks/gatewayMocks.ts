@@ -42,11 +42,11 @@ const API_GATEWAY_PROXY_MOCK = {
 };
 
 export const mockApiEvent = (...params: any) => {
-    const [sitename, platform, viewslug, sectionid, memberid, queryParams = {}] = params;
+    const [sitename, platform, viewslug, sectionid, queryParams = {}] = params;
 
     return {
         ...API_GATEWAY_PROXY_MOCK,
         pathParameters: { sitename, viewslug, sectionid, platform },
-        queryStringParameters: { memberid: memberid, ...queryParams },
+        queryStringParameters: { ...queryParams },
     };
 };

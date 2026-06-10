@@ -1,0 +1,80 @@
+---
+parameters:
+  - name: X-LOBBY-VARIANT
+    description: Custom header for AB testing. Accepted (treatment, control, unaffected) defaults to unaffected.
+    schema:
+      type: string
+    in: header
+    required: false
+  - name: sitename
+    description: Venture name
+    schema:
+      type: string
+    in: path
+    required: true
+  - name: platform
+    description: Platform device type. Accepted values 'web', 'ios' and 'android'.
+    schema:
+      type: string
+    in: path
+    required: true
+  - name: viewslug
+    description: the slug of the view
+    schema:
+      type: string
+    in: path
+    required: true
+  - name: sectionid
+    description: section id
+    schema:
+      type: string
+    in: path
+    required: true
+  - name: locale
+    in: query
+    description: Used for localization. Values are set in Contentful. Accepted values "en-GB", "en-CA", "en-US", "es-ES"
+    schema:
+      type: string
+    required: false
+  - name: offset
+    in: query
+    description: offset for pagination.
+    schema:
+      type: number
+    required: false
+  - name: limit
+    in: query
+    description: limit for pagination.
+    schema:
+      type: number
+    required: false
+get:
+  summary: Games for a section
+  x-controller: getSectionGames
+  tags:
+    - SectionGames
+  responses:
+    "200":
+      description: A list of venture games for a platform.
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/section-games.yml'
+    '400':
+      $ref: '../schemas/error-responses.yml'
+    '401':
+      $ref: '../schemas/error-responses.yml'
+    '403':
+      $ref: '../schemas/error-responses.yml'
+    '404':
+      $ref: '../schemas/error-responses.yml'
+    '429':
+      $ref: '../schemas/error-responses.yml'
+    '500':
+      $ref: '../schemas/error-responses.yml'
+    '502':
+      $ref: '../schemas/error-responses.yml'
+    '503':
+      $ref: '../schemas/error-responses.yml'
+    '504':
+      $ref: '../schemas/error-responses.yml'

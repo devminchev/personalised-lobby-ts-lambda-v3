@@ -1,0 +1,19 @@
+title: igQuickLinks
+required:
+    - entryId
+    - classification
+    - layoutType
+properties:
+  entryId:
+    description: Unique id for the quickLinks section
+    type: string
+  layoutType:
+    description: Layout type (can be - carousel-pill, carousel, grid, list)
+    type: string
+  classification:
+    description: Classification type of the section
+    type: string
+  links:
+    type: array
+    items:
+      $ref: "../link.yml"

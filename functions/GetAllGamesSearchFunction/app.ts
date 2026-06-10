@@ -17,6 +17,7 @@ import {
     ALL_SECTIONS_SHARED_READ_ALIAS,
     IG_GAMES_V2_READ_ALIAS,
     IHeadlessJackpot,
+    SanitizedBynder,
     pickGameOrSiteGameValue,
     errorResponseHandler,
     gzipResponse,
@@ -56,7 +57,13 @@ interface IGameSearchRecord {
     imgUrlPattern?: string;
     sash?: string;
     representativeColor?: string;
+    tags?: string[];
+    animationMedia?: string;
+    sigCons?: string;
+    foregroundLogoMedia?: SanitizedBynder;
+    backgroundMedia?: SanitizedBynder;
     headlessJackpot?: IHeadlessJackpot;
+    liveHidden?: boolean;
     navigation: string[];
 }
 
@@ -159,6 +166,8 @@ export const constructGameSearchResponse = (
             ? tryGetValueFromLocalised(localeOverride, spaceLocale, gameData?.animationMedia, null)
             : tryGetValueFromLocalised(localeOverride, spaceLocale, gameData?.loggedOutAnimationMedia, null);
 
+        const sigCons = tryGetValueFromLocalised(localeOverride, spaceLocale, gameData?.sigCons, null);
+
         const foregroundLogoMedia = getPreferredOrFallbackLocalised(
             localeOverride,
             spaceLocale,
@@ -191,6 +200,7 @@ export const constructGameSearchResponse = (
             ...(tags && { tags }),
             ...(finalImageUrl && { imgUrlPattern: finalImageUrl }),
             ...(animationMedia && { animationMedia }),
+            ...(sigCons && { sigCons }),
             ...(foregroundLogoMediaObj && { foregroundLogoMedia: foregroundLogoMediaObj }),
             ...(backgroundMediaObj && { backgroundMedia: backgroundMediaObj }),
             ...(headlessJackpot && { headlessJackpot }),
@@ -244,6 +254,7 @@ export const createGamesSearchQuery = (
                                             'game.imgUrlPattern',
                                             'game.animationMedia',
                                             'game.loggedOutAnimationMedia',
+                                            'game.sigCons',
                                             'game.foregroundLogoMedia',
                                             'game.loggedOutForegroundLogoMedia',
                                             'game.backgroundMedia',
@@ -288,7 +299,7 @@ export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGat
     const showOnlyLoggedIn = authenticated.trim().toLowerCase() === 'true';
 
     try {
-        const client = getClient();
+        const client = getClient({ tier: 'C', enabled: true });
 
         checkRequestParams([siteNameFromParams, validators.siteName], [platform, validators.platform]);
         const siteName = patchVentureName(siteNameFromParams);

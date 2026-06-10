@@ -1,0 +1,29 @@
+{
+    "version": "0",
+    "id": "abc12345-0000-1111-2222-def678901242",
+    "source": "aws.cloudwatch",
+    "account": "123456789012",
+    "time": "2026-04-21T10:00:00Z",
+    "region": "eu-west-1",
+    "resources": [
+        "arn:aws:cloudwatch:eu-west-1:123456789012:alarm:breaker:GLOBAL:lobby-v2:api-5xx"
+    ],
+    "detail-type": "CloudWatch Alarm State Change",
+    "detail": {
+        "alarmName": "breaker:GLOBAL:lobby-v2:api-5xx",
+        "previousState": {
+            "value": "OK",
+            "timestamp": "2026-04-21T09:55:00Z",
+            "reason": "Below threshold."
+        },
+        "state": {
+            "value": "ALARM",
+            "timestamp": "2026-04-21T10:00:00Z",
+            "reason": "Threshold Crossed: 3 out of the last 5 datapoints were greater than or equal to the threshold (0.01)."
+        },
+        "configuration": {
+            "description": "api-5xx",
+            "metrics": []
+        }
+    }
+}

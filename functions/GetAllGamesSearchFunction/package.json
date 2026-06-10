@@ -1,9 +1,9 @@
 {
   "name": "get-all-games-search",
-  "version": "0.28.6",
+  "version": "0.33.0",
   "description": "Returns a list of all searchable games for the venture",
   "main": "app.js",
-  "repository": "https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda",
+  "repository": "https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3",
   "relComponent": "igaming_lobby_old_search_v3",
   "scripts": {
     "unit": "jest",

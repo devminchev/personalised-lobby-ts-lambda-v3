@@ -1,0 +1,134 @@
+---
+title: Glossary
+description: Terms used across the resilience documentation, defined in one place
+---
+
+# Glossary
+
+Terms with project-specific meaning across the resilience section. When the same term has multiple plausible meanings (e.g. "version", "mode"), the entry below is what *we* mean by it in this codebase.
+
+## Anti-flap
+
+Two compounding mechanisms that prevent the breaker's consumer-visible state from oscillating faster than once a minute: alarm-side `DatapointsToAlarm` smoothing (3-of-5 for warnings, 2-of-3 for criticals) and controller-side `openHoldMs ≥ 60 s`. See [Behaviour — anti-flap](./circuit-breaker-behaviour.mdx#anti-flap).
+
+## Audit row
+
+An `EVENT#<isoTs>#<alarmName>` item in DynamoDB capturing a consumed alarm state-change event. Written in the same atomic transaction as the resulting state change. TTL'd at 14 days by default. See [Data model — `EVENT#`](./circuit-breaker-data-model.mdx#eventistsalarmname--raw-alarm-event-audit).
+
+## Bounded retry
+
+The controller's choice to retry an optimistic-concurrency failure exactly once, then throw — instead of a retry loop. Throwing routes the invocation to the DLQ via Lambda's async-retry path. See [Consistency and concurrency — one-shot retry](./consistency-and-concurrency.mdx#one-shot-retry) and [ADR-003](./adr/003-optimistic-concurrency.mdx).
+
+## Breaker
+
+Shorthand for "circuit breaker". This entire system. The persisted artefact lives at `BREAKER#GLOBAL` `STATE#CURRENT` in DynamoDB.
+
+## CLOSED / OPEN / HALF_OPEN
+
+The three breaker states.
+
+- **CLOSED** — healthy; normal traffic.
+- **OPEN** — tripped; consumers shed non-critical traffic.
+- **HALF_OPEN** — probing; cooldown elapsed but consumers still shed until evidence of recovery.
+
+`OPEN` and `HALF_OPEN` collapse to the same `mode` for consumers. See [State machine — states](./circuit-breaker-state-machine.mdx#states).
+
+## Compound severity / Compound warning
+
+A score computed across **all** currently-active signals, not just the alarm that triggered the current invocation. `compound_warning` specifically means *two or more* warning signals firing simultaneously, which is enough to trip the breaker even though a single warning on its own would not. See [State machine — compound severity scoring](./circuit-breaker-state-machine.mdx#compound-severity-scoring).
+
+## Critical signal
+
+An alarm whose name's trailing segment is in `CRITICAL_SIGNALS` (`os-search-rejections`, `os-write-rejections`). A single critical signal in ALARM trips the breaker. See [`src/config.ts`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/config.ts) and [Alarms — critical signals](./circuit-breaker-alarms.mdx#critical-signals).
+
+## Defensive collapse
+
+`parseAlarmName` always forces `service: 'GLOBAL'` regardless of what the parsed alarm name says. Protects against template-drift typos that would otherwise route to a stuck orphan partition. See [State machine — manual override](./circuit-breaker-state-machine.mdx#manual-override) and [ADR-002](./adr/002-global-only-partition.mdx).
+
+## Edge-triggered
+
+CloudWatch alarms publish EventBridge events only on **state transitions** (`OK ↔ ALARM ↔ INSUFFICIENT_DATA`), never on every evaluation. A 10-minute sustained breach produces exactly two events (trip + recovery), regardless of `Period`. The whole reason a [scheduled tick](#scheduled-tick) is needed for timeout-driven recovery — see [ADR-005](./adr/005-edge-triggered-with-tick.mdx).
+
+## Fail-loud
+
+The settings loader's stance: any error throws. Missing parameter, malformed value, SSM throttle, missing prefix env var — all surface immediately. There is intentionally no fallback to hardcoded defaults. The DLQ + `ControllerErrorsAlarm` make those failures visible. See [`src/settings.ts`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/settings.ts) header.
+
+## GLOBAL
+
+The fixed routing key in `BREAKER#GLOBAL`. Every alarm routes to this single partition. Per-service partitions exist as an escape hatch via `setBreakerStateManually` but the controller's automatic paths only act on GLOBAL. See [ADR-002](./adr/002-global-only-partition.mdx).
+
+## `holdUntil`
+
+ISO 8601 timestamp on `BreakerStateItem` indicating the earliest time the next state-evolving transition is permitted. Set on entry into OPEN to `now + openHoldMs`; set on entry into HALF_OPEN to `now + halfOpenMaxMs`; cleared on CLOSED. See [State machine — persisted fields](./circuit-breaker-state-machine.mdx#persisted-fields-driving-the-machine).
+
+## `mode`
+
+The consumer-facing decision input — either `'normal'` or `'protect'`. CLOSED → `normal`; OPEN and HALF_OPEN both → `protect`. See [State machine — states](./circuit-breaker-state-machine.mdx#states) and [Consumer integration](./circuit-breaker-consumer-integration.mdx#what-mode-means).
+
+## Optimistic concurrency
+
+The pattern of guarding writes with a `ConditionExpression` on a monotonic version, retrying on a lost race rather than holding a lock. The standard primitive for "if my predecessor moved, recompute". See [Consistency and concurrency](./consistency-and-concurrency.mdx) and [ADR-003](./adr/003-optimistic-concurrency.mdx).
+
+## Probe / probe path
+
+The HALF_OPEN-exit-via-OK-events path. While in HALF_OPEN, each non-ALARM alarm event bumps `healthyProbeCount`; reaching `healthyOkEventsToClose` (default 2) closes the breaker. Distinct from the [tick path](#tick-path), which closes via the timeout + empty-signals check. See [State machine — alarm-event transitions](./circuit-breaker-state-machine.mdx#alarm-event-transitions).
+
+## Posture
+
+The current breaker decision the controller has committed to — i.e. the contents of `STATE#CURRENT`. Used interchangeably with "state" in operator contexts; the schema reserves "state" for the literal `state` field.
+
+## Reserved concurrency
+
+The Lambda configuration knob that caps the maximum number of concurrent executions for this function. Set to 5 ([template.yaml](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/template.yaml)) to bound contention on `BREAKER#GLOBAL` during alarm storms. See [AWS docs](https://docs.aws.amazon.com/lambda/latest/dg/configuration-concurrency.html).
+
+## Scheduled tick / tick
+
+The 1-minute EventBridge Scheduler invocation that drives timeout-based transitions (OPEN → HALF_OPEN, HALF_OPEN → CLOSED/OPEN). Required because alarms are [edge-triggered](#edge-triggered) and would never produce a "cooldown elapsed" event on their own. See [ADR-005](./adr/005-edge-triggered-with-tick.mdx).
+
+## Self-observability alarms
+
+The two alarms watching the controller itself: `ControllerErrorsAlarm` and `ControllerDlqDepthAlarm`. They are deliberately **not** prefixed `breaker:` so they cannot feed back into the controller via the EventBridge rule. See [ADR-004](./adr/004-no-breaker-prefix-on-self-obs.mdx).
+
+## Severity
+
+The four-level compound score (`HIGH | MEDIUM_HIGH | LOW | NONE`) computed across active signals. Currently used internally by the controller; not yet persisted to `BreakerStateItem`. Future tier-aware shedding would persist this and let consumers branch on it. See [Consumer integration — future tier-aware shedding](./circuit-breaker-consumer-integration.mdx#future-tier-aware-shedding).
+
+## Signal
+
+A named alarm entry in the active-signals snapshot. Identified by the trailing segment of the alarm name (`os-search-rejections`, `api-p99`, etc.). The set of recognised signals is `CRITICAL_SIGNALS ∪ WARNING_SIGNALS`; an unrecognised signal name is consumed by the controller but does not affect severity scoring (it lands in the snapshot but no scoring rule references it). See [`src/config.ts`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/config.ts).
+
+## Single warning
+
+Exactly one warning signal in ALARM. Severity `LOW`, `shouldOpen: false`. The breaker stays CLOSED — single warnings are informational, not actionable. Two or more would be a [compound warning](#compound-severity--compound-warning). See [State machine — compound severity](./circuit-breaker-state-machine.mdx#compound-severity-scoring).
+
+## Stale event
+
+An alarm event whose `state.timestamp` is older than `staleEventMs` (default 10 min) at the moment the controller receives it. Dropped without further processing. Set `staleEventMs = 0` to disable the freshness guard, primarily for tests and local replay. See [`isExpired` in `src/index.ts`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/index.ts).
+
+## Tick path
+
+The HALF_OPEN-exit-via-tick path. When the 1-minute tick fires and `now ≥ holdUntil`, the controller checks the (pruned) signal snapshot: empty → CLOSED, non-empty → re-OPEN. Distinct from the [probe path](#probe--probe-path). See [State machine — tick-event transitions](./circuit-breaker-state-machine.mdx#tick-event-transitions).
+
+## Tier (A / B / C)
+
+Endpoint classification driving load shedding order. Tier A is the core user journey ("see games and play them"); Tier C is enrichment (recommendations, suggestions). Shed in reverse order: C first, then B, then A is the last line of defence. See [Service tiers](./service-tiers.mdx).
+
+## TransactWriteItems
+
+The DynamoDB API the controller uses for every state write. All-or-nothing across multiple items in one round-trip. The controller wraps `STATE#CURRENT`, `STATE#<isoTs>` (history), `SIGNAL_STATE#CURRENT`, and optionally `EVENT#<isoTs>#<alarmName>` (audit) into one transaction so a failed condition rolls all of them back. See [the API reference](https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_TransactWriteItems.html) and [Consistency and concurrency](./consistency-and-concurrency.mdx).
+
+## `tripCount`
+
+A monotonic counter on `BreakerStateItem` that increments only on a *fresh* trip (`prev.state !== 'OPEN' && next.state === 'OPEN'`). OPEN → OPEN sustains do not increment. Useful for "is this breaker chronically unstable" dashboards. See [Data model — `tripCount`](./circuit-breaker-data-model.mdx#tripcount).
+
+## `version`
+
+A monotonic counter on `BreakerStateItem` incremented by every state write. Acts as the optimistic-concurrency token: the next write's `ConditionExpression` is `version = :prevVersion`, which fails if any other writer committed between read and write. Distinct from `tripCount` — `version` increments on every transition; `tripCount` only on fresh trips. See [Consistency and concurrency](./consistency-and-concurrency.mdx).
+
+## Warning signal
+
+An alarm whose name's trailing segment is in `WARNING_SIGNALS` (`api-p99`, `api-5xx`, `jvm-pressure`, `cpu-high`). One warning is informational; two or more simultaneously trip the breaker. See [`src/config.ts`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/config.ts) and [Alarms — warning signals](./circuit-breaker-alarms.mdx#warning-signals).
+
+## Zombie signal
+
+A `SIGNAL_STATE#CURRENT` entry whose closing OK event was lost (EventBridge drop, signal renamed, OK event arrived too old and got dropped by the freshness guard). Without intervention, a zombie signal would pin the breaker OPEN forever — the tick's HALF_OPEN-expiry check would always see `signals` non-empty. `pruneStaleSignals` drops entries unrefreshed within `signalMaxAgeMs` (default 20 min); the cleaned snapshot is then **persisted back to DynamoDB** in the same transaction as the state write, both on the alarm path and on the HALF_OPEN-expiry tick. See [State machine — zombie pruning](./circuit-breaker-state-machine.mdx#zombie-pruning).

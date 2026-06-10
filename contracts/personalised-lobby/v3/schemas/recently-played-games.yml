@@ -1,0 +1,10 @@
+---
+title: RecentlyPlayedGamesResponse
+description: Response for recently-played games as per memberId.
+type: array
+items:
+  type: object
+  $ref:  "./section-games-auth-ml.yml"
+
+example:
+  $ref: '../examples/recently-played-games.yml'

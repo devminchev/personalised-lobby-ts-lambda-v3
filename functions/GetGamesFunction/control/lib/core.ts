@@ -7,11 +7,9 @@ import {
     ISectionGameOnlyQuery,
     getHits,
     createError,
-    IMlPersonalizedSection,
     ALL_SECTIONS_SHARED_READ_ALIAS,
     IG_GAMES_V2_READ_ALIAS,
     logMessage,
-    OrderCriteriaContentful,
 } from 'os-client';
 
 const SECTION_GAMES_SECTION_RECORDS_LIMIT = 100;
@@ -23,8 +21,6 @@ export interface ISectionGamesPagination {
 
 export interface ISectionGamesList {
     sectionGameIds: string[];
-    sectionType: string;
-    sortCriteria?: OrderCriteriaContentful | null;
 }
 
 export const getGamesListForSection = async (
@@ -39,7 +35,7 @@ export const getGamesListForSection = async (
     const platformField = `platformVisibility.${locale}.keyword`;
     const environmentField = `environmentVisibility.${locale}.keyword`;
     const getSectionGamesListQuery = {
-        _source: ['games', 'game', 'classification', 'type', 'sort'],
+        _source: ['games', 'game', 'classification'],
         size: SECTION_GAMES_SECTION_RECORDS_LIMIT,
         query: {
             constant_score: {
@@ -66,14 +62,8 @@ export const getGamesListForSection = async (
         logMessage('warn', ErrorCode.MissingSection, { siteName, platform, sectionId, hits });
         throw createError(ErrorCode.MissingSection, 404);
     }
-    let sectionType: IMlPersonalizedSection | string = '';
-
-    const sortCriteria = hits?.[0]?.sort?.[locale];
 
     const sectionGameIds: string[] = hits.reduce((acc: string[], section: any) => {
-        // TODO: improve in the future. the next line handles only a single section
-        sectionType = section?.type?.[locale];
-
         const singleSectionGame = section?.game?.[locale] || null;
 
         if (section?.games?.[locale]) {
@@ -90,7 +80,7 @@ export const getGamesListForSection = async (
         pagination.limit ? (pagination.offset ?? 0) + pagination.limit : undefined,
     );
 
-    return { sectionGameIds: paginatedSectionGameIds, sectionType, sortCriteria };
+    return { sectionGameIds: paginatedSectionGameIds };
 };
 
 export const getGamesSiteGames = async (

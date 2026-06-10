@@ -1,0 +1,56 @@
+---
+parameters:
+  - name: sitename
+    description: The name of the Venture
+    schema:
+      type: string
+    in: path
+    required: true
+  - name: platform
+    description: Platform device type. Accepted values 'web', 'ios' and 'android'.
+    schema:
+      type: string
+    in: path
+    required: true
+  - name: gamename
+    description: The name of game. If there is a mobileOverride for the game name in Contentful we will return this record if the platform is 'ios' or 'android'.
+    schema:
+      type: string
+    in: path
+    required: true
+  - name: locale
+    in: query
+    description: Used for localization. Values are set in Contentful. Accepted values "en-GB", "en-CA", "en-US", "es-ES"
+    schema:
+      type: string
+    required: false
+get:
+  summary: Game information
+  x-controller: getGameInfo
+  tags:
+    - GameInfo
+  responses:
+    "200":
+      description: A games information
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/game-info.yml'
+    '400':
+      $ref: '../schemas/error-responses.yml'
+    '401':
+      $ref: '../schemas/error-responses.yml'
+    '403':
+      $ref: '../schemas/error-responses.yml'
+    '404':
+      $ref: '../schemas/error-responses.yml'
+    '429':
+      $ref: '../schemas/error-responses.yml'
+    '500':
+      $ref: '../schemas/error-responses.yml'
+    '502':
+      $ref: '../schemas/error-responses.yml'
+    '503':
+      $ref: '../schemas/error-responses.yml'
+    '504':
+      $ref: '../schemas/error-responses.yml'

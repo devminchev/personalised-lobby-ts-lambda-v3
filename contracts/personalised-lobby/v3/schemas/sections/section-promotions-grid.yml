@@ -1,0 +1,16 @@
+title: IG Promotions Grid
+description: Section that is a place holder for promotions content
+required:
+  - entryid
+  - classification
+  - title
+properties:
+  entryId:
+    description: Unique id for the IG Promotions Grid
+    type: string
+  classification:
+    description: Classification type of the section (fixed to `PromotionsGridSection`)
+    type: string
+  title:
+    description: Localized title for the section
+    type: string

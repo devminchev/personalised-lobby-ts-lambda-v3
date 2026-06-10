@@ -13,21 +13,21 @@ Since this is a library it's meant to be used in conjunction with a lambda funct
 To do that from top level of the project simply run:
 
 ```sh
-sam build --parameter-overrides "FunctionName={YourLambdaFunction} libraryName=OSClientlibrary LambdaArchitecture=arm64"
+sam build --parameter-overrides "FunctionName={YourLambdaFunction} LambdaArchitecture=arm64"
 ```
 
 and then run it locally with
 
 ```sh
-sam local invoke "{YourLambdaFunction}" -e lambdas/{your-lambda-function}/events/event.json --env-vars env.json
+sam local invoke "{YourLambdaFunction}" -e functions/{YourLambdaFunction}/events/event.json --env-vars env.json
 ```
 
 For example if you want to test it with the get-navigation lambda function:
 
 ```sh
-sam build --parameter-overrides "FunctionName=GetNavigationFunction libraryName=OSClientlibrary LambdaArchitecture=arm64"
+sam build --parameter-overrides "FunctionName=GetNavigationFunction LambdaArchitecture=arm64"
 
-sam local invoke "GetNavigationFunction" -e lambdas/get-navigation/events/event.json --env-vars env.json
+sam local invoke "GetNavigationFunction" -e functions/GetNavigationFunction/events/event.json --env-vars env.json
 ```
 
 ## Decisions

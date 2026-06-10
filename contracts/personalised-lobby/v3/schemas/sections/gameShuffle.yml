@@ -1,0 +1,21 @@
+title: IG Game Shuffle Section
+description: Section with Game Shuffle
+type: object
+required:
+  - entryId
+  - classification
+  - title
+  - name
+properties:
+  entryId:
+    description: Unique id for the Game Shuffle section
+    type: string
+  classification:
+    description: Classification type of the section
+    type: string
+  title:
+    description: Localized title for the section
+    type: string
+  name:
+    description: Localized name for the section
+    type: string

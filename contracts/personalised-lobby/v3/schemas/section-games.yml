@@ -1,0 +1,129 @@
+title: SectionGamesResponse
+description: Response for sectiongames as per sectionid or gameids
+required:
+  - entryId
+  - isProgressiveJackpot
+  - title
+  - name
+  - gameSkin
+  - realUrl
+  - gameId
+properties:
+  entryId:
+    type: string
+    description: The unique entry id for the siteGame
+  title:
+    description: Game title
+    type: string
+  gameSkin:
+    type: string
+    description: unique identifier of game (legacy)
+  gameId:
+    type: string
+    description: The unique id for the game model
+  name:
+    description: Game name
+    type: string
+  realUrl:
+    description: Url used to access game
+    type: string
+  isProgressiveJackpot:
+    description: Is there a progressive jackpot for the game?
+    type: boolean
+  dfgWeeklyImgUrlPattern:
+    description: Path to the DFG game image
+    type: string
+  bynderDFGWeeklyImage:
+    description: Bynder image object
+    $ref: './bynderImage.yaml'
+  imgUrlPattern:
+    description: Hero image for the game information screen
+    type: string
+  loggedOutImgUrlPattern:
+    description: Path to the game image (for logged out users)
+    type: string
+  progressiveBackgroundColor:
+    description: Progressive jackpot background colour
+    type: string
+  representativeColor:
+    description: Colour associated with a game for backgrounds and other UI purposes
+    type: string
+  videoUrlPattern:
+    description: Path to the game video
+    type: string
+  animationMedia:
+    description: Type of animation (animated or default).
+    type: string
+  loggedOutAnimationMedia:
+    description: Type of animation (animated or default).
+    type: string
+  sigCons:
+    description: Significant Conditions for the game (localised text). Optional — omitted from the response when the game has no Significant Conditions.
+    type: string
+  foregroundLogoMedia:
+    description: Bynder image object.
+    $ref: './bynderImage.yaml'
+  loggedOutForegroundLogoMedia:
+    description: Bynder image object.
+    $ref: './bynderImage.yaml'
+  backgroundMedia:
+    description: Bynder image object.
+    $ref: './bynderImage.yaml'
+  loggedOutBackgroundMedia:
+    description: Bynder image object.
+    $ref: './bynderImage.yaml'
+  demoUrl:
+    description: Path to demo
+    type: string
+  tags:
+    description: Tags
+    type: array
+    items:
+      type: string
+  sash:
+    type: string
+    description: Sash or badge information of the game
+  webComponentData:
+    type: object
+    description: Available only for bingo games
+  headlessJackpot:
+    type: object
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+  liveHidden:
+      description: If the link will be visible on live
+      type: boolean
+oneOf:
+  - description: Mobile-specific fields
+    properties:
+      name:
+        description: Game name for mobile
+        type: string
+      gameSkin:
+        description: Unique identifier of the game (mobile version)
+        type: string
+      realUrl:
+        description: URL used to access game (mobile version)
+        type: string
+      demoUrl:
+        description: Path to demo (mobile version)
+        type: string
+  - description: desktop fields
+    properties:
+      name:
+        description: Game name (desktop)
+        type: string
+      gameSkin:
+        description: Unique identifier of the game (desktop version)
+        type: string
+      realUrl:
+        description: URL used to access game (desktop version)
+        type: string
+      demoUrl:
+        description: Path to demo (desktop version)
+        type: string
+example:
+  $ref: '../examples/section-games.yml'

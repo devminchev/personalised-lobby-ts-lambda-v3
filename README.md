@@ -1,6 +1,6 @@
 # Personalised Lobby
 
-The project contains a collection of lambdas and layers in order to provide functionality needed by the frontend for lobby personalization.
+The project contains a collection of lambdas in order to provide functionality needed by the frontend for lobby personalization.
 
 ## Project Structure
 
@@ -70,10 +70,7 @@ Resources:
         Properties:
             CodeUri: ./lambdas/{your-lambda-folder}/ # for example ./lambdas/get-navigation/
             Handler: app.lambdaHandler # How your handler function is called
-            Runtime: nodejs20.x
-            Layers: # if there are any layers that the lambda uses they are referenced here
-                # - !ImportValue OSClientLayerArn
-                - !Ref OSClientLayer
+            Runtime: nodejs24.x
             Environment: # Any environment variables that the lambda would need.
             Architectures:
                 - !Ref LambdaArchitecture
@@ -89,12 +86,11 @@ Resources:
             BuildMethod: esbuild
             BuildProperties:
                 Minify: true
-                Target: es2020
+                Target: es2022
                 EntryPoints:
                     - app.ts
                 External:
                     - os-client
-                    - /opt/nodejs/node_modules/os-client
 ```
 
 ## Prerequisites
@@ -103,7 +99,7 @@ Resources:
 
 - AWS CLI
 - SAM CLI - [Install the SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html)
-- Node.js - [Install Node.js 20](https://nodejs.org/en/), including the NPM package management tool.
+- Node.js - [Install Node.js 24](https://nodejs.org/en/), including the NPM package management tool.
 - Docker - [Install Docker community edition](https://hub.docker.com/search/?type=edition&offering=community)
 
 ### AWS CLI
@@ -132,17 +128,15 @@ Build your application with the `sam build` command.
 sam build
 ```
 
-If you want to build a specific lambda function and layer you can specify the resources via parameter overrides — see [Deploying when there are multiple lambda functions](#deploying-when-there-are-multiple-lambda-functions).
+If you want to build a specific lambda function you can specify the resources via parameter overrides — see [Deploying when there are multiple lambda functions](#deploying-when-there-are-multiple-lambda-functions).
 
 ```sh
-sam build --parameter-overrides "FunctionName=GetNavigationFunction LayerName=OSClientLayer LambdaArchitecture=x86_64" # Change the LambdaArchitecture=arm64 if you are building on M1
+sam build --parameter-overrides "FunctionName=GetNavigationFunction LambdaArchitecture=x86_64" # Change the LambdaArchitecture=arm64 if you are building on M1
 ```
 
 The SAM CLI installs dependencies defined in `functions/GetNavigationFunction/package.json`, compiles TypeScript with esbuild, creates a deployment package, and saves it in the `.aws-sam/build` folder.
 
 Test a single function by invoking it directly with a test event. An event is a JSON document that represents the input that the function receives from the event source. Test events are included in the `events` folder for each lambda function in the project.
-
-Since our lambdas use layers as well, sam builds those using a Makefile.
 
 To run the functions locally and invoke them use the `sam local invoke` command specifying which function you want to run as well as the events.json and env.json credentials file. For example running locally the getCategories lambda function:
 
@@ -199,7 +193,7 @@ yarn docker:push
 The Docker images use a multi-stage build approach:
 
 1. **Builder Stage**: Uses Node.js to build the lambda function using NX
-2. **Runtime Stage**: Uses RHEL9 Node.js 20 as the base image for running the function
+2. **Runtime Stage**: Uses RHEL9 Node.js 24 as the base image for running the function
 
 ### Versioning and Tagging
 
@@ -255,15 +249,15 @@ When doing `sam build` or `sam deploy` add the architecture flag override if you
 
 ### Deploying when there are multiple lambda functions
 
-If trying to build and deploy only specific function or layer you can point to the resources directly when doing the build.
-Keep in mind the `FunctionName` and `LayerName` have to correspond to their names in the `template.yaml` file.
+If trying to build and deploy only specific function you can point to the resources directly when doing the build.
+Keep in mind the `FunctionName` has to correspond to its name in the `template.yaml` file.
 
 ```sh
-sam build --parameter-overrides "FunctionName=GetNavigationFunction LayerName=OSClientLayer LambdaArchitecture=x86_64" # Change the LambdaArchitecture=arm64 if you are building for M1
+sam build --parameter-overrides "FunctionName=GetNavigationFunction LambdaArchitecture=x86_64" # Change the LambdaArchitecture=arm64 if you are building for M1
 ```
 
 ```sh
-sam deploy --template-file .aws-sam/build/template.yaml --parameter-overrides "FunctionName=GetNavigationFunction LayerName=OSClientLayer"
+sam deploy --template-file .aws-sam/build/template.yaml --parameter-overrides "FunctionName=GetNavigationFunction"
 ```
 
 ### Cleanup
@@ -306,7 +300,7 @@ Here is an example of what the values look like. Apply logic and use the values 
 # Pipeline triggers
 
 Variable: CHANGES
-Values: lambdas/GetAllGamesSearchFunction lambdas/GetNavigationFunction lambdas/GetGameConfigFunction lambdas/GetGameInfoFunction lambdas/GetGamesFunction lambdas/GetSectionsFunction layers/OSClientLayer
+Values: lambdas/GetAllGamesSearchFunction lambdas/GetNavigationFunction lambdas/GetGameConfigFunction lambdas/GetGameInfoFunction lambdas/GetGamesFunction lambdas/GetSectionsFunction
 
 Variable: ENVS
 Values: stg_eu00 prod_eu00
@@ -405,15 +399,9 @@ The commit linting is enforced via pre-commit hooks using commitlint.
 
 - See the [AWS SAM developer guide](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/what-is-sam.html) for an introduction to SAM specification, the SAM CLI, and serverless application concepts.
 - [Lambda runtimes](https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html)
-- [Working with lambda layers](https://docs.aws.amazon.com/lambda/latest/dg/chapter-layers.html)
-- [Building layers](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/building-layers.html)
-- [Layer versions](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-layerversion.html)
 - [AWS::CloudFormation::Stack](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-cloudformation-stack.html)
 - [AWS SAM template anatomy](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-specification-template-anatomy.html)
-- [Using AWS SAM with layers](https://docs.aws.amazon.com/lambda/latest/dg/layers-sam.html)
-- [Lambda layers with SAM](https://aws.amazon.com/blogs/compute/working-with-aws-lambda-and-lambda-layers-in-aws-sam/)
 - [Deploy Node.js Lambda functions with .zip file archives](https://docs.aws.amazon.com/lambda/latest/dg/nodejs-package.html)
-- [Local development with lambda layers](https://stackoverflow.com/questions/76702621/import-lambda-layers-locally)
 - [Using nested applications](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-template-nested-applications.html)
 - [Working with nested stacks](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-nested-stacks.html)
 - [Nested stack demo guthub sample project](https://github.com/aws-samples/sam-accelerate-nested-stacks-demo)

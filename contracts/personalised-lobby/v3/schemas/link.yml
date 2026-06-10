@@ -1,0 +1,32 @@
+---
+title: Link
+description: Represents a navigation link
+type: object
+required:
+  - entryId
+  - label
+properties:
+  entryId:
+    description: Unique id for the navigation entry.
+    type: string
+  label:
+    description: Label for the navigation.
+    type: string
+  viewSlug:
+    description: Unique slug for the view associated with this navigation (if applicable).
+    type: string
+  internalUrl:
+    description: URL for internal navigation (if applicable).
+    type: string
+  externalUrl:
+    description: URL for external navigation (if applicable).
+    type: string
+  image:
+    description: Image URL (if applicable).
+    type: string
+  bynderImage:
+    description: Bynder image asset details.
+    $ref: './bynderImage.yaml'
+  liveHidden:
+    description: If the link will be visible on live.
+    type: boolean

@@ -18,7 +18,7 @@ GetGameShuffleFunction:
     Properties:
         CodeUri: ./lambdas/GetGameShuffleFunction/ # Folder of the lambda function
         Handler: app.lambdaHandler # Adjust the handler path to dist/app.lambdaHandler
-        Runtime: nodejs20.x
+        Runtime: nodejs24.x
         Environment:
             Variables:
                 HOST: https://search-lobby-opsearch-oc5o7t2piau33hcu5ej3ortis4.eu-west-1.es.amazonaws.com/
@@ -39,12 +39,11 @@ GetGameShuffleFunction:
         BuildMethod: esbuild
         BuildProperties:
             Minify: true
-            Target: es2020
+            Target: es2022
             EntryPoints:
                 - app.ts
             External:
                 - os-client
-                - /opt/nodejs/node_modules/os-client
 
 GetGameShuffleAPI:
     Type: AWS::Serverless::Api

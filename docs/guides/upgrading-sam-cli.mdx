@@ -1,0 +1,145 @@
+---
+title: Upgrading the AWS SAM CLI
+description: macOS-focused step-by-step for bumping the AWS SAM CLI when a new runtime is required, with troubleshooting for the install methods we actually use.
+---
+
+# Upgrading the AWS SAM CLI
+
+This guide covers upgrading the AWS SAM CLI on **macOS**. The most common reason to upgrade is that the project has moved to a Lambda runtime your SAM doesn't recognise yet (e.g. `Error: 'nodejsXX.x' runtime is not supported`), but the steps are the same for any upgrade.
+
+## TL;DR
+
+| What you have | What to do |
+| --- | --- |
+| Official `.pkg` install at `/usr/local/aws-sam-cli/` | Download the latest `.pkg` from [SAM CLI releases](https://github.com/aws/aws-sam-cli/releases) and double-click |
+| Homebrew | `brew update && brew upgrade aws-sam-cli` |
+| pip `--user` install | `python3 -m pip install --user --upgrade aws-sam-cli` |
+
+Verify with `sam --version` in a **new terminal**.
+
+## When to upgrade
+
+- A new Lambda runtime was added to `template.yaml` and SAM doesn't recognise it.
+- A security advisory in the SAM CLI release notes affects you.
+- You need a fix from a recent release.
+
+There's no need to chase every release. Stay one or two minor versions behind the bleeding edge — release-day regressions are common. **Pick the latest version that's at least 7 days old.**
+
+## Step 1 — Check your current version
+
+```bash
+sam --version
+```
+
+Note the version. Then compare it to the [SAM CLI releases page](https://github.com/aws/aws-sam-cli/releases) to confirm an upgrade is actually needed.
+
+## Step 2 — Identify your install method
+
+How SAM got onto your machine determines how to upgrade it:
+
+```bash
+which sam
+ls -la "$(which sam)"
+```
+
+Match the output to one of:
+
+| `which sam` output | Install method |
+| --- | --- |
+| `/usr/local/bin/sam → /usr/local/aws-sam-cli/sam` | Official `.pkg` installer |
+| `/opt/homebrew/bin/sam` or `/usr/local/Cellar/aws-sam-cli/...` | Homebrew |
+| `~/.local/bin/sam` or `~/Library/Python/<x.y>/bin/sam` | `pip --user` |
+
+If you have **multiple installs**, the one earliest on `PATH` wins. Use `which -a sam` to list them all.
+
+## Step 3 — Upgrade
+
+### Official `.pkg` (most common at Bally's)
+
+1. Open the [SAM CLI releases page](https://github.com/aws/aws-sam-cli/releases).
+2. Find the latest release that's **at least 7 days old**.
+3. Download the macOS installer for your chip:
+   - **Apple Silicon** (M1/M2/M3/M4): `aws-sam-cli-macos-arm64.pkg`
+   - **Intel**: `aws-sam-cli-macos-x86_64.pkg`
+4. Double-click the `.pkg` and follow the prompts. You'll need your admin password.
+5. The installer replaces the existing install at `/usr/local/aws-sam-cli/` — no manual cleanup needed.
+
+### Homebrew
+
+```bash
+brew update
+brew upgrade aws-sam-cli
+```
+
+Homebrew installs to `/opt/homebrew/bin/sam` (Apple Silicon) or `/usr/local/bin/sam` (Intel).
+
+### pip `--user` (no admin needed)
+
+If you can't install the `.pkg` (no admin rights):
+
+```bash
+python3 -m pip install --user --upgrade aws-sam-cli
+```
+
+Then ensure `~/Library/Python/<your-python-version>/bin` is on your `PATH` **before** `/usr/local/bin`, so this install shadows any older system one:
+
+```bash
+echo 'export PATH="$HOME/Library/Python/3.11/bin:$PATH"' >> ~/.zshrc   # adjust 3.11 to match your Python
+source ~/.zshrc
+```
+
+**Note**: pip can only install SAM versions compatible with your Python. The system Python 3.9 (from Xcode tools) caps you at SAM 1.155.2. For newer SAM, install Python 3.10+ first.
+
+## Step 4 — Verify
+
+Open a **new terminal** (so the shell hashes the new binary) and run:
+
+```bash
+sam --version
+```
+
+Confirm it shows the version you just installed.
+
+Sanity-check it can build the project:
+
+```bash
+cd /path/to/personalised-lobby-ts-lambda-v3
+./nx graph --file=tmp/graph.json   # one-time, seeds Nx graph cache (works around a known race)
+sam build
+```
+
+You should see `Build Succeeded`.
+
+## Troubleshooting
+
+### `sam --version` still shows the old version after upgrading
+
+The shell cached the old binary path. Either open a new terminal, or:
+
+```bash
+hash -r
+```
+
+If still wrong, run `which -a sam` — you have multiple installs and an older one is earlier on `PATH`. Either remove the older install or reorder `PATH`.
+
+### `Error: 'nodejsXX.x' runtime is not supported`
+
+You're still on an old SAM. Recheck `sam --version` — your shell is almost certainly hitting a different binary than the one you upgraded.
+
+### `Build Failed: ... readCachedProjectGraph ... No cached ProjectGraph is available`
+
+This is unrelated to your SAM version — it's a known Nx race condition when `samconfig.toml` has `parallel = true`. Run `./nx graph --file=tmp/graph.json` once before `sam build`.
+
+### `pip install` fails with a "no matching distribution" error
+
+Your Python version is too old for the SAM version you asked for. Either:
+- Install a newer Python (3.10+), or
+- Pin to the latest SAM version your Python supports (e.g. `aws-sam-cli==1.155.2` for Python 3.9).
+
+### Multiple `sam` binaries on `PATH`
+
+Run `which -a sam` to see them all. The first wins. Either remove the older install, or adjust your `PATH` order in `~/.zshrc` / `~/.bash_profile`.
+
+## Notes for other operating systems
+
+This project's contributors are macOS-only, so the steps above cover the cases we actually hit. If you need Linux or Windows steps, AWS's [official install/upgrade guide](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html) is the canonical reference.

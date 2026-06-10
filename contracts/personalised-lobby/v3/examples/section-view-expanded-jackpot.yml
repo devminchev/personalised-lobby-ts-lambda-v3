@@ -1,0 +1,32 @@
+summary: "Expanded Jackpot Section Example"
+value:
+  classification: "JackpotSection"
+  layoutType: "grid-a-expanded-jackpot"
+  title: "Jackpot Fish Games Section"
+  headerImage: "https://example.com/header-blueprint.jpg"
+  type: "blueprint-jackpots"
+  backgroundImage: "https://example.com/background-blueprint.jpg"
+  pot1Image: "https://example.com/pot1-blueprint.jpg"
+  pot2Image: "https://example.com/pot2-blueprint.jpg"
+  pot3Image: "https://example.com/pot3-blueprint.jpg"
+  games:
+    - entryId: "15c7wqRpB1uhyhXfNpiuap"
+      demoUrl: "/service/game/demo/play-bp-fishin-frenzy-big-catch-92"
+      title: "Fishin Frenzy Big Catch"
+      dfgWeeklyImgUrlPattern: "test-data"
+      gameSkin: "BP_FISHING_FRENZY_BIG_CATCH_V92"
+      imgUrlPattern: "/api/content/gametiles/fishin-frenzy-big-catch/scale-s%s/fishin-frenzy-big-catch-tile-r%s-w%s.jpg-data"
+      loggedOutImgUrlPattern: "test-data"
+      name: "test-data"
+      isProgressiveJackpot: true
+      progressiveBackgroundColor: "test-data"
+      realUrl: "/service/game/play/play-bp-fishin-frenzy-big-catch-92"
+      representativeColor: "#0A0566"
+      sash: "test-data"
+      videoUrlPattern: "test-data"
+      tags:
+        - "test-data"
+      webComponentData: {}
+      headlessJackpot:
+        id: 1234
+        name: "JACKPOT_BLAST"

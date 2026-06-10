@@ -2,7 +2,7 @@ process.env.HOST = 'http://localhost:9200';
 process.env.OS_USER = 'your-username';
 process.env.OS_PASS = 'your-password';
 
-import { lambdaHandler } from '../app';
+import { lambdaHandler, createMinigamesLobby } from '../app';
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import nock from 'nock';
 import { jest, describe, beforeEach, it, expect } from '@jest/globals';
@@ -15,6 +15,8 @@ import {
     MINIGAMES_ENDPOINT_SUCCESS_RESP,
     MINIGAMES_SECTIONS_INVALID_GAMES_RESP,
     MINI_GAMES_VIEW_SUCCESS_RESP,
+    SIG_CONS_MINIGAMES,
+    SIG_CONS_SECTION_DATA,
 } from './mocks/responses';
 import {
     ErrorCode,
@@ -168,5 +170,15 @@ describe('Integration Test for Lambda Handler', () => {
         expect(result.statusCode).toBe(500);
         const body = JSON.parse(result.body);
         expect(body.message).toBe('Internal Server Error');
+    });
+});
+
+describe('createMinigamesLobby', () => {
+    it('forwards sigCons from the requested locale and omits it when missing', () => {
+        const [section] = createMinigamesLobby(SIG_CONS_SECTION_DATA, SIG_CONS_MINIGAMES, 'en-GB', 'en-GB');
+        const [withGame, withoutGame] = section.games as Array<{ entryId: string; sigCons?: string }>;
+
+        expect(withGame.sigCons).toBe('sig-cons-en');
+        expect(withoutGame).not.toHaveProperty('sigCons');
     });
 });

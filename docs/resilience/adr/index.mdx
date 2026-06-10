@@ -1,0 +1,32 @@
+---
+title: Architecture Decision Records
+description: Index of ADRs for the resilience / circuit-breaker work — irreversible-or-load-bearing decisions written down once so future readers can skip the archaeology
+---
+
+# Architecture Decision Records
+
+ADRs (Architecture Decision Records) capture decisions whose context is hard to reconstruct later — typically because they involve trade-offs that aren't visible in the code, or because they're load-bearing for the system's correctness in non-obvious ways. The format is borrowed from [Michael Nygard's ADR template](https://cognitect.com/blog/2011/11/15/documenting-architecture-decisions): each ADR has Status, Context, Decision, Consequences, Considered alternatives.
+
+## Index
+
+| # | Title | Status | Why it's an ADR |
+|---|---|---|---|
+| 001 | [Configuration store decision](./../configuration-store-decision.mdx) | Accepted (2026-04-29) | Three viable options (AppConfig, SSM via Lambda Extension, SDK + cache); choice has long tail of operational implications. |
+| 002 | [Single GLOBAL partition](./002-global-only-partition.mdx) | Accepted (2026-04-23) | Fixes a correctness bug from the incoming branch; collapses an architectural axis (per-service vs single-partition). Reversible but with material work. |
+| 003 | [Optimistic concurrency with one-shot retry](./003-optimistic-concurrency.mdx) | Accepted (2026-04-23) | Coordination model under shared-partition contention. Alternatives (queue-serialised, leader-locked) considered and rejected. |
+| 004 | [Self-observability alarms must not be `breaker:`-prefixed](./004-no-breaker-prefix-on-self-obs.mdx) | Accepted (2026-04-25) | Naming-as-loop-prevention rule — easily violated by a renaming PR; needs the rationale written down. |
+| 005 | [Edge-triggered alarms + scheduled tick](./005-edge-triggered-with-tick.mdx) | Accepted (2026-04-23) | Why we run a 1-minute tick alongside the alarm pipeline. Touches every part of the state machine. |
+
+## Adding a new ADR
+
+1. Pick the next number.
+2. Copy the format from any existing ADR. Each has the same five-section shape (Context, Decision, Consequences, Considered alternatives, References).
+3. Write *why*, not *what*. The code says what; the ADR exists for the trade-offs that aren't visible in the code.
+4. Include URLs / page references where you used external sources to verify a claim.
+5. Add an entry to the table above. Keep the "Why it's an ADR" column honest — if a decision doesn't have hard-to-reconstruct context, it doesn't need an ADR.
+
+## What is *not* an ADR
+
+- **Changes a future deploy could undo cheaply.** Bumping a default, fixing a typo, retuning a threshold. These belong in commits.
+- **Decisions already documented elsewhere.** If the explanation already lives in the alarms doc, the data-model doc, or a source comment — that's the right place. ADRs duplicate when there's no better home.
+- **Open questions.** ADRs document accepted decisions. Open questions go in the relevant doc as a flagged section, or in a JIRA ticket.

@@ -1,0 +1,18 @@
+title: IG Braze Placeholder Section
+description: Section block acting as a placeholder for hte BRAZE promotions in NA.
+type: object
+required:
+  - entryId
+  - classification
+properties:
+  entryId:
+    description: Unique id for the marketing section
+    type: string
+
+  title:
+    description: Optional title for braze promo section.
+    type: string
+
+  classification:
+    description: Classification type of the section. `BrazePromosSection` for the Braze Promo section.
+    type: string

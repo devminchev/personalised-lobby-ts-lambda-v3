@@ -1,0 +1,121 @@
+---
+title: Consistency and concurrency
+description: How the controller stays correct when alarm events race on the shared BREAKER#GLOBAL partition — strongly-consistent reads, optimistic-concurrency conditional writes, one-shot retry, and the DLQ as a release valve
+---
+
+# Consistency and concurrency
+
+The controller writes to a single shared partition (`BREAKER#GLOBAL`) and is invoked concurrently — alarm events fan out from EventBridge in parallel during incidents, and the 1-minute tick can land at any moment. This page documents how the controller stays correct under that contention. The decisions here are also captured as [ADR-003](./adr/003-optimistic-concurrency.mdx).
+
+For why we chose a single shared partition in the first place, see [ADR-002](./adr/002-global-only-partition.mdx).
+
+## What can go wrong
+
+Two failure modes show up immediately in this design.
+
+### The lost-update race
+
+Two alarms transition within the same second. Both invocations read the same `BREAKER#GLOBAL` snapshot, both compute "merge in my signal", both write the merged result. Without coordination:
+
+```
+T0  Writer A:  BatchGet → signals={},  version=5
+T0  Writer B:  BatchGet → signals={},  version=5    (same snapshot)
+T1  Writer A:  TransactWrite → signals={A}, version=6   ✓
+T2  Writer B:  TransactWrite → signals={B}, version=6   ✓ (overwrites A)
+```
+
+Writer A's signal silently disappears from the snapshot. The breaker now sees only signal B and may under-trip — `compound_warning` becomes `single_warning`, `critical_signal` is lost entirely. This is a real correctness bug, not just an audit-trail nuisance.
+
+### The stale-read race
+
+A handler reads `STATE#CURRENT`, computes a transition, writes back — but between the read and the write, a different handler has already committed a more recent transition. The second writer overwrites the more recent one with stale state. Same lost-update class, but now affecting the breaker posture itself rather than the signal map.
+
+## What we do about it
+
+Three mechanisms compose: strongly-consistent reads, conditional writes guarded by a monotonic `version`, and a one-shot retry with the DLQ as the release valve.
+
+### Strongly-consistent reads
+
+Every controller invocation reads `STATE#CURRENT` and `SIGNAL_STATE#CURRENT` with `ConsistentRead: true` on the `BatchGetItem` ([index.ts](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/index.ts)).
+
+The default in DynamoDB is eventually-consistent — see [DynamoDB read consistency](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.ReadConsistency.html) — which can return a snapshot that's a few hundred milliseconds out of date. For most workloads that's fine. For a controller that does back-to-back read → compute → write inside the same partition, eventually-consistent reads occasionally hand back the *pre-write* snapshot from the last invocation, which produces a transition based on stale state.
+
+Strong reads cost twice the capacity of eventually-consistent reads — 1 RRU per ≤ 4 KB item on-demand, vs 0.5 RRU for an eventually-consistent read of the same item ([on-demand read request units](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.ReadWriteCapacityMode.html#HowItWorks.OnDemand.ReadRequestUnits)). For two keys per invocation that is negligible — the controller fires at most a few times per minute under normal load. Correctness is a strictly better trade.
+
+### Optimistic-concurrency conditional writes
+
+Every write to `STATE#CURRENT` carries a `ConditionExpression` that pins the predecessor version. The expression has two shapes ([`breakerStateCondition`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/index.ts)):
+
+- **First-ever write** (`prevVersion === undefined`): `attribute_not_exists(PK)`. This blocks two simultaneous first-writes both succeeding on a fresh partition.
+- **Subsequent writes** (`prevVersion` is the version we read): `version = :prevVersion`. The committed `version` is incremented by every write ([statemachine.ts](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/statemachine.ts)) so any racing writer that committed between our read and our write will have advanced it past the value we observed, and our write fails `ConditionalCheckFailed`.
+
+Both shapes use DynamoDB's [condition expressions](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.ConditionExpressions.html). When the write happens inside `TransactWriteItems` (as it does for every controller path) the failure surfaces as a [`TransactionCanceledException`](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/transaction-apis.html#transaction-apis-txwriteitems) whose `CancellationReasons` array contains `Code: ConditionalCheckFailed`.
+
+We only guard `STATE#CURRENT`, not `SIGNAL_STATE#CURRENT`. DynamoDB transactions are all-or-nothing: if the breaker-state Put's condition fails, the SIGNAL_STATE Put in the same transaction also rolls back. One guard on the monotonic version protects both items with less code. This holds for the alarm path (always writes `SIGNAL_STATE#CURRENT`) **and** the HALF_OPEN-expiry tick path, which now also writes the pruned `SIGNAL_STATE#CURRENT` atomically alongside the state transition ([`putStateAndHistory`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/index.ts) takes an optional `signalState` parameter for exactly this case). The OPEN→HALF_OPEN tick and the manual-override path do not write `SIGNAL_STATE#CURRENT` and so do not need any additional guard.
+
+The full lost-update narrative — including the four-line trace at the top of this page — is in the source comment block at [`transactWriteEvaluation`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/index.ts).
+
+### One-shot retry
+
+[`withOptimisticRetry`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/index.ts) wraps every entry-point handler (`handleAlarmEvent`, `handleScheduledTick`, `setBreakerStateManually`). It runs the read-compute-write op once; on a `ConditionalCheckFailed`-shaped error it runs the op once more — re-reading the post-race state — then propagates whatever happens.
+
+Why one shot, not a loop:
+
+- **Single contender (the common case)** — one retry almost always wins because two-way races are rare and three-way rarer still.
+- **Many contenders (alarm storm)** — retry-looping amplifies contention and slows recovery while the system is already stressed. Better to fail loudly.
+- **Event-driven correctness is self-healing** — the very next alarm event (often within seconds) re-observes the world and produces the correct posture anyway. A single dropped invocation under contention does not strand the breaker; it strands a single signal write, which is recovered on the next event.
+
+The one-shot bound is *exactly one*. The handler is then expected to throw on the second failure, which routes the invocation into the DLQ — see below.
+
+### Retry predicate is narrow
+
+`isConditionalCheckFailure` ([index.ts](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/index.ts)) only matches:
+
+- `ConditionalCheckFailedException` (a standalone `PutItem` would surface this; transactional writes don't, but matching it here means a future refactor to a plain `PutCommand` does not silently break the retry semantics);
+- `TransactionCanceledException` whose `CancellationReasons` array contains an entry with `Code: 'ConditionalCheckFailed'`.
+
+Other transaction cancellation codes (`ThrottlingError`, `ItemCollectionSizeLimit`, `ProvisionedThroughputExceeded`, etc.) are deliberately **not** retried. Retrying a throttling error in a tight loop just compounds the throttle; the right response is to surface it to the DLQ and let the operator triage. The full set of cancellation codes is documented in the [TransactWriteItems API reference](https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_TransactWriteItems.html).
+
+## The DLQ as the release valve
+
+If both the initial attempt and the retry lose the race, the handler throws. Lambda is invoked asynchronously by EventBridge (and by EventBridge Scheduler), so the invocation framework catches the exception and applies its async-invocation retry policy: by default the initial attempt + 2 automatic retries = 3 total attempts, after which the event is sent to the configured destination — in our case the SQS dead-letter queue. See [AWS Lambda asynchronous invocation](https://docs.aws.amazon.com/lambda/latest/dg/invocation-async.html).
+
+Messages on the DLQ trip [`ControllerDlqDepthAlarm`](./circuit-breaker-alarms.mdx#lobby-controller-dlq-depth-stagename) which fires on the first message at `Period: 60, EvaluationPeriods: 1, DatapointsToAlarm: 1` — there is no smoothing because by the time a message reaches the DLQ, three invocation attempts have already failed. A non-empty DLQ is always an incident. See the [Runbook](./circuit-breaker-runbook.mdx#dlq-depth-alarm) for triage.
+
+## Idempotency
+
+The controller is **at-least-once**. The same alarm event can reasonably arrive twice (EventBridge retry, ECS retry on the consumer side, manual `aws events test-event-pattern` invocations during debugging). The handler is therefore designed so that a duplicate event produces an equivalent — not necessarily identical — final state.
+
+Concretely:
+
+- The active-signals map is a `Record<string, ActiveSignalEntry>`. A duplicate `ALARM` event for the same signal name overwrites the existing entry's `updatedAt` rather than producing a duplicate; the size of the map and the resulting compound severity are unchanged.
+- A duplicate `OK` event for a signal that has already been removed is a no-op `delete`.
+- Each *alarm-driven* invocation produces an audit row at `EVENT#<isoTs>#<alarmName>` ([`handleAlarmEvent`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/index.ts); the tick path does not write audit rows). Because the SK is keyed off the event's `stateChangeTime`, a retried alarm event re-uses the same SK and overwrites the prior audit row rather than producing a duplicate. Two genuinely-distinct events with the same alarm name and the same timestamp would also land on the same row — this cannot happen in practice given CloudWatch's monotonic state-change timestamps but is worth knowing.
+- The version-based guard ensures that a duplicate event arriving slightly later (after another transition has committed) does not regress state: it observes the higher version and, on retry, recomputes from the current snapshot.
+
+What the controller does **not** guarantee:
+
+- **Strict ordering across alarms.** Two alarm events committed in fan-out order may race; whichever commits first sets the predecessor for the other. Both will land — the merge is commutative for the active-signals map — but the audit row sequencing reflects commit order, not arrival order.
+- **Effects on the audit trail under retry.** A retried event's audit row will use the same `stateChangeTime` (because the source event hasn't changed) and therefore the same SK, so the row is overwritten on the second attempt. The state and history rows reflect the latest commit.
+
+## Why this is enough
+
+This is not a distributed-consensus problem. The controller is a single-writer-per-event state machine; the only coordination it needs is "if my predecessor moved, recompute." Optimistic concurrency on a monotonic version is the standard primitive for that — see [DynamoDB conditional writes](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.ConditionExpressions.html#Expressions.ConditionExpressions.PreventingOverwrites) — and is significantly simpler than alternatives like a leadership lock or a serialised queue:
+
+- A leadership lock (FIFO queue + single in-flight Lambda) would serialise alarm processing but at the cost of a hard cap on throughput equal to the slowest event, plus a new failure mode if the lock owner dies mid-write.
+- A locking record in DynamoDB (TTL-bounded "I'm processing" item) would add a write per invocation and a manual recovery path for orphaned locks.
+
+Optimistic concurrency wins when contention is low and writes are commutative-or-recomputable. Both are true here: alarm storms are episodic, not steady, and every write is a pure function of the predecessor + the incoming event.
+
+## Operational hooks
+
+| Surface | Purpose |
+|---|---|
+| `ControllerErrorsAlarm` ([circuit-breaker-alarms.mdx](./circuit-breaker-alarms.mdx#lobby-controller-errors-stagename)) | Fires on Lambda errors — the post-retry throw, plus any other exception. 3-of-5 smoothing absorbs a single transient. |
+| `ControllerDlqDepthAlarm` | Fires the moment an event hits the DLQ — i.e. an invocation has failed *all* retries. |
+| `version` field on `STATE#CURRENT` | Increments by exactly one per committed write. Sudden gaps indicate writes that landed from outside the controller (operator override) or from a manually-replayed event. |
+| `EVENT#*` audit rows | Show every alarm-driven write ordered by source `stateChangeTime`. Useful for reconstructing race outcomes. |
+
+## Test coverage for the race semantics
+
+The unit tests in [`tests/index.test.ts`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/tests/index.test.ts) cover the algorithmic pieces — `attribute_not_exists` on first write, `version = :prevVersion` on subsequent writes, retry-once-then-throw, the cancellation-code filter. The end-to-end suite in [`scripts/test-e2e.js`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/scripts/test-e2e.js) drives the real DynamoDB Local with concurrent invocations to assert that the optimistic guard actually fires and the retry actually wins on a fresh partition — see the README's "End-to-end integration test" section for the full scenario list.

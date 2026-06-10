@@ -1,0 +1,41 @@
+- because-you-played-x: "Because you played Double bubble"
+  games:
+    - entryId: "1SC6Pyl5XFF1w8S4Y2uMzZ"
+      name: "mobile-test-data"
+      gameSkin: "mobile-skin-data"
+      realUrl: "mobile-url-data"
+      demoUrl: "mobile-demo-url-data"
+      gameId: "4lpZkuydT6HDe1MdBJdfr5"
+      title: "mobile-title-data"
+      dfgWeeklyImgUrlPattern: "mobile-img-pattern-data"
+      imgUrlPattern: "mobile-img-url-pattern"
+      isProgressiveJackpot: true
+      progressiveBackgroundColor: "mobile-bg-color"
+      representativeColor: "mobile-representative-color"
+      sash: "mobile-sash-data"
+      videoUrlPattern: "mobile-video-url-pattern"
+      tags:
+        - "mobile-tag1"
+        - "mobile-tag2"
+
+
+- because-you-played-y: "Because you played Secrets of the Phoenix"
+  games:
+    - entryId: "1SC6Pyl5XFF1w8S4Y2uMzZ"
+      name: "desktop-test-data"
+      gameSkin: "desktop-skin-data"
+      realUrl: "desktop-url-data"
+      demoUrl: "desktop-demo-url-data"
+      gameId: "4lpZkuydT6HDe1MdBJdfr5"
+      title: "desktop-title-data"
+      dfgWeeklyImgUrlPattern: "desktop-img-pattern-data"
+      imgUrlPattern: "desktop-img-url-pattern"
+      isProgressiveJackpot: true
+      progressiveBackgroundColor: "desktop-bg-color"
+      representativeColor: "desktop-representative-color"
+      sash: "desktop-sash-data"
+      videoUrlPattern: "desktop-video-url-pattern"
+      tags:
+        - "desktop-tag1"
+        - "desktop-tag2"
+      webComponentData: {}

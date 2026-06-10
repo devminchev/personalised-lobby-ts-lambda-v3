@@ -6,6 +6,7 @@ process.env.OS_PASS = 'your-password';
 import { lambdaHandler } from '../app';
 import nock from 'nock';
 import { mockApiEvent } from './mocks/gatewayMocks';
+import { SIG_CONS_GAMES_RESPONSE, SIG_CONS_ML_RESPONSE, SIG_CONS_VENTURE_RESPONSE } from './mocks/responses';
 import { jest, describe, beforeEach, it, expect } from '@jest/globals';
 import { ErrorCode, IG_GAMES_V2_READ_ALIAS, VENTURES_INDEX_ALIAS, parseCompressedBody } from 'os-client';
 import { ML_RECOMMENDED_GAMES_ON_EXIT_INDEX_ALIAS } from 'os-client/lib/constants';
@@ -578,5 +579,24 @@ describe('Integration Test for Lambda Handler - recommended-games-on-exit', () =
         // Game with lower distance should come first
         expect(body[0].gameId).toBe('game2');
         expect(body[1].gameId).toBe('game1');
+    });
+
+    it('forwards sigCons from the requested locale and omits it when missing', async () => {
+        nock(HOST).post(`/${VENTURES_INDEX_ALIAS}/_search`).query(true).reply(200, SIG_CONS_VENTURE_RESPONSE);
+        nock(HOST)
+            .post(`/${ML_RECOMMENDED_GAMES_ON_EXIT_INDEX_ALIAS}/_search`)
+            .query(true)
+            .reply(200, SIG_CONS_ML_RESPONSE);
+        nock(HOST).post(`/${IG_GAMES_V2_READ_ALIAS}/_search`).query(true).reply(200, SIG_CONS_GAMES_RESPONSE);
+
+        const event = mockApiEvent(sitename, platform, gameskin, locale);
+        const result = await lambdaHandler(event);
+
+        expect(result.statusCode).toBe(200);
+        const body = parseCompressedBody<Array<{ gameId: string; sigCons?: string }>>(result);
+        const withGame = body.find((g) => g.gameId === 'game-with');
+        const withoutGame = body.find((g) => g.gameId === 'game-without');
+        expect(withGame?.sigCons).toBe('sig-cons-en');
+        expect(withoutGame).not.toHaveProperty('sigCons');
     });
 });

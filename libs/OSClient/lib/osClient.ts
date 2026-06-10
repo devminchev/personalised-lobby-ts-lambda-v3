@@ -1,5 +1,15 @@
 import { Client } from '@opensearch-project/opensearch';
 import { ErrorCode, createError } from './errors';
+import { BreakerClient, NonTrippableError } from './breakerClient';
+import type { ServiceTier } from './breakerClient';
+
+/** Circuit-breaker config injected at the call site in each Lambda handler. */
+export interface BreakerConfig {
+    /** Service tier — drives HALF_OPEN behaviour. Defaults to `'A'`. */
+    tier?: ServiceTier;
+    /** Master on/off switch. Defaults to `false`. */
+    enabled?: boolean;
+}
 
 export interface SearchResponse<T, S = any> {
     hits: {
@@ -68,7 +78,7 @@ interface CustomClient extends Client {
 
 let client: CustomClient | null = null;
 
-export const getClient = (): CustomClient => {
+export const getClient = (breakerConfig: BreakerConfig = {}): CustomClient => {
     if (!client) {
         const newClient = new Client({
             node: process.env.HOST,
@@ -82,69 +92,105 @@ export const getClient = (): CustomClient => {
                 maxSockets: 50,
             },
         }) as CustomClient;
+        console.warn('Initializing breaker client with config', {
+            tier: breakerConfig.tier,
+            enabled: breakerConfig.enabled,
+            tableName: process.env.CB_DDB_TABLE ?? 'undefined',
+        });
+        const breaker = new BreakerClient({
+            tableName: process.env.CB_DDB_TABLE ?? '',
+            tier: breakerConfig.tier ?? 'C',
+            enabled: breakerConfig.enabled ?? false,
+        });
+        console.warn('Breaker client initialized');
+
+        // Seed the global breaker-state cache from DynamoDB on first warm-instance
+        // call (cold start). Fire-and-forget — subsequent warm requests use the
+        // cached value; no per-request DDB round-trip.
+        if (process.env.CB_DDB_TABLE) {
+            void breaker.init();
+        }
 
         newClient.searchWithHandling = async <T, S = any>(
             query: object,
             index: string,
         ): Promise<SearchResponse<T, S>> => {
-            try {
-                const response = await newClient.search({
-                    index,
-                    body: query,
-                    request_cache: true,
-                });
+            return breaker.withOsCall(async () => {
+                try {
+                    const response = await newClient.search({
+                        index,
+                        body: query,
+                        request_cache: true,
+                    });
 
-                return response.body as SearchResponse<T, S>;
-            } catch (err: any) {
-                console.error({
-                    error: err?.message,
-                    statusCode: err?.statusCode,
-                    errorCode: ErrorCode.OpenSearchClientError,
-                    details: {
-                        origin: `opensearch client ApiError error (@opensearch-project/opensearch) when querying index ${index}`,
-                        name: err?.name,
-                        errorBody: err?.body || err,
-                    },
-                });
+                    return response.body as SearchResponse<T, S>;
+                } catch (err: any) {
+                    console.error({
+                        error: err?.message,
+                        statusCode: err?.statusCode,
+                        errorCode: ErrorCode.OpenSearchClientError,
+                        details: {
+                            origin: `opensearch client ApiError error (@opensearch-project/opensearch) when querying index ${index}`,
+                            name: err?.name,
+                            errorBody: err?.body || err,
+                        },
+                    });
 
-                throw createError(ErrorCode.ServerError, 500, 'Internal Server Error');
-            }
+                    const mapped = createError(ErrorCode.ServerError, 500, 'Internal Server Error');
+                    const status: number | undefined = err?.statusCode;
+                    const nonTrippedCondition =
+                        typeof status === 'number' && status >= 400 && status < 500 && status !== 408 && status !== 429;
+                    if (nonTrippedCondition) {
+                        throw new NonTrippableError(mapped);
+                    }
+                    throw mapped;
+                }
+            });
         };
 
         newClient.getDocWithHandling = async <T>(index: string, id: string): Promise<T | null> => {
-            try {
-                const response = await newClient.get({
-                    index,
-                    id,
-                });
+            return breaker.withOsCall(async () => {
+                try {
+                    const response = await newClient.get({
+                        index,
+                        id,
+                    });
 
-                const body = response.body as GetDocResponse<T>;
+                    const body = response.body as GetDocResponse<T>;
 
-                // if found is false or _source is missing, return null
-                if (!body.found || !body._source) {
-                    return null;
+                    // if found is false or _source is missing, return null
+                    if (!body.found || !body._source) {
+                        return null;
+                    }
+
+                    return body._source;
+                } catch (err: any) {
+                    // Treat 404 as "not found" instead of an error
+                    if (err?.statusCode === 404) {
+                        return null;
+                    }
+
+                    console.error({
+                        error: err?.message,
+                        statusCode: err?.statusCode,
+                        errorCode: ErrorCode.OpenSearchClientError,
+                        details: {
+                            origin: `opensearch client ApiError error (@opensearch-project/opensearch) when getting document ${id} from index ${index}`,
+                            name: err?.name,
+                            errorBody: err?.body || err,
+                        },
+                    });
+
+                    const mapped = createError(ErrorCode.ServerError, 500, 'Internal Server Error');
+                    const status: number | undefined = err?.statusCode;
+                    const nonTrippedCondition =
+                        typeof status === 'number' && status >= 400 && status < 500 && status !== 408 && status !== 429;
+                    if (nonTrippedCondition) {
+                        throw new NonTrippableError(mapped);
+                    }
+                    throw mapped;
                 }
-
-                return body._source;
-            } catch (err: any) {
-                // Treat 404 as "not found" instead of an error
-                if (err?.statusCode === 404) {
-                    return null;
-                }
-
-                console.error({
-                    error: err?.message,
-                    statusCode: err?.statusCode,
-                    errorCode: ErrorCode.OpenSearchClientError,
-                    details: {
-                        origin: `opensearch client ApiError error (@opensearch-project/opensearch) when getting document ${id} from index ${index}`,
-                        name: err?.name,
-                        errorBody: err?.body || err,
-                    },
-                });
-
-                throw createError(ErrorCode.ServerError, 500, 'Internal Server Error');
-            }
+            });
         };
 
         client = newClient;

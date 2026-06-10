@@ -1,0 +1,75 @@
+---
+title: BulkGameDataResponse
+description: Bulk response of game data that is visible to users on sites
+type: object
+properties:
+  id:
+    type: string
+  title:
+    type: string
+  gameSkin:
+    type: string
+  maxBet:
+    type: string
+    nullable: true
+  minBet:
+    type: string
+    nullable: true
+  gameStudio:
+    type: string
+    nullable: true
+  gameProvider:
+    type: string
+    nullable: true
+  subGameType:
+    type: string
+    nullable: true
+  federalGameType:
+    type: string
+    nullable: true
+  rtp:
+    type: string
+  demoUrl:
+    type: string
+    nullable: true
+  gameLoaderFileName:
+    type: string
+    nullable: true
+  realUrl:
+    type: string
+    nullable: true
+  mobileRealUrl:
+    type: string
+    nullable: true
+  mobileGameSkin:
+    type: string
+    nullable: true
+  mobileName:
+    type: string
+    nullable: true
+  mobileGameLoaderFileName:
+    type: string
+    nullable: true
+  mobileDemoUrl:
+    type: string
+    nullable: true
+  name:
+    type: string
+  gameType:
+    type: object
+    oneOf:
+    - $ref: './gameTypes/slots.yml'
+    - $ref: './gameTypes/non-slot-games.yml'
+    - $ref: './gameTypes/live-dealer.yml'
+    - $ref: './gameTypes/casino.yml'
+  contentType:
+    type: string
+  vendor:
+    type: string
+  platform:
+    type: array
+    items:
+      type: string
+
+example:
+  $ref: '../examples/bulk-game-data.yml'

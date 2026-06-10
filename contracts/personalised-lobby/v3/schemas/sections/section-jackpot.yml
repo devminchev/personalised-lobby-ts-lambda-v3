@@ -1,0 +1,67 @@
+title: IG Jackpot Section
+description: Section with Jackpot
+required:
+  - entryId
+  - classification
+  - title
+properties:
+  entryId:
+    description: Unique id for the Jackpot section
+    type: string
+  classification:
+    description: Classification type of the section. `JackpotSection` for jackpot types section.
+    type: string
+  title:
+    description: Localized title for the section
+    type: string
+  type:
+    description: The type of the jackpot section. Can be of (`blueprint-jackpots`, `red-tiger-jackpots`, `headless-jackpots`, `whitehat-jackpots`)
+    type: string
+  hasGames:
+    description: Flag to indicate if this section has games
+    type: boolean
+  headlessJackpot:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+  headerImage:
+    description: URL to configure header image
+    type: string
+    nullable: false
+  bynderHeaderImage:
+    description: Bynder media object
+    $ref: '../bynderImage.yaml'
+  backgroundImage:
+    description: URL to configure header image
+    type: string
+    nullable: false
+  bynderBackgroundImage:
+    description: Bynder media object
+    $ref: '../bynderImage.yaml'
+  pot1Image:
+    description: URL to configure pot1 image
+    type: string
+    nullable: false
+  bynderPot1Image:
+    description: Bynder media object
+    $ref: '../bynderImage.yaml'
+  pot2Image:
+    description: URL to configure pot2 image
+    type: string
+    nullable: false
+  byndePot2Image:
+    description: Bynder media object
+    $ref: '../bynderImage.yaml'
+  pot3Image:
+    description: URL to configure pot3 image
+    type: string
+    nullable: false
+  byndePot3Image:
+    description: Bynder media object
+    $ref: '../bynderImage.yaml'
+  viewAll:
+    type: object
+    $ref: '../view-all-action.yml'

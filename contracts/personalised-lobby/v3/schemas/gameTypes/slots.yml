@@ -1,0 +1,53 @@
+title: Slots
+description: Game type
+properties:
+  winLineType:
+    type: string
+    nullable: true
+  maxMultiplier:
+    type: string
+    nullable: true
+  type:
+    type: string
+  winLines:
+    type: string
+    nullable: true
+  symbolType:
+    type: array
+    items:
+      type: string
+    nullable: true
+  reel:
+    type: string
+    nullable: true
+  isPersistence:
+    type: boolean
+  themes:
+    type: array
+    items:
+      type: string
+    nullable: true
+  features:
+    type: array
+    items:
+      type: string
+    nullable: true
+  isJackpotFixedPrize:
+    type: boolean
+  isJackpotInGameProgressive:
+    type: boolean
+  waysToWin:
+    type: string
+    nullable: true
+  symbolCount:
+    type: string
+    nullable: true
+  brand:
+    type: array
+    items:
+      type: string
+    nullable: true
+  isJackpot:
+    type: boolean
+  isJackpotPlatformProgressive:
+    type: boolean

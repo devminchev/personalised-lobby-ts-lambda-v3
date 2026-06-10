@@ -1,0 +1,125 @@
+tileOne:
+  - entryId: "7ls5kwzlsvZT02twxziwTw"
+    gameId: "5YnCwTuaHcdyYw31kj3J9z"
+    name: play-bp-dond-jk
+    title: "Deal or No Deal: What's In Your Box Jackpot King"
+    gameSkin: "PP_BIG_BASS_SPLASH"
+    demoUrl: "/service/game/demo/play-big-bass-splash"
+    realUrl: "/service/game/play/play-big-bass-splash"
+    imgUrlPattern: "/api/content/gametiles/dond-whats-in-your-box-logged-out/scale-s%s/dond-whats-in-your-box-tile-r%s-w%s.jpg"
+    loggedOutImgUrlPattern: "/api/content/gametiles/fishin’-frenzy-the-big-catch-2/scale-s%s/fishin’-frenzy-the-big-catch-2-tile-r%s-w%s.jpg"
+    representativeColor: "#163850"
+
+tileTwo:
+  - entryId: "3fgfKTICpJRGgInI9ddTsB"
+    gameId: "47pCOzgVwy8CZOlgegnbv5"
+    name: play-sg-dwg-jars-of-power-lucky-tap
+    title: "Jars of Power Lucky Tap"
+    gameSkin: "SGD_DWG_JARS_OF_POWER_LUCKYTAP"
+    demoUrl: "/service/game/demo/play-sg-dwg-jars-of-power-lucky-tap"
+    realUrl: "/service/game/play/play-sg-dwg-jars-of-power-lucky-tap"
+    imgUrlPattern: "/api/content/gametiles/jars-of-power-lucky-tap/scale-s%s/jars-of-power-lucky-tap-tile-r%s-w%s.jpg"
+    loggedOutImgUrlPattern: "/api/content/gametiles/jars-of-power-lucky-tap/scale-s%s/jars-of-power-lucky-tap-tile-r%s-w%s.jpg"
+    representativeColor: "#163850"
+    animationMedia: "default"
+    loggedOutAnimationMedia: "default"
+    foregroundLogoMedia:
+      name: "flash-match-on-feb26-25-Marquee-New-3X"
+      type: "image"
+      width: 750
+      height: 372
+      orientation: "landscape"
+      original: null
+      tags: []
+      thumbnails:
+        transformBaseUrl: "https://assets.ballys.com/transform/4c901602-85e2-41b4-99b6-ad7a928a5e6e/flash-match-on-feb26-25-Marquee-New-3X"
+    loggedOutForegroundLogoMedia:
+      name: "flash-match-on-feb26-25-Marquee-New-3X"
+      type: "image"
+      width: 750
+      height: 372
+      orientation: "landscape"
+      original: null
+      tags: []
+      thumbnails:
+        transformBaseUrl: "https://assets.ballys.com/transform/4c901602-85e2-41b4-99b6-ad7a928a5e6e/flash-match-on-feb26-25-Marquee-New-3X"
+    backgroundMedia:
+      name: "flash-match-on-feb26-25-Marquee-New-3X"
+      type: "image"
+      width: 750
+      height: 372
+      orientation: "landscape"
+      original: null
+      tags: []
+      thumbnails:
+        transformBaseUrl: "https://assets.ballys.com/transform/4c901602-85e2-41b4-99b6-ad7a928a5e6e/flash-match-on-feb26-25-Marquee-New-3X"
+    loggedOutBackgroundMedia:
+      name: "flash-match-on-feb26-25-Marquee-New-3X"
+      type: "image"
+      width: 750
+      height: 372
+      orientation: "landscape"
+      original: null
+      tags: []
+      thumbnails:
+        transformBaseUrl: "https://assets.ballys.com/transform/4c901602-85e2-41b4-99b6-ad7a928a5e6e/flash-match-on-feb26-25-Marquee-New-3X"
+    headlessJackpot:
+      name: "JACKPOT_BLAST"
+      id: 1
+
+tileThree:
+  - entryId: "7wwC69qbLHnIeyBwdtcCxf"
+    gameId: "3jkNodvBa3QjoNjslZaoCp"
+    name: play-sg-dwg-coconut-climb-luckytap
+    title: "Coconut Climb Luckytap"
+    gameSkin: "SGD_DWG_COCONUT_CLIMB_LUCKYTAP"
+    demoUrl: "/service/game/demo/play-sg-dwg-coconut-climb-luckytap"
+    realUrl: "/service/game/play/play-sg-dwg-coconut-climb-luckytap"
+    imgUrlPattern: "/api/content/gametiles/coconut-climb-lucky-tap/scale-s%s/coconut-climb-lucky-tap-tile-r%s-w%s.jpg"
+    loggedOutImgUrlPattern: "/api/content/gametiles/coconut-climb-lucky-tap/scale-s%s/coconut-climb-lucky-tap-tile-r%s-w%s.jpg"
+    representativeColor: "#163850"
+    animationMedia: "default"
+    loggedOutAnimationMedia: "default"
+    foregroundLogoMedia:
+      name: "flash-match-on-feb26-25-Marquee-New-3X"
+      type: "image"
+      width: 750
+      height: 372
+      orientation: "landscape"
+      original: null
+      tags: []
+      thumbnails:
+        transformBaseUrl: "https://assets.ballys.com/transform/4c901602-85e2-41b4-99b6-ad7a928a5e6e/flash-match-on-feb26-25-Marquee-New-3X"
+    loggedOutForegroundLogoMedia:
+      name: "flash-match-on-feb26-25-Marquee-New-3X"
+      type: "image"
+      width: 750
+      height: 372
+      orientation: "landscape"
+      original: null
+      tags: []
+      thumbnails:
+        transformBaseUrl: "https://assets.ballys.com/transform/4c901602-85e2-41b4-99b6-ad7a928a5e6e/flash-match-on-feb26-25-Marquee-New-3X"
+    backgroundMedia:
+      name: "flash-match-on-feb26-25-Marquee-New-3X"
+      type: "image"
+      width: 750
+      height: 372
+      orientation: "landscape"
+      original: null
+      tags: []
+      thumbnails:
+        transformBaseUrl: "https://assets.ballys.com/transform/4c901602-85e2-41b4-99b6-ad7a928a5e6e/flash-match-on-feb26-25-Marquee-New-3X"
+    loggedOutBackgroundMedia:
+      name: "flash-match-on-feb26-25-Marquee-New-3X"
+      type: "image"
+      width: 750
+      height: 372
+      orientation: "landscape"
+      original: null
+      tags: []
+      thumbnails:
+        transformBaseUrl: "https://assets.ballys.com/transform/4c901602-85e2-41b4-99b6-ad7a928a5e6e/flash-match-on-feb26-25-Marquee-New-3X"
+    headlessJackpot:
+      name: "JACKPOT_BLAST"
+      id: 1

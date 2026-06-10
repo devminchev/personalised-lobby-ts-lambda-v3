@@ -1,0 +1,89 @@
+---
+title: GameInfo
+description: Response for getGameInfo game
+required:
+  - entryId
+  - name
+  - title
+  - gameSkin
+  - realUrl
+type: object
+properties:
+  entryId:
+    type: string
+    description: The unique entry id for this game info
+  gameSkin:
+    description: Unique identifier of the game.
+    type: string
+  gameType:
+    description: Type of game
+    type: string
+  name:
+    description: Name of the game
+    type: string
+  title:
+    description: Title of the game.
+    type: string
+  realUrl:
+    description: URL used to access the game
+    type: string
+  demoUrl:
+    description: Path to demo.
+    type: string
+  howToPlayContent:
+    description: How to play the game description.
+    type: string
+  infoDetails:
+    description: Features of the game.
+    type: string
+  infoImgUrlPattern:
+    description: URL pattern for images that will be displayed alongside the game information.
+    type: string
+  introductionContent:
+    description: Introducing the game.
+    type: string
+  maxBet:
+    description: Maximum monetary bet amount that the game allows.
+    type: string
+  minBet:
+    description: Minimum monetary bet amount that the game allows
+    type: string
+  representativeColor:
+    description: Colour associated with the game
+    type: string
+  sigCons:
+      description: Significant Conditions for the game (localised text). Optional — omitted from the response when the game has no Significant Conditions.
+      type: string
+  animationMedia:
+    description: Type of animation (animated or default).
+    type: string
+  foregroundLogoMedia:
+    description: Bynder image object.
+    $ref: './bynderImage.yaml'
+  backgroundMedia:
+    description: Bynder image object used for the page background.
+    $ref: './bynderImage.yaml'
+  loggedOutAnimationMedia:
+    description: Type of animation (animated or default).
+    type: string
+  loggedOutForegroundLogoMedia:
+    description: Bynder image object.
+    $ref: './bynderImage.yaml'
+  loggedOutBackgroundMedia:
+    description: Bynder image object.
+    $ref: './bynderImage.yaml'
+  funPanelGame:
+    oneOf:
+      - type: object
+        properties:
+          defaultCategory:
+            type: string
+      - type: boolean
+  showNetPosition:
+    description: Display regulatory required net position bar in gx-console
+    type: boolean
+  liveHidden:
+    description: If the link will be visible on live
+    type: boolean
+example:
+  $ref: "../examples/game-info.yml"

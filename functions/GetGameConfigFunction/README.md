@@ -9,7 +9,7 @@ Full contract can be found [here](http://static0.psnative.pgt.gaia/personalised_
 
 ### Local invoke with sam
 
-Neither the lambdas nor the layers need to be build locally before building with sam as `sam build` itself will take care of that.
+The lambdas do not need to be built locally before building with sam as `sam build` itself will take care of that.
 
 To build the lambda locally run `sam build` from top level.
 

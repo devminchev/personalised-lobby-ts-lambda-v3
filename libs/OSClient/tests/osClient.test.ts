@@ -1,12 +1,23 @@
 import { jest, describe, beforeEach, it, expect, beforeAll } from '@jest/globals';
 import { Client } from '@opensearch-project/opensearch';
-import { getClient } from '../index';
+import { getClient } from '../lib/osClient';
 
 jest.mock('@opensearch-project/opensearch', () => {
     return {
         Client: jest.fn(),
     };
 });
+
+// Stub BreakerClient so getClient() doesn't trigger real DDB calls.
+jest.mock('../lib/breakerClient', () => ({
+    BreakerClient: jest.fn().mockImplementation(() => ({
+        init: jest.fn<() => Promise<void>>().mockResolvedValue(undefined),
+        withOsCall: jest.fn(<T>(fn: () => Promise<T>) => fn()),
+        getGlobalState: jest.fn().mockReturnValue('CLOSED'),
+    })),
+    BreakerOpenError: class BreakerOpenError extends Error {},
+    SlowOsCallError: class SlowOsCallError extends Error {},
+}));
 
 const MockedClient = Client as jest.MockedClass<typeof Client>;
 

@@ -1,0 +1,270 @@
+---
+title: Circuit-breaker runbook
+description: Operator triage for the controller — alarm responses, common failure modes, mid-incident tuning, manual override, and forensic queries
+---
+
+# Circuit-breaker runbook
+
+The controller is load-bearing: when it stops reacting, downstream consumers read an increasingly stale breaker posture while real conditions move on. This page is the operator playbook — what each alarm means, where to look, and what to do.
+
+For background see the [overview](./circuit-breaker-overview.mdx), [state machine](./circuit-breaker-state-machine.mdx), and [alarms](./circuit-breaker-alarms.mdx).
+
+> All `aws` commands below assume your shell already has credentials for the right account/region (e.g. via `aws sso login --profile <profile>`). The function name is `personalisation-lobby-games-cloudwatch-controller` ([template.yaml](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/template.yaml)). Replace `${StageName}` with your environment (`v2`, `playground`, etc).
+
+## Alarms and what to do
+
+### `lobby-controller-errors-${StageName}` — controller errors alarm
+
+**What it means.** The controller's `AWS/Lambda Errors` count is ≥ 1 in 3 of the last 5 minutes. The controller is throwing exceptions faster than Lambda's automatic async retries can cover. See the alarm spec at [alarms — `lobby-controller-errors-${StageName}`](./circuit-breaker-alarms.mdx#lobby-controller-errors-stagename).
+
+**First five minutes.**
+
+```bash
+# Tail the logs for the last 15 minutes
+aws logs tail /aws/lambda/personalisation-lobby-games-cloudwatch-controller \
+  --since 15m --follow
+
+# Or pull an exception-only view via CloudWatch Logs Insights
+aws logs start-query \
+  --log-group-name /aws/lambda/personalisation-lobby-games-cloudwatch-controller \
+  --start-time $(( $(date +%s) - 900 )) \
+  --end-time $(date +%s) \
+  --query-string 'fields @timestamp, @message | filter @message like /ERROR|Exception/ | sort @timestamp desc | limit 100'
+```
+
+**Common causes.**
+
+| Symptom in logs                                                 | Likely cause                                                        | Fix                                                                                                                                                                                                                                                                                                                                                   |
+| --------------------------------------------------------------- | ------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Missing required environment variable: CB_DDB_TABLE`           | Lambda env config missing                                           | Re-deploy; verify CFN didn't roll back                                                                                                                                                                                                                                                                                                                |
+| `BREAKER_SETTINGS_PARAMETER_NAME env var is required`           | SSM parameter name not set                                          | Re-deploy; verify [`template.yaml`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/template.yaml) declares the env var                                                                                                                                                                             |
+| `SSM did not return a value for breaker settings parameter ...` | Parameter missing or IAM-blocked                                    | Verify the parameter exists (`aws ssm get-parameter --name personalisation-lobby-${StageName}-breaker.json`); verify IAM policy `CircuitControlBreakerSettingsRead` ([template.yaml](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/template.yaml)) grants `ssm:GetParameter` on the parameter ARN |
+| `Failed to parse JSON in breaker settings parameter ...`        | Operator stored malformed JSON                                      | Re-set the parameter with valid JSON (full document, all six keys)                                                                                                                                                                                                                                                                                    |
+| `Missing key "<KEY>" in breaker settings parameter ...`         | `put-parameter --overwrite` was called with a partial JSON document | Re-set with the full document; `--overwrite` replaces, it does not merge                                                                                                                                                                                                                                                                              |
+| `Negative value not allowed for <field>`                        | Bad `aws ssm put-parameter` value                                   | Re-set the parameter to a sane value (see [defaults](./circuit-breaker-state-machine.mdx#tunable-knobs))                                                                                                                                                                                                                                              |
+| `ConditionalCheckFailedException` after retries                 | Sustained alarm storm winning the race twice                        | Check `ControllerDlqDepthAlarm` — those events are now in the DLQ; see DLQ section                                                                                                                                                                                                                                                                    |
+| `AccessDenied: ... dynamodb:...`                                | IAM drift on the role                                               | Verify [`PostCloudWatchControllerRole`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/template.yaml) has the `CircuitControlDynamoAccess` policy attached                                                                                                                                         |
+
+**If the cause is non-obvious.** Check the most recent successful invocations vs the current state. If the controller was healthy 1 hour ago and is failing now without a deploy, the change is likely external — alarm storm, DDB throttling, SSM throttling, or a region issue.
+
+### `lobby-controller-dlq-depth-${StageName}` — DLQ depth alarm
+
+**What it means.** At least one alarm event has been **permanently lost** to the controller — Lambda's async retry budget (initial + 2 = 3 attempts, see [Lambda async invocation](https://docs.aws.amazon.com/lambda/latest/dg/invocation-async.html)) has been exhausted. See the alarm spec at [alarms — `lobby-controller-dlq-depth-${StageName}`](./circuit-breaker-alarms.mdx#lobby-controller-dlq-depth-stagename).
+
+This alarm fires at the first message — there is no smoothing.
+
+**First five minutes.**
+
+```bash
+# Inspect the queue (find the URL first)
+DLQ_URL=$(aws sqs get-queue-url \
+  --queue-name personalisation-lobby-cloudwatch-controller-dlq-${StageName} \
+  --query QueueUrl --output text)
+
+# Read up to 10 messages without removing them
+aws sqs receive-message --queue-url "$DLQ_URL" \
+  --max-number-of-messages 10 --visibility-timeout 60 \
+  --message-attribute-names All --attribute-names All
+```
+
+The message body is the original EventBridge payload. The relevant pieces:
+
+- `detail.alarmName` — which alarm transition was lost.
+- `detail.state.value` — what state it transitioned into (ALARM / OK / INSUFFICIENT_DATA).
+- `detail.state.timestamp` — when it transitioned.
+
+**Recovery options.**
+
+1. **Replay the event.** If the underlying cause has cleared (e.g. transient DDB throttle), re-invoke the controller with the saved payload. Save the message body to a file first, then:
+
+    ```bash
+    aws lambda invoke \
+      --function-name personalisation-lobby-games-cloudwatch-controller \
+      --invocation-type Event \
+      --payload fileb://saved-event.json \
+      /tmp/lambda-out
+    ```
+
+    The `fileb://` prefix tells the CLI to read the payload as raw bytes (the form AWS CLI v2 expects for raw JSON payloads — see [`aws lambda invoke` reference](https://docs.aws.amazon.com/cli/latest/reference/lambda/invoke.html)). Then delete the message from the DLQ.
+
+2. **Drop the event and let the next alarm transition catch up.** Acceptable if the alarm is still firing — the next transition (re-trip or recovery) will produce a fresh event that the controller will consume normally. The audit row for the dropped event will be missing, but the live posture is correct.
+
+3. **Reconstruct from CloudWatch.** If the lost event was a state transition that no longer fires (e.g. it has already cleared and the next change is a long way off), use [`describe-alarm-history`](https://docs.aws.amazon.com/cli/latest/reference/cloudwatch/describe-alarm-history.html) to confirm what was missed, then run a manual override (below) to align the breaker's posture.
+
+**After triage.** Always delete consumed messages from the DLQ — they don't auto-clear:
+
+```bash
+aws sqs delete-message --queue-url "$DLQ_URL" --receipt-handle "<receipt-handle>"
+```
+
+DLQ retention is 14 days ([template.yaml](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/template.yaml)) — older messages drop automatically.
+
+### Signal alarms (`breaker:GLOBAL:*`) — informational, not for the controller operator
+
+When one of the six breaker signal alarms fires, the controller reacts to it on its own. The signal alarms are not for the _controller_ operator to triage — they're for the _backend_ operator (OpenSearch, API Gateway). Use them as evidence in the corresponding backend's runbook; the breaker side is just the loudspeaker.
+
+## Common diagnostic questions
+
+### "Is the breaker currently OPEN?"
+
+```bash
+aws dynamodb get-item \
+  --table-name CircuitControl-${StageName} \
+  --key '{"PK":{"S":"BREAKER#GLOBAL"},"SK":{"S":"STATE#CURRENT"}}' \
+  --consistent-read
+```
+
+Look at `state`, `mode`, `holdUntil`, `reason`, `updatedAt`. The fields are documented in [Data model](./circuit-breaker-data-model.mdx#statecurrent--live-breaker-posture).
+
+### "Why did the breaker open at 14:23?"
+
+```bash
+aws dynamodb query \
+  --table-name CircuitControl-${StageName} \
+  --key-condition-expression "PK = :pk AND begins_with(SK, :sk)" \
+  --expression-attribute-values '{":pk":{"S":"BREAKER#GLOBAL"},":sk":{"S":"STATE#"}}' \
+  --scan-index-forward false \
+  --max-items 50
+```
+
+The `STATE#<isoTs>` rows are written every transition. Look at `reason` — it carries the `compound_open:critical_signal:<name>` or `compound_open:compound_warning:<csv>` segment. Look at `openedByAlarm.alarmName` for the specific alarm that flipped first.
+
+### "Which alarm events landed during the incident?"
+
+```bash
+aws dynamodb query \
+  --table-name CircuitControl-${StageName} \
+  --key-condition-expression "PK = :pk AND begins_with(SK, :sk)" \
+  --expression-attribute-values '{":pk":{"S":"BREAKER#GLOBAL"},":sk":{"S":"EVENT#2026-04-30T14"}}' \
+  --max-items 100
+```
+
+The audit rows are keyed by `EVENT#<isoTs>#<alarmName>` so the `begins_with` filter narrows by hour. The `rawEvent` field holds the full EventBridge payload.
+
+Audit retention is 14 days by default (`EVENT_HISTORY_TTL_SEC = 1209600`, [template.yaml](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/template.yaml)).
+
+### "Is the breaker stuck OPEN?"
+
+A genuinely-stuck breaker shows up as:
+
+- `state: 'OPEN'` for hours with no HALF_OPEN transitions in the history.
+- `holdUntil` in the past.
+- The 1-minute tick _should_ have moved it to HALF_OPEN once `holdUntil` expired.
+
+If `holdUntil` is in the past and `state` is still `OPEN`, the tick is not running. Check:
+
+1. **Is the EventBridge schedule enabled?**
+    ```bash
+    aws scheduler list-schedules --query "Schedules[?Name && contains(Name, 'controller')]"
+    ```
+2. **Is the controller throwing on every tick?** Check `ControllerErrorsAlarm` and the logs. If yes, the tick events are landing in the DLQ — see DLQ section.
+3. **Are zombie signals pinning it?** `SIGNAL_STATE#CURRENT` may have stale entries that survived pruning. Pruning runs only when the controller is invoked — if it's been failing for longer than `signalMaxAgeMs` (default 20 min), the next successful invocation will drop them. The relevant invocation is either an alarm event (always rewrites the pruned `SIGNAL_STATE#CURRENT` via `transactWriteEvaluation`) or a HALF_OPEN-expiry tick (now also persists the pruned snapshot atomically — [index.ts](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/index.ts)). Both paths leave the DB item clean once they run successfully. If you can't wait, manual override below.
+
+### "Operator changed `OPEN_HOLD_MS` and nothing happened"
+
+The controller caches settings for 60 s ([`src/settings.ts`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/settings.ts), `TTL_MS = 60_000`). After `aws ssm put-parameter --overwrite`:
+
+- A **cold-start** invocation picks up the new value immediately.
+- A **warm** container picks it up at its next cache miss — bounded by 60 s.
+
+If you've waited more than 60 s and the next breaker transition still uses the old value, check:
+
+- Did the `put-parameter` actually succeed? `aws ssm get-parameter --name personalisation-lobby-${StageName}-breaker.json`.
+- Is there a `BREAKER_OPEN_HOLD_MS` env var set on the function? **Env vars win over SSM** ([`src/settings.ts`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/settings.ts)). Inspect:
+    ```bash
+    aws lambda get-function-configuration \
+      --function-name personalisation-lobby-games-cloudwatch-controller \
+      --query 'Environment.Variables'
+    ```
+    If `BREAKER_*` env vars are set with non-empty values, those are the active settings — SSM is being shadowed. The template declares them empty by default ([template.yaml](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/template.yaml)).
+
+See the [propagation diagrams](./configuration-store-decision.mdx#how-initialisation-and-propagation-work) for the full flow.
+
+## Mid-incident tuning
+
+The intended workflow is the same as the [drift caveat](./configuration-store-decision.mdx#drift-caveat) at the bottom of the configuration-store doc:
+
+1. **Read the current document first** so you don't accidentally drop other keys when `--overwrite` replaces the whole thing:
+    ```bash
+    aws ssm get-parameter \
+      --name personalisation-lobby-${StageName}-breaker.json \
+      --query 'Parameter.Value' --output text
+    ```
+2. **Apply the emergency value:** edit the JSON locally to bump the field you want (e.g. `OPEN_HOLD_MS: 90000`), then write the whole document back:
+    ```bash
+    aws ssm put-parameter \
+      --name personalisation-lobby-${StageName}-breaker.json \
+      --type String --overwrite \
+      --value '{"OPEN_HOLD_MS":90000,"HALF_OPEN_MAX_MS":120000,"HEALTHY_OK_EVENTS_TO_CLOSE":2,"EVENT_HISTORY_TTL_SEC":1209600,"STATE_HISTORY_TTL_SEC":2592000,"STALE_EVENT_MS":600000}'
+    ```
+3. **Wait up to 60 s** for the warm-container cache to refresh.
+4. **Verify** by reading `STATE#CURRENT` after the next transition — `holdUntil - updatedAt` should match the new `openHoldMs`.
+5. **After the incident, commit the new JSON into the template.** Update the `BreakerSettingsJson` resource's `Value:` field in [`template.yaml`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/template.yaml) so it persists past the next deploy. This step is easy to forget; CloudFormation will reset the parameter to the template's value on the next `sam deploy` (dev/playground only — stg/prod are terraform-managed).
+
+The six tunable parameters and their defaults are in the [state machine — Tunable knobs](./circuit-breaker-state-machine.mdx#tunable-knobs) section.
+
+## Manual override
+
+`setBreakerStateManually` ([`src/index.ts`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/index.ts)) is the operator escape hatch. It is **not exposed via API Gateway** — the only way to invoke it is by calling the function directly with a payload your wrapper code dispatches to it. The function is currently exported but not wired to a public entry point; if you need to use it in production, add a one-shot operator-only invocation path and remove it after the incident.
+
+What it does: forces the breaker into a target state, atomically writing both `STATE#CURRENT` and a `STATE#<isoTs>` history row. The `updatedBy` field is set to the actor argument so the audit trail shows the override.
+
+What it does _not_ do:
+
+- Mutate `SIGNAL_STATE#CURRENT`. If the signals are still active, the next automatic alarm event or tick may flip the state back. To make an override stick, you must also fix the underlying signals (e.g. acknowledge a backend incident, ensure the alarms have cleared) or follow up with a settings change.
+- Apply the `parseAlarmName` `GLOBAL`-collapse. The `service` argument is taken at face value — you can override `BREAKER#some-other-service` if you really want to, but the controller's automatic paths will never read or write that partition. See [ADR-002](./adr/002-global-only-partition.mdx).
+
+When to use it:
+
+- The breaker is stuck OPEN past the point of usefulness, the underlying alarms have cleared, and you want to force it CLOSED rather than waiting for the next tick + probe.
+- You suspect the signal map is wrong (zombie signals, wrong values from a previous deploy) and want to short-circuit. Reset to CLOSED and let the next genuine alarm transition rebuild from scratch.
+
+## Forensic queries (post-incident)
+
+The simplest "how many fresh trips have ever happened on this breaker" answer is to read `tripCount` from `STATE#CURRENT` — the controller increments it only on `prev.state !== 'OPEN' && next.state === 'OPEN'` ([statemachine.ts](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/statemachine.ts)), so it ignores OPEN→OPEN sustains:
+
+```bash
+# What's the current trip count?
+aws dynamodb get-item \
+  --table-name CircuitControl-${StageName} \
+  --key '{"PK":{"S":"BREAKER#GLOBAL"},"SK":{"S":"STATE#CURRENT"}}' \
+  --query 'Item.tripCount.N'
+```
+
+## Disaster scenarios
+
+### "DynamoDB is down for an extended period"
+
+The controller will throw on every invocation. Async retries exhaust, events go to the DLQ, `ControllerDlqDepthAlarm` fires. The breaker posture (`STATE#CURRENT`) is whatever was last written — consumers will see stale state. After DDB recovers, drain the DLQ (replay or drop) per the DLQ section.
+
+There is no fallback store. The controller is intentionally fail-loud (see [`src/settings.ts`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/settings.ts) header) — silent degradation in a control plane is worse than visible failure.
+
+### "EventBridge is dropping events"
+
+Visible only via missed transitions in the audit trail (gaps where you'd expect alarm events). Because the controller is event-driven, missed events typically self-correct on the next alarm transition. The persistent risk is a stuck-OPEN breaker if the dropped event was the recovery OK — see "Is the breaker stuck OPEN?" above; the tick + signal pruning will eventually unstick it within `signalMaxAgeMs` (default 20 min).
+
+### "Reserved concurrency saturates (= 5)"
+
+Excess invocations are throttled and routed to the DLQ. `ControllerDlqDepthAlarm` fires. If the storm persists you can temporarily raise reserved concurrency:
+
+```bash
+aws lambda put-function-concurrency \
+  --function-name personalisation-lobby-games-cloudwatch-controller \
+  --reserved-concurrent-executions 20
+```
+
+But understand the trade-off: more concurrency = more contention on `BREAKER#GLOBAL` = more `ConditionalCheckFailed` retries. The 5-cap exists to bound that contention ([template.yaml](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/template.yaml)). After the storm, return to the template default and commit the change if you want it permanent.
+
+### "PITR — restore the table"
+
+If a bad controller deploy corrupts state, PITR is on with a 35-day window. The procedure is documented in [Restoring a DynamoDB table to a point in time](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/PointInTimeRecovery.Tutorial.html). The restore creates a new table; you'll need to repoint the controller (`CB_DDB_TABLE` env var), or rename the restored table to match.
+
+The breaker's data volume is tiny — restore is fast.
+
+## Related references
+
+- [AWS Lambda asynchronous invocation](https://docs.aws.amazon.com/lambda/latest/dg/invocation-async.html) — retry semantics, destinations, DLQ.
+- [SQS dead-letter queues](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-dead-letter-queues.html) — message lifecycle.
+- [DynamoDB Point-in-Time Recovery](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/PointInTimeRecovery.html) — restore-to-time procedure.
+- [SSM Parameter Store](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html) — `put-parameter` / `get-parameter` reference.
+- [CloudWatch alarm history](https://docs.aws.amazon.com/cli/latest/reference/cloudwatch/describe-alarm-history.html) — reconstruct missed transitions.

@@ -1,0 +1,44 @@
+---
+parameters:
+  - name: sitename
+    description: Venture name
+    schema:
+      type: string
+    in: path
+    required: true
+  - name: memberid
+    in: query
+    description: Member ID
+    schema:
+      type: string
+    required: true
+get:
+  summary: Get Additional ML personalised data per user_venture
+  x-controller: PersonalisedExtraData
+  tags:
+    - PersonalisedExtraData
+  responses:
+    "200":
+      description: An object with set of properties containing additional ML personalised data for a user for a venture.
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/personalised-extra-data.yml'
+    '400':
+      $ref: '../schemas/error-responses.yml'
+    '401':
+      $ref: '../schemas/error-responses.yml'
+    '403':
+      $ref: '../schemas/error-responses.yml'
+    '404':
+      $ref: '../schemas/error-responses.yml'
+    '429':
+      $ref: '../schemas/error-responses.yml'
+    '500':
+      $ref: '../schemas/error-responses.yml'
+    '502':
+      $ref: '../schemas/error-responses.yml'
+    '503':
+      $ref: '../schemas/error-responses.yml'
+    '504':
+      $ref: '../schemas/error-responses.yml'

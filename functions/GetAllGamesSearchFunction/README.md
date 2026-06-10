@@ -97,7 +97,7 @@ _Note: Outputs are needed for deployments to AWS. If we switch to terraform in t
 
 ### Local invoke with sam
 
-Neither the lambdas nor the lambda-layers need to be build locally before building with sam as `sam build` itself will take care of that.
+The lambdas do not need to be built locally before building with sam as `sam build` itself will take care of that.
 
 To build the lambda locally run `sam build` from top level.
 

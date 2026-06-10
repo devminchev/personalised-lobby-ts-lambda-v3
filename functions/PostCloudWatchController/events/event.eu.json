@@ -1,0 +1,4 @@
+{
+  "_note": "Smoke-test event for `sam-invoke-eu` / pre-push validation. The controller depends on AWS SSM and DynamoDB to do real work, neither of which is reachable without creds in CI / on a fresh laptop. SSM is bypassed via per-function BREAKER_* env vars in env.eu.json (settings.ts skips the SSM call when all six are set). DDB is bypassed by giving the handler an event whose `source` matches neither isCloudWatchAlarmEvent nor isScheduledTickEvent, so it returns `ignored_unknown_event` before getBreakerAndSignalState is called. Real event flows are covered by `yarn unit` and `yarn test:e2e` (DynamoDB Local).",
+  "source": "smoke-test"
+}

@@ -1,4 +1,4 @@
-FROM dockerhub-proxy.artifactory.gamesys.co.uk/node:20-bookworm AS builder
+FROM dockerhub-proxy.artifactory.gamesys.co.uk/node:24-bookworm AS builder
 
 WORKDIR /app
 
@@ -16,7 +16,7 @@ RUN test -n "$FUNCTION_NAME" || (echo "FUNCTION_NAME build argument is required"
 RUN ./nx build $FUNCTION_NAME --configuration=production
 
 # Intermediate stage to prepare files
-FROM dockerhub-proxy.artifactory.gamesys.co.uk/node:20-bookworm AS prepare
+FROM dockerhub-proxy.artifactory.gamesys.co.uk/node:24-bookworm AS prepare
 
 # Copy the mapping file and dist directory from builder
 COPY --from=builder /app/dist /tmp/dist
@@ -53,8 +53,9 @@ RUN mkdir -p /tmp/app && \
     cp -r /tmp/dist/functions/$mapped_value/* /tmp/app/
 
 # Final stage - use official AWS Lambda base image
-# NEVER CHANGE THIS BASE IMAGE
-FROM public.ecr.aws/lambda/nodejs:20
+# NEVER swap this image to another provider (alpine, distroless, etc.) — only
+# bump the Node major version tag when upgrading runtimes.
+FROM public.ecr.aws/lambda/nodejs:24
 
 # Copy function code and dependencies to Lambda task root
 COPY --from=prepare /tmp/app/ ${LAMBDA_TASK_ROOT}/

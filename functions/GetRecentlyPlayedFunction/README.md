@@ -114,7 +114,7 @@ unless stated otherwise.
 
 ### Prerequisites
 
-- Node.js 20 + Yarn
+- Node.js 24 + Yarn
 - AWS CLI and SAM CLI
 - Podman (preferred) or Docker for container-based workflows
 

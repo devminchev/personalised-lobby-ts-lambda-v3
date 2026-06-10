@@ -53,6 +53,7 @@ export type DerivedPayload = {
     videoUrlPattern: string | null;
     animationMedia: string | null;
     loggedOutAnimationMedia: string | null;
+    sigCons: string | null;
     foregroundLogoMedia: object | null;
     loggedOutForegroundLogoMedia: object | null;
     backgroundMedia: object | null;
@@ -119,6 +120,7 @@ export const computeDerivedPayload = (
         gameData?.loggedOutAnimationMedia,
         null,
     );
+    const sigCons = tryGetValueFromLocalised(localeOverride, spaceLocale, gameData?.sigCons, null);
     const loggedInForegroundLogoMedia = tryGetValueFromLocalised(
         localeOverride,
         spaceLocale,
@@ -174,6 +176,7 @@ export const computeDerivedPayload = (
         videoUrlPattern,
         animationMedia,
         loggedOutAnimationMedia,
+        sigCons,
         foregroundLogoMedia,
         loggedOutForegroundLogoMedia: loggedOutForegroundLogoMediaObj,
         backgroundMedia,
@@ -360,6 +363,7 @@ export const payloadBuilder = (
         ...(computed.videoUrlPattern ? { videoUrlPattern: computed.videoUrlPattern } : {}),
         ...(computed.animationMedia ? { animationMedia: computed.animationMedia } : {}),
         ...(computed.loggedOutAnimationMedia ? { loggedOutAnimationMedia: computed.loggedOutAnimationMedia } : {}),
+        ...(computed.sigCons ? { sigCons: computed.sigCons } : {}),
         ...(computed.foregroundLogoMedia ? { foregroundLogoMedia: computed.foregroundLogoMedia } : {}),
         ...(computed.loggedOutForegroundLogoMedia
             ? { loggedOutForegroundLogoMedia: computed.loggedOutForegroundLogoMedia }

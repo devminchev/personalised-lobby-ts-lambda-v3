@@ -1,0 +1,26 @@
+title: Carousel B Section
+description: Carousel B
+required:
+  - entryId
+  - classification
+  - layoutType
+  - title
+properties:
+  entryId:
+    description: Unique id for the carousel B section
+    type: string
+  classification:
+    description: Classification type of the section
+    type: string
+  title:
+    description: Localized title for the section
+    type: string
+  hasGames:
+    description: Flag to indicate if this section has games
+    type: boolean
+  layoutType:
+    description: Layout type (fixed to carousel-b)
+    type: string
+  viewAll:
+    type: object
+    $ref: '../view-all-action.yml'

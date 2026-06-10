@@ -8,9 +8,14 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import nock from 'nock';
 import { jest, describe, beforeEach, it, expect } from '@jest/globals';
 import { mockApiEvent } from './mocks/gatewayMock';
-import { NOT_FOUND_RESPONSE, SUCCESSFUL_GAME_RESPONSE, DUPLICATE_GAME_SKIN_RESPONSE } from './mocks/responses';
+import {
+    NOT_FOUND_RESPONSE,
+    SUCCESSFUL_GAME_RESPONSE,
+    DUPLICATE_GAME_SKIN_RESPONSE,
+    GAME_RESPONSE_NO_AGGREGATOR,
+} from './mocks/responses';
 import { ErrorCode, getErrorMessage, parseCompressedBody, IG_GAMES_V2_READ_ALIAS } from 'os-client';
-import { EXPECTED_WEB_RESP } from './mocks/expectedAPIResponses';
+import { EXPECTED_WEB_RESP, EXPECTED_WEB_RESP_NULL_AGGREGATOR } from './mocks/expectedAPIResponses';
 
 jest.mock('@opensearch-project/opensearch', () => {
     const actualOpenSearch: any = jest.requireActual('@opensearch-project/opensearch');
@@ -37,6 +42,19 @@ describe('Integration Test for Lambda Handler', () => {
             const body = parseCompressedBody(result);
             expect(result.statusCode).toEqual(200);
             expect(body).toEqual(EXPECTED_WEB_RESP);
+        });
+
+        it('Should return (200) with gameAggregator as null when missing from the source', async () => {
+            nock('http://localhost:9200')
+                .post(`/${IG_GAMES_V2_READ_ALIAS}/_search?request_cache=true`)
+                .reply(200, GAME_RESPONSE_NO_AGGREGATOR);
+
+            const event: APIGatewayProxyEvent = mockApiEvent(GAME_SKIN);
+            const result: APIGatewayProxyResult = await lambdaHandler(event);
+
+            const body = parseCompressedBody(result);
+            expect(result.statusCode).toEqual(200);
+            expect(body).toEqual(EXPECTED_WEB_RESP_NULL_AGGREGATOR);
         });
 
         it('should log a duplicate warning and still return (200) when OS returns multiple hits with the same gameSkin', async () => {

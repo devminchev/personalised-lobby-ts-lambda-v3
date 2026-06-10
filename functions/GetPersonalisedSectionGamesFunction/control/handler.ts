@@ -81,7 +81,7 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
         const offset = parsePaginationParam(event.queryStringParameters?.offset);
         const limit = parsePaginationParam(event.queryStringParameters?.limit);
 
-        const client = getClient();
+        const client = getClient({ tier: 'B', enabled: false });
 
         const spaceLocale = handleSpaceLocalization();
         const showWebComponent: boolean = shouldIncludeWebComponentData(viewSlug);

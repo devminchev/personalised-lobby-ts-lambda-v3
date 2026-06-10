@@ -1,0 +1,129 @@
+---
+title: GameConfig
+description: Response of configuration info of particular game
+type: object
+required:
+  - entryId
+  - gameName
+  - title
+  - gameSkin
+  - realUrl
+  - gameLoaderFileName
+  - vendor
+properties:
+  entryId:
+    type: string
+    description: The unique entry id for this game config
+  gameName:
+    description: Name of the game.
+    type: string
+  gameSkin:
+    description: Unique identifier of the game.
+    type: string
+  realUrl:
+    description: URL used to access the game.
+    type: string
+  chat:
+    properties:
+      isEnabled:
+        type: boolean
+  gameLoaderFileName:
+    description: The unique entry id for this game info
+    type: string
+  vendor:
+    description: Which vendor will load the game
+    type: string
+  funPanelEnabled:
+    description: Does the game support the multi game layout? (only required for Gamesys vendor)
+    type: boolean
+  showNetPosition:
+    description: Display regulatory required net position bar in gx-console
+    type: boolean
+  gameType:
+    description:
+    type: object
+    properties:
+      type:
+        type: string
+      casinoType:
+        type: string
+      brand:
+        type: string
+      features:
+        type: array
+        items:
+          type: string
+      themes:
+        type: array
+        items:
+          type: string
+      symbolType:
+        type: array
+        items:
+          type: string
+      maxMultiplier:
+        type: string
+      reel:
+        type: string
+      symbolCount:
+        type: string
+      waysToWin:
+        type: string
+      winLineType:
+        type: string
+      winLines:
+        type: string
+      isJackpotFixedPrize:
+        type: boolean
+      isJackpotInGameProgressive:
+        type: boolean
+      isJackpotPlatformProgressive:
+        type: boolean
+      isPersistence:
+        type: boolean
+  minBet:
+    description: Minimum monetary bet amount that the game allows.
+    type: string
+  maxBet:
+    description: Maximum monetary bet amount that the game allows.
+    type: string
+  headlessJackpot:
+    description:
+    type: object
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+  mobileOverride:
+    description:
+    type: boolean
+  demoUrl:
+    description: Path to demo.
+    type: string
+  mobileName:
+    description: Name of the mobile game.
+    type: string
+  mobileGameSkin:
+    description: Unique identifier of the mobile game.
+    type: string
+  mobileRealUrl:
+    description: URL used to access the game
+    type: string
+  mobileDemoUrl:
+    description: URL used to access the demo
+    type: string
+  mobileGameLoaderFileName:
+    description:
+    type: string
+  gameStudio:
+    description:
+    type: string
+  gameProvider:
+    description:
+    type: string
+  liveHidden:
+    description: If the link will be visible on live
+    type: boolean
+example:
+  $ref: '../examples/game-config.yml'

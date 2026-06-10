@@ -31,6 +31,8 @@ import {
     QuickLinksLayoutType,
     IGameShuffleOS,
     IGameShuffleSection,
+    IPlaceholderSectionOS,
+    IPlaceholderSection,
 } from './types';
 
 type QuickLinksParams = {
@@ -599,5 +601,19 @@ export const buildGameShuffleSection = ({
         classification: section.classification?.[spaceLocale],
         title: tryGetValueFromLocalised(userLocale, spaceLocale, section.title, ''),
         name: section.name?.[spaceLocale] || '',
+    };
+};
+
+type PlaceholderParams = {
+    section: IPlaceholderSectionOS;
+    spaceLocale: string;
+};
+
+export const buildPlaceholderSection = ({ section, spaceLocale }: PlaceholderParams): IPlaceholderSection => {
+    return {
+        entryId: section.id,
+        classification: section.classification[spaceLocale],
+        placeholderType: section.placeholderType[spaceLocale],
+        title: section.entryTitle[spaceLocale],
     };
 };

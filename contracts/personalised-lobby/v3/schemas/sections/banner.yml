@@ -1,0 +1,35 @@
+title: IG Banner Section
+description: Section with banner
+type: object
+required:
+  - entryId
+  - classification
+  - title
+properties:
+  entryId:
+    description: Unique id for the banner section
+    type: string
+  classification:
+    description: Classification type of the section
+    type: string
+  title:
+    description: Localized title for the banner
+    type: string
+  image:
+    description: Image URL for the banner. This is supporting legacy, eventually will be bynder.
+    type: string
+  video:
+    description: Video URL for the banner. This is supporting legacy, eventually will be bynder.
+    type: string
+  bynderMedia:
+    description: Bynder media object
+    $ref: '../bynderImage.yaml'
+  bannerLink:
+    description: Banner link URL
+    type: string
+  displaySize:
+    description: Size of the banner on the page. Can be ('small', 'medium', 'large')
+    type: string
+  bannerType:
+    description: Type of banner. (Can be 'media' or 'hero')
+    type: string

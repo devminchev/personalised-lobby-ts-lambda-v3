@@ -1,9 +1,9 @@
 {
   "name": "get-recently-played",
-  "version": "0.5.14",
+  "version": "0.8.5",
   "description": "Get games for a section",
   "main": "app.js",
-  "repository": "https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda",
+  "repository": "https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3",
   "relComponent": "igaming_lobby_recently_played_games_v3",
   "scripts": {
     "unit": "jest",

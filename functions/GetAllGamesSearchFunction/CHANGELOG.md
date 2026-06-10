@@ -2,6 +2,121 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.33.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-all-games-search-0.32.4...get-all-games-search-0.33.0) (2026-06-09)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.61.0`
+
+### Features
+
+* **gtech-1322058:** circuit breaker global posture setup testing on stg infra with prod load ([8093a29](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/8093a294e2c3f1d7406b15aba7e4e132c270c676))
+
+## [0.32.4](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-all-games-search-0.32.3...get-all-games-search-0.32.4) (2026-06-09)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.60.2`
+## [0.32.3](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-all-games-search-0.32.2...get-all-games-search-0.32.3) (2026-06-05)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.60.1`
+
+### Bug Fixes
+
+* **gtech-1320927:** disable breaker logic for tier b and c ([8d1a3b9](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/8d1a3b9b748e83526e691cb74ad4c51d3afb6766))
+
+## [0.32.2](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-all-games-search-0.32.1...get-all-games-search-0.32.2) (2026-06-05)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.60.1`
+## [0.32.1](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-all-games-search-0.32.0...get-all-games-search-0.32.1) (2026-06-05)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.60.0`
+## [0.32.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-all-games-search-0.31.0...get-all-games-search-0.32.0) (2026-06-03)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.59.0`
+
+### Features
+
+* **gtech-1319757:** upgrade lambda node version to lts ([af44b88](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/af44b886b04e87327753f172dd91c67fba5764ab))
+
+## [0.31.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-all-games-search-0.30.2...get-all-games-search-0.31.0) (2026-06-02)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.58.0`
+
+### Features
+
+* **gtech-1320927:** lobby api lambdas to be able to get global breaker state ([a645e28](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/a645e284292ba9076283c26b1c49e133aa1840aa))
+
+## [0.30.2](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-all-games-search-0.30.1...get-all-games-search-0.30.2) (2026-05-20)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.57.1`
+## [0.30.1](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-all-games-search-0.30.0...get-all-games-search-0.30.1) (2026-05-20)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.57.0`
+## [0.30.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-all-games-search-0.29.4...get-all-games-search-0.30.0) (2026-05-20)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.56.1`
+
+### Features
+
+* **gtech-1322384:** add controller lambda component to nightwatch jira automation ([3f30a54](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/3f30a544d01ca2ba3d55851b1e9bd192e4bc5c3f))
+
+## [0.29.4](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-all-games-search-0.29.3...get-all-games-search-0.29.4) (2026-05-14)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.56.1`
+## [0.29.3](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-all-games-search-0.29.2...get-all-games-search-0.29.3) (2026-05-08)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.56.0`
+## [0.29.2](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-all-games-search-0.29.1...get-all-games-search-0.29.2) (2026-05-08)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.55.0`
+## [0.29.1](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-all-games-search-0.29.0...get-all-games-search-0.29.1) (2026-05-01)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.54.1`
+## [0.29.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-all-games-search-0.28.8...get-all-games-search-0.29.0) (2026-05-01)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.54.0`
+
+### Features
+
+* **gtech-1319733:** add sigcons lines to game model and lambda responses ([ac3ef91](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/commit/ac3ef9140a89291c720a5475b95914f582c1a89f))
+
+## [0.28.8](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-all-games-search-0.28.7...get-all-games-search-0.28.8) (2026-04-29)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.53.4`
+## [0.28.7](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-all-games-search-0.28.6...get-all-games-search-0.28.7) (2026-04-28)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.53.3`
 ## [0.28.6](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-all-games-search-0.28.5...get-all-games-search-0.28.6) (2026-04-24)
 
 ### Dependency Updates

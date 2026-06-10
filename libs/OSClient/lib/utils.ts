@@ -165,6 +165,7 @@ export const createGamesQuery = (siteGameIds: string[], spaceLocale: string, pla
                                             'game.bynderDFGWeeklyImage',
                                             'game.animationMedia',
                                             'game.loggedOutAnimationMedia',
+                                            'game.sigCons',
                                             'game.foregroundLogoMedia',
                                             'game.loggedOutForegroundLogoMedia',
                                             'game.backgroundMedia',

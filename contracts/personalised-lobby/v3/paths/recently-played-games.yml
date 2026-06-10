@@ -1,0 +1,56 @@
+---
+parameters:
+  - name: sitename
+    description: Venture name
+    schema:
+      type: string
+    in: path
+    required: true
+  - name: platform
+    description: Platform device type. Accepted values 'web', 'ios' and 'android'.
+    schema:
+      type: string
+    in: path
+    required: true
+  - name: memberid
+    in: query
+    description: Member ID
+    schema:
+      type: string
+    required: true
+  - name: locale
+    in: query
+    description: Used for localization. Values are set in Contentful. Accepted values "en-GB", "en-CA", "en-US", "es-ES"
+    schema:
+      type: string
+    required: false
+get:
+  summary: Recently Played Games
+  x-controller: RecentlyPlayedGames
+  tags:
+    - RecentlyPlayedGames
+  responses:
+    "200":
+      description: A list of games that the user has played AND put a wager on in the past 6 months. The data for this section comes from Databricks. Shown ONLY for logged-in users. If the player has less than 3 games that they have played and put a wager on in the last 6 months the contents of the section would be empty.
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/recently-played-games.yml'
+    '204':
+      $ref: '../schemas/success-no-content.yml#/204'
+    '400':
+      $ref: '../schemas/error-responses.yml#/400'
+    '401':
+      $ref: '../schemas/error-responses.yml#/401'
+    '403':
+      $ref: '../schemas/error-responses.yml#/403'
+    '429':
+      $ref: '../schemas/error-responses.yml#/429'
+    '500':
+      $ref: '../schemas/error-responses.yml#/500'
+    '502':
+      $ref: '../schemas/error-responses.yml#/502'
+    '503':
+      $ref: '../schemas/error-responses.yml#/503'
+    '504':
+      $ref: '../schemas/error-responses.yml#/504'

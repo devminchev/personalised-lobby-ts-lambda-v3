@@ -35,7 +35,7 @@ export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGat
     const locale: string = validateLocaleQuery(event.queryStringParameters?.locale);
 
     try {
-        const client = getClient();
+        const client = getClient({ tier: 'C', enabled: false });
 
         checkRequestParams([siteNameFromParams, validators.siteName], [platform, validators.platform], gameSkin);
 

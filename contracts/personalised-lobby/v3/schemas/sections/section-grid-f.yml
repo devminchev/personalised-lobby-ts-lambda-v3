@@ -1,0 +1,26 @@
+title: IG Grid F Section
+description: Section with grid F
+required:
+  - entryId
+  - classification
+  - layoutType
+  - title
+properties:
+  entryId:
+    description: Unique id for the IG Grid F section
+    type: string
+  classification:
+    description: Classification type of the section
+    type: string
+  title:
+    description: Localized title for the section
+    type: string
+  hasGames:
+    description: Flag to indicate if this section has games
+    type: boolean
+  layoutType:
+    description: Layout type (fixed to grid-f)
+    type: string
+  viewAll:
+    type: object
+    $ref: '../view-all-action.yml'

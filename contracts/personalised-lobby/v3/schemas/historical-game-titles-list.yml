@@ -1,0 +1,6 @@
+---
+title: HistoricalGameTitlesList (Internal API)
+description: List of Historical Game Titles
+type: array
+items:
+  $ref: './historical-game-title.yml'

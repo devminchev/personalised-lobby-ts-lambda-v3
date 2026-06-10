@@ -1,0 +1,69 @@
+---
+title: RecommendedGamesOnExitResponse
+description: Response for recommended-games-on-exit for the logged in user.
+type: array
+items:
+  type: object
+  required:
+    - entryId
+    - isProgressiveJackpot
+    - title
+    - name
+    - gameSkin
+    - realUrl
+    - gameId
+  properties:
+    entryId:
+      type: string
+      description: The unique entry id for the siteGame
+    title:
+      description: Game title
+      type: string
+    gameSkin:
+      type: string
+      description: unique identifier of game (legacy)
+    gameId:
+      type: string
+      description: The unique id for the game model
+    name:
+      description: Game name
+      type: string
+    realUrl:
+      description: Url used to access game
+      type: string
+    demoUrl:
+      description: Path to demo
+      type: string
+    imgUrlPattern:
+      description: Hero image for the game information screen
+      type: string
+    isProgressiveJackpot:
+      description: Is there a progressive jackpot for the game?
+      type: boolean
+    animationMedia:
+      description: Type of animation (animated or default).
+      type: string
+    sigCons:
+      description: Significant Conditions for the game (localised text). Optional — omitted from the response when the game has no Significant Conditions.
+      type: string
+    foregroundLogoMedia:
+      description: Bynder image object.
+      $ref: './bynderImage.yaml'
+    backgroundMedia:
+      description: Bynder image object.
+      $ref: './bynderImage.yaml'
+    headlessJackpot:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+    tags:
+      description: Tags
+      type: array
+      items:
+        type: string
+
+example:
+  $ref: '../examples/recommended-games-on-exit.yml'

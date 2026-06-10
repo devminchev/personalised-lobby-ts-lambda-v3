@@ -1,7 +1,7 @@
 {
   "body": "",
-  "resource": "/sites/{sitename}/platform/{platform}/view/{viewslug}/sections/{sectionid}/sitegames?memberid={memberId}&offset={offset}&limit={limit}",
-  "path": "/sites/doublebubblebingo/platform/web/view/homepage/sections/67qn1jZbtaKQFlmZaHqMAa/sitegames?memberid=13439972&locale=en-GB&offset=0&limit=10",
+  "resource": "/sites/{sitename}/platform/{platform}/view/{viewslug}/sections/{sectionid}/sitegames?offset={offset}&limit={limit}",
+  "path": "/sites/doublebubblebingo/platform/web/view/homepage/sections/67qn1jZbtaKQFlmZaHqMAa/sitegames?locale=en-GB&offset=0&limit=10",
   "httpMethod": "GET",
   "isBase64Encoded": false,
   "pathParameters": {
@@ -11,7 +11,6 @@
     "platform": "web"
   },
   "queryStringParameters": {
-    "memberid": "13439972",
     "locale": "en-GB",
     "offset": "0",
     "limit": "10"
@@ -58,8 +57,8 @@
       "userAgent": "Custom User Agent String",
       "user": null
     },
-    "path": "/sites/doublebubblebingo/platform/web/view/homepage/sections/6AVNkV28m7T150Xk8kFTXQ/sitegames?member=13439972&offset=0&limit=10",
-    "resourcePath": "/sites/{sitename}/platform/{platform}/view/{viewslug}/sections/{sectionid}/sitegames?member={memberId}&offset={offset}&limit={limit}",
+    "path": "/sites/doublebubblebingo/platform/web/view/homepage/sections/6AVNkV28m7T150Xk8kFTXQ/sitegames?offset=0&limit=10",
+    "resourcePath": "/sites/{sitename}/platform/{platform}/view/{viewslug}/sections/{sectionid}/sitegames?offset={offset}&limit={limit}",
     "httpMethod": "get",
     "apiId": "13267801567890",
     "protocol": "HTTP/1.1"

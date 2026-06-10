@@ -1,0 +1,225 @@
+---
+openapi: 3.0.0
+info:
+  title: personalised-lobby
+  version: "1"
+  description: |-
+    New personalised lobby. Extra rizz.
+  termsOfService: "http://swagger.io/terms/"
+  contact:
+    name: Lobby Team
+paths:
+  /api/excite/v3/content/sites/{sitename}/platform/{platform}/navigation:
+    get:
+      summary: Returns a navigation object for a venture.
+      operationId: getNavigation
+      x-controller: getNavigation
+      parameters:
+        - name: X-LOBBY-VARIANT
+          description: Custom header for AB testing. Accepted (treatment, control, unaffected) defaults to unaffected
+          schema:
+            type: string
+          in: header
+          required: false
+        - name: sitename
+          description: Venture name
+          schema:
+            type: string
+          in: path
+          required: true
+        - name: platform
+          in: path
+          description: Platform device type. Accepted values 'web', 'ios' and 'android'.
+          schema:
+            type: string
+            enum: ["web", "ios", "android"]
+          required: true
+        - name: auth
+          description: Indicator if the user is loggedin or not. If true - user is considered loggedin. If it's missing or any value different from true, backend considers the user to be logged out.
+          schema:
+            type: string
+          in: query
+          required: false
+        - name: locale
+          in: query
+          description: Used for localization. Values are set in Contentful. Accepted values "en-GB", "en-CA", "en-US", "es-ES"
+          schema:
+            type: string
+            enum: ["en-GB", "en-CA", "en-US", "es-ES"]
+          required: false
+      tags:
+        - Navigation
+      responses:
+        "200":
+          description: List of IG Navigation definitions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Navigation"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "503":
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "504":
+          description: Gateway Timeout
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/excite/v3/content/sites/{sitename}/platform/{platform}/view/{viewslug}:
+    $ref: "./paths/view.yml"
+
+  /api/excite/v3/content/sites/{sitename}/platform/{platform}/section/{sectionslug}:
+    $ref: "./paths/section-view.yml"
+  # /api/excite/v3/content/sites/{sitename}/view/{viewSlug}/sections/{sectionid}/sitegames:
+  #   $ref: './paths/view.yml'
+
+  # add from GCS
+  /api/excite/v3/content/sites/{sitename}/platform/{platform}/view/{viewslug}/sections/{sectionid}/sitegames:
+    $ref: "./paths/section-games.yml"
+  /api/excite/v3/content/sites/{sitename}/platform/{platform}/view/{viewslug}/sections/{sectionid}/sitegames/personalised:
+    $ref: "./paths/personalised-section-games.yml"
+  /api/excite/v3/content/sites/{sitename}/platform/{platform}/games/{gamename}:
+    $ref: "./paths/game-info.yml"
+  /api/excite/v3/content/sites/{sitename}/platform/{platform}/game-config/{gamename}:
+    $ref: "./paths/game-config.yml"
+  /api/excite/v3/content/sites/all/game-skin-config/{gameskin}:
+    $ref: "./paths/game-skin-config.yml"
+  /api/excite/v3/content/sites/{sitename}/platform/{platform}/minigames:
+    $ref: "./paths/mini-games.yml"
+  /api/excite/v3/content/sites/{sitename}/platform/{platform}/suggested-for-you:
+    $ref: "./paths/suggested-games.yml"
+  /api/excite/v3/content/sites/{sitename}/platform/{platform}/gameskin/{gameskin}/recommended-games-on-exit:
+    $ref: "./paths/recommended-games-on-exit.yml"
+  /api/excite/v3/content/sites/{sitename}/personalised-extra-data:
+    $ref: "./paths/personalised-extra-data.yml"
+  /api/excite/v3/content/sites/{sitename}/platform/{platform}/recently-played:
+    $ref: "./paths/recently-played-games.yml"
+
+  # get details from CAS
+  /api/excite/v3/content/sites/{sitename}/platform/{platform}/search:
+    get:
+      summary: Returns a list of searched game data.
+      x-controller: getGamesSearch
+      operationId: getGamesSearch
+      parameters:
+        - name: sitename
+          description: Venture name
+          schema:
+            type: string
+          in: path
+          required: true
+        - name: platform
+          description: Platform device type. Accepted values 'web', 'ios' and 'android'.
+          schema:
+            type: string
+          in: path
+          required: true
+        - name: auth
+          description: Indicator if the user is loggedin or not. If true - user is considered loggedin. If it's missing or any value different from true, backend considers the user to be logged out.
+          schema:
+            type: string
+          in: query
+          required: false
+        - name: locale
+          in: query
+          description: Used for localisation. Values are set in Contentful. Accepted values "en-GB", "en-CA", "en-US", "es-ES". If not provided for all EU will default to "en-GB" and for US to" en-US".
+          schema:
+            type: string
+          required: false
+      tags:
+        - Search
+      responses:
+        "200":
+          description: List of searched games
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GamesSearchList"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "503":
+          description: Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "504":
+          description: Gateway Timeout
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /api/excite/v3/content/sites/{sitename}/historical-game-titles:
+    $ref: "./paths/historical-game-titles.yml"
+
+  /api/excite/v3/content/sites/{sitename}/platform/{platform}/get-bulk-game-data:
+    $ref: "./paths/bulk-game-data.yml"
+
+  /api/excite/v3/content/sites/{sitename}/platform/{platform}/game-shuffle:
+    $ref: "./paths/game-shuffle.yml"
+
+  /api/excite/v3/content/sites/{sitename}/memberid/{memberid}/variant:
+    $ref: "./paths/variant-lambda.yml"
+
+components:
+  schemas:
+    Error:
+      $ref: "./schemas/error.yml"
+    Navigation:
+      $ref: "./schemas/navigation.yml"
+    View:
+      $ref: "./schemas/view.yml"
+    SectionGamesResponse:
+      $ref: "./schemas/section-games.yml"
+    PersonalisedSectionGamesResponse:
+      $ref: "./schemas/personalised-section-games.yml"
+    GameInfoResponse:
+      $ref: "./schemas/game-info.yml"
+    HistoricalGameTitlesResponse:
+      $ref: "./schemas/historical-game-titles-list.yml"
+    GameConfigResponse:
+      $ref: "./schemas/game-config.yml"
+    examples:
+      $ref: "./examples/all-game.yml"
+    GamesSearchList:
+      $ref: "./schemas/games-search.yml"
+    BulkGameData:
+      $ref: "./schemas/bulk-game-data.yml"

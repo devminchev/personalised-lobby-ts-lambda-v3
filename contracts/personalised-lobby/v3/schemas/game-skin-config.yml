@@ -1,0 +1,21 @@
+---
+title: GameSkinConfigResponse
+description: Response containing game name and type for a game skin
+type: object
+required:
+  - gameName
+  - gameType
+  - gameAggregator
+properties:
+  gameName:
+    description: Name of the game.
+    type: string
+  gameType:
+    description: Type classification details for the game.
+    type: string
+  gameAggregator:
+    description: Aggregator the game is delivered through. `null` when the source value is missing or empty.
+    type: string
+    nullable: true
+example:
+  $ref: '../examples/game-skin-config.yml'

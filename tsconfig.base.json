@@ -1,0 +1,35 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "target": "es2022",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "preserveConstEnums": true,
+    "noEmit": true,
+    "sourceMap": false,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    // Map the os-client workspace lib to its source. Without this, tsserver
+    // follows node_modules/os-client (symlink to libs/OSClient). Previously
+    // that resolved to libs/OSClient/dist/*.d.ts which was only refreshed by
+    // a manual `tsc` inside the package, so edits to libs/OSClient appeared
+    // stale in the IDE. libs/OSClient/dist/ has since been removed and
+    // libs/OSClient/package.json now points main/types at ./index.ts, so the
+    // symlink path also resolves to source — but this explicit mapping keeps
+    // the override authoritative and survives any future packaging change.
+    // The runtime build is unaffected: @nx/esbuild injects the same source
+    // override via the project graph. dynamoClient follows the same
+    // source-consumed pattern (package.json main/types -> ./index.ts), so it is
+    // mapped here for the same reasons.
+    "paths": {
+      "os-client": ["./libs/OSClient/index.ts"],
+      "os-client/lib/*": ["./libs/OSClient/lib/*"],
+      "dynamoClient": ["./libs/dynamoClient/index.ts"],
+      "dynamoClient/lib/*": ["./libs/dynamoClient/lib/*"]
+    }
+  },
+  "exclude": ["node_modules", "tmp", "dist"]
+}

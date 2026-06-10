@@ -1,0 +1,109 @@
+---
+title: "ADR-005: Edge-triggered alarms + scheduled tick"
+description: Why the controller pairs the alarm-event pipeline with a 1-minute scheduled tick — CloudWatch alarms only fire on transitions, so timeout-based recovery transitions need a separate driver
+---
+
+# ADR-005: Edge-triggered alarms + scheduled tick
+
+- **Status:** Accepted (2026-04-23)
+- **Implementation:** [`handleScheduledTick`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/index.ts), [EventBridge Scheduler `RecoveryTick`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/template.yaml)
+
+## Context
+
+CloudWatch alarms publish state-change events to EventBridge **only when the alarm's state changes** — `OK ↔ ALARM ↔ INSUFFICIENT_DATA`. They do not publish on every evaluation period while the state stays the same. A 10-minute sustained breach produces exactly two events (trip + recovery), regardless of how short `Period` is. From [AWS docs on alarm events](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch-and-eventbridge.html):
+
+> CloudWatch sends events to EventBridge when an alarm's state changes between OK, ALARM, and INSUFFICIENT_DATA.
+
+This is the right behaviour for downstream observers — it's the reason adding `Period: 60` everywhere doesn't make the system chatty (see [the steady-state event volume invariant](./../circuit-breaker-behaviour.mdx#baseline-mechanics)). But it has a load-bearing implication for the controller: **timeout-driven transitions cannot fire from alarm events alone.**
+
+The breaker's state machine has three transitions whose trigger is "time has passed", not "an alarm has changed":
+
+- `OPEN → HALF_OPEN` once `holdUntil` has elapsed (cooldown expiry).
+- `HALF_OPEN → CLOSED` once `holdUntil` has elapsed and the signal map is empty (recovery via timeout).
+- `HALF_OPEN → OPEN` once `holdUntil` has elapsed and the signal map is non-empty (cooldown re-trip on timeout).
+
+Without a separate driver, the breaker would never leave OPEN — alarm events while OPEN bump signal entries, but no alarm event maps to "an arbitrary amount of time has passed since you opened."
+
+The second sub-problem: even when an OK *does* arrive while the breaker is OPEN, the alarm map might already be empty by the time we get to HALF_OPEN. Alarms are edge-triggered: if all signals cleared *before* the cooldown ended, no further OK events will arrive during the HALF_OPEN probe window, and the probe-path-via-OK-events will never close the breaker on its own. This is documented as the central case for the tick path in the controller's source ([`handleScheduledTick` header comment](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/index.ts)).
+
+## Decision
+
+Add a 1-minute scheduled tick alongside the alarm-event pipeline.
+
+The tick is declared in [`template.yaml`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/template.yaml) as a `ScheduleV2` event on the function:
+
+```yaml
+RecoveryTick:
+    Type: ScheduleV2
+    Properties:
+        ScheduleExpression: rate(1 minute)
+        Input: '{"source":"aws.scheduler","detail-type":"Scheduled Recovery Tick","time":"","detail":{}}'
+```
+
+This creates an [`AWS::Scheduler::Schedule`](https://docs.aws.amazon.com/scheduler/latest/UserGuide/managing-schedule.html) that invokes the Lambda every minute with a synthetic tick payload. The handler distinguishes it from real alarm events by source string (`aws.scheduler` or `aws.events`).
+
+The tick invocation:
+
+1. No-ops if the breaker is `CLOSED`. Most invocations land here at steady state. The tick does **one** DDB read (the BatchGet) and exits — no writes, no audit row.
+2. Reads the live posture and signal snapshot.
+3. If `state === 'OPEN'` and `now ≥ holdUntil`, transitions to `HALF_OPEN` with a fresh `holdUntil = now + halfOpenMaxMs`.
+4. If `state === 'HALF_OPEN'` and `now ≥ holdUntil`, prunes the signal snapshot, then:
+   - If pruned signals are empty → transitions to `CLOSED`.
+   - If pruned signals remain → transitions to `OPEN` with a fresh `holdUntil = now + openHoldMs`.
+
+Each transition is written via the same `TransactWriteItems` + `ConditionExpression` machinery as the alarm path, so the tick respects optimistic concurrency (see [ADR-003](./003-optimistic-concurrency.mdx)).
+
+The pruning step inside the tick is critical. Without it, an orphaned signal whose closing OK event was lost (EventBridge drop, signal renamed, OK arrived too old) would force `hasActiveSignals === true` on every HALF_OPEN expiry and pin the breaker OPEN forever. With pruning, signals unrefreshed within `signalMaxAgeMs` (default 20 min) are dropped before the empty-set check, and the cleaned `SIGNAL_STATE#CURRENT` is **persisted back atomically** alongside the state transition ([index.ts](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/index.ts)) — so the same tick that recovers the breaker from a stuck-with-zombies state also leaves the DB signal item clean, rather than relying on the next alarm event to overwrite it.
+
+## Consequences
+
+### Positive
+
+- **Timeout-driven transitions actually fire.** OPEN → HALF_OPEN → CLOSED works under all the normal recovery patterns, including the "all signals cleared while OPEN, no further events arrive during HALF_OPEN" pattern that is the most common real recovery shape.
+- **Self-healing on lost OK events.** A lost OK event would, in an alarm-event-only world, leave a signal in the map forever. The pruning-on-tick combination unsticks the breaker within `signalMaxAgeMs`.
+- **Predictable cost.** Per-environment, the tick is exactly 1 invocation/minute = 1440/day. `BatchGetItem` of 2 keys with `ConsistentRead: true` consumes 1 RRU per item ≤ 4 KB ([on-demand read units](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.ReadWriteCapacityMode.html#HowItWorks.OnDemand.ReadRequestUnits)) = 2 RRUs per tick × 1440 = 2880 RRUs/day. On PAY_PER_REQUEST that is a fraction of a cent per month — see [DynamoDB pricing](https://aws.amazon.com/dynamodb/pricing/on-demand/) for current rates.
+- **Tick is no-op when not needed.** The tick early-returns on `CLOSED` ([index.ts](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/index.ts)), so the steady-state cost during healthy periods is only the read.
+
+### Negative
+
+- **Detection latency is bounded below by the tick rate.** A breaker that should transition on cooldown expiry will wait up to 60 s for the next tick. Acceptable because the consumer-visible mode is `protect` for both OPEN and HALF_OPEN — the user-facing behaviour does not care which of the two we're in.
+- **Two invocation sources to reason about.** Anyone reading the source has to understand both `handleAlarmEvent` and `handleScheduledTick`. Documented in the [state machine spec](./../circuit-breaker-state-machine.mdx#transitions) and in the source's section comments.
+- **Couples the controller to EventBridge Scheduler.** If Scheduler stops invoking us (region issue, IAM drift on the scheduler permission), the breaker freezes in whatever non-CLOSED state it last reached. Mitigated by `ControllerDlqDepthAlarm` (DLQ visibility) and by the fact that an unrelated alarm event will still produce a write — but a sustained Scheduler outage with no concurrent alarm activity could leave the breaker stuck. This is a low-probability failure mode and not worth additional machinery.
+
+### Neutral / observable
+
+- **Tick events do not produce audit rows.** The `EVENT#*` audit family is for externally-driven inputs. The tick's transitions are visible in `STATE#<isoTs>` history rows (with reasons like `cooldown_expired_probe`, `half_open_timeout_no_signals`, `half_open_timeout_reopen`) but not in `EVENT#*`. This is the right shape — the tick has nothing to audit.
+
+## Considered alternatives
+
+### A. Poll CloudWatch metrics directly on every tick
+
+Instead of consuming alarm state-change events, query the underlying metrics on each tick and recompute alarm state in-process.
+
+**Why we rejected it.** Reimplementing CloudWatch's alarm engine (period, evaluation periods, datapoints to alarm, missing-data policy, metric math) inside the controller is a significant duplication, with new failure modes (metric query throttling, time-skew between query and evaluation). The alarm engine is a perfectly good service; we should consume its output, not reimplement it.
+
+### B. Re-derive state from alarm-event audit log on every invocation
+
+Read the last N `EVENT#*` rows, replay them, compute current state.
+
+**Why we rejected it.** O(N) read on every invocation; N grows with incident length. Also doesn't help with timeouts — we'd still need a tick to drive cooldown expiry.
+
+### C. Use CloudWatch alarm `INSUFFICIENT_DATA` transitions as the timeout
+
+If we tuned `Period: <openHoldMs>` and `TreatMissingData: ...` cleverly, the alarm could itself flip to a synthetic state after the cooldown.
+
+**Why we rejected it.** Conflates the alarm tuning (which is about detecting the underlying condition) with the breaker tuning (which is about cooldown). They have different reasons to change. Also the `holdUntil` is per-state-transition; CloudWatch alarms don't carry that bookkeeping.
+
+### D. Reduce the tick rate to e.g. 5 minutes
+
+`rate(5 minutes)` would reduce invocation count proportionally.
+
+**Why we rejected it.** The tick rate sets a floor on `openHoldMs`. With `openHoldMs = 60 s` (the default), we want the next tick to land within ~60 s of cooldown expiry; a 5-minute tick would mean an OPEN breaker waits up to 5 minutes longer than its cooldown before transitioning. The 1-minute tick keeps the timing close to the configured `openHoldMs`, and the cost is negligible.
+
+## References
+
+- [CloudWatch alarm state changes & EventBridge](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch-and-eventbridge.html)
+- [EventBridge Scheduler — schedule expressions](https://docs.aws.amazon.com/scheduler/latest/UserGuide/schedule-types.html)
+- [Source: `handleScheduledTick` header comment](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/index.ts)
+- [Behaviour — Scenario 2 walks the tick path during a critical-peak recovery](./../circuit-breaker-behaviour.mdx#scenario-2--short-critical-peak-2-min)
+- [State machine — tick-event transitions](./../circuit-breaker-state-machine.mdx#tick-event-transitions)

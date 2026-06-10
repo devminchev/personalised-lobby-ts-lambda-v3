@@ -20,7 +20,8 @@ export type topContent =
     | IPersonalisedSection
     | IQuickLinksSection
     | IGameSection
-    | ISearchPlaceholderSection;
+    | ISearchPlaceholderSection
+    | IPlaceholderSection;
 
 export type primaryContent =
     | IJackpotSection
@@ -32,7 +33,8 @@ export type primaryContent =
     | IPersonalisedSection
     // | IQuickLinksSection
     | IGameSection
-    | ISearchPlaceholderSection;
+    | ISearchPlaceholderSection
+    | IPlaceholderSection;
 
 export interface ViewSectionResponse {
     topContent: topContent[];
@@ -331,4 +333,19 @@ export interface IGameShuffleSection {
     classification: 'GameShuffleSection';
     title: string;
     name: string;
+}
+
+export interface IPlaceholderSectionOS {
+    id: string;
+    classification: LocalizedField<'PlaceholderSection'>;
+    contentType: 'igContentPlaceholder';
+    placeholderType: LocalizedField<string>;
+    entryTitle: LocalizedField<string>;
+}
+
+export interface IPlaceholderSection {
+    entryId: string;
+    classification: 'PlaceholderSection';
+    placeholderType: string;
+    title: string;
 }

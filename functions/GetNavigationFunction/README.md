@@ -7,30 +7,17 @@ Full contract can be found [here](http://static0.psnative.pgt.gaia/personalised_
 
 ### Local development for the getCategories function
 
-The function uses the `os-client` layer available under `layers/os-client` in order to be able to initiate a connection to OpenSearch.
-In order to be able to develop locally as well as the layer import to work on production, the import point to the location where AWS organizes the layer code inside the container.
+The function imports `os-client` as a workspace dependency by package name in order to be able to initiate a connection to OpenSearch.
 
 ```ts
-import { getClient, IClient } from '/opt/nodejs/node_modules/os-client';
+import { getClient, IClient } from 'os-client';
 ```
 
-Since this import won't be resolve locally there is a configuration in the `tsconfig.json` file which maps the path to the local module.
-
-```json
-{
-    "compilerOptions": {
-        "paths": {
-            "/opt/nodejs/node_modules/os-client": ["../../layers/OSClientLayer/index.ts"]
-        }
-    }
-}
-```
-
-This is so the `os-client` layer dependency can be found locally and you don't get any errors.
+`os-client` is a workspace library that is resolved from source by the nx project graph and bundled by esbuild. No per-function tsconfig path mapping is needed — the per-project `tsconfig.json` only extends `../../tsconfig.base.json`.
 
 ### Local invoke with sam
 
-Neither the lambdas nor the layers need to be build locally before building with sam as `sam build` itself will take care of that.
+The lambdas do not need to be built locally before building with sam as `sam build` itself will take care of that.
 
 To build the lambda locally run `sam build` from top level.
 

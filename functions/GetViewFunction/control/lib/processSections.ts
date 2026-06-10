@@ -28,6 +28,7 @@ import {
     buildSearchResultsSection,
     buildPromotionGridSection,
     buildGameShuffleSection,
+    buildPlaceholderSection,
 } from './sectionBuilders';
 import {
     IBannerSectionOS,
@@ -45,6 +46,7 @@ import {
     topContent as TopSectionType,
     primaryContent as PrimarySectionType,
     IGameShuffleOS,
+    IPlaceholderSectionOS,
 } from './types';
 
 export interface IGSection {
@@ -405,6 +407,12 @@ const extractSectionData = async (
                     section: sec as IGameShuffleOS,
                     spaceLocale,
                     userLocale,
+                });
+
+            case 'PlaceholderSection':
+                return buildPlaceholderSection({
+                    section: sec as IPlaceholderSectionOS,
+                    spaceLocale,
                 });
 
             default:

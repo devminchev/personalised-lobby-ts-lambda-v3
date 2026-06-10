@@ -2,6 +2,101 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.12.4](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/post-historical-game-title-handler-0.12.3...post-historical-game-title-handler-0.12.4) (2026-06-09)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.61.0`
+## [0.12.3](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/post-historical-game-title-handler-0.12.2...post-historical-game-title-handler-0.12.3) (2026-06-09)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.60.2`
+## [0.12.2](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/post-historical-game-title-handler-0.12.1...post-historical-game-title-handler-0.12.2) (2026-06-05)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.60.1`
+## [0.12.1](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/post-historical-game-title-handler-0.12.0...post-historical-game-title-handler-0.12.1) (2026-06-05)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.60.0`
+## [0.12.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/post-historical-game-title-handler-0.11.0...post-historical-game-title-handler-0.12.0) (2026-06-03)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.59.0`
+
+### Features
+
+* **gtech-1319757:** upgrade lambda node version to lts ([af44b88](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/af44b886b04e87327753f172dd91c67fba5764ab))
+
+## [0.11.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/post-historical-game-title-handler-0.10.2...post-historical-game-title-handler-0.11.0) (2026-06-02)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.58.0`
+
+### Features
+
+* **gtech-1320927:** lobby api lambdas to be able to get global breaker state ([a645e28](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/a645e284292ba9076283c26b1c49e133aa1840aa))
+
+## [0.10.2](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/post-historical-game-title-handler-0.10.1...post-historical-game-title-handler-0.10.2) (2026-05-20)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.57.1`
+## [0.10.1](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/post-historical-game-title-handler-0.10.0...post-historical-game-title-handler-0.10.1) (2026-05-20)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.57.0`
+## [0.10.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/post-historical-game-title-handler-0.9.35...post-historical-game-title-handler-0.10.0) (2026-05-20)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.56.1`
+
+### Features
+
+* **gtech-1322384:** add controller lambda component to nightwatch jira automation ([3f30a54](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/3f30a544d01ca2ba3d55851b1e9bd192e4bc5c3f))
+
+## [0.9.35](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/post-historical-game-title-handler-0.9.34...post-historical-game-title-handler-0.9.35) (2026-05-14)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.56.1`
+## [0.9.34](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/post-historical-game-title-handler-0.9.33...post-historical-game-title-handler-0.9.34) (2026-05-08)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.56.0`
+## [0.9.33](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/post-historical-game-title-handler-0.9.32...post-historical-game-title-handler-0.9.33) (2026-05-08)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.55.0`
+## [0.9.32](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/post-historical-game-title-handler-0.9.31...post-historical-game-title-handler-0.9.32) (2026-05-01)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.54.1`
+## [0.9.31](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/post-historical-game-title-handler-0.9.30...post-historical-game-title-handler-0.9.31) (2026-05-01)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.54.0`
+## [0.9.30](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/post-historical-game-title-handler-0.9.29...post-historical-game-title-handler-0.9.30) (2026-04-29)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.53.4`
+## [0.9.29](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/post-historical-game-title-handler-0.9.28...post-historical-game-title-handler-0.9.29) (2026-04-28)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.53.3`
 ## [0.9.28](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/post-historical-game-title-handler-0.9.27...post-historical-game-title-handler-0.9.28) (2026-04-24)
 
 ### Dependency Updates

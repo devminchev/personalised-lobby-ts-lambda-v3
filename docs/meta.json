@@ -3,6 +3,8 @@
   "pages": [
     "index",
     "api-design",
-    "resilience"
+    "resilience",
+    "guides",
+    "api-reference"
   ]
 }

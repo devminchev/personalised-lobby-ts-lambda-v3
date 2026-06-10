@@ -1,0 +1,20 @@
+title: SectionNamesResponse
+description: Response containing a mapping between ML properties and their respective section types. The response can be empty or explicitly contain mappings.
+type: object
+required:
+  - sectionNames
+properties:
+  sectionNames:
+    type: object
+    description: Mapping of ML properties to section names.
+    properties:
+      because-you-played-x:
+        type: string
+        description: Contains a game name based on which ML has made game recommendations for the user for "because-you-played-x" section type on the lobby.
+      because-you-played-y:
+        type: string
+        description: Contains a game name based on which ML has made game recommendations for the user for "because-you-played-y" section type on the lobby.
+    additionalProperties: false
+
+example:
+  $ref: '../examples/personalised-extra-data.yml'

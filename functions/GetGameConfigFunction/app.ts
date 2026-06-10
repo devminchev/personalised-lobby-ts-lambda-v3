@@ -144,8 +144,8 @@ const createResponseObject = async (
 ): Promise<IGameConfigResponse> => {
     const { siteGame, game } = games;
 
-    const minBet: LocalizedField<string> = overrideGameLocaleValues<string>(siteGame.minBet, game.minBet, '-');
-    const maxBet: LocalizedField<string> = overrideGameLocaleValues<string>(siteGame.maxBet, game.maxBet, '-');
+    const minBet: LocalizedField<string> = overrideGameLocaleValues<string>(siteGame.minBet, game.minBet, '');
+    const maxBet: LocalizedField<string> = overrideGameLocaleValues<string>(siteGame.maxBet, game.maxBet, '');
     const showNetPosition: boolean = coalescePropValue({
         overrideField: siteGame?.showNetPosition,
         baseField: game?.showNetPosition,

@@ -54,6 +54,7 @@ export interface GamePayloadFields {
     infoDetails?: LocalizedField<string>;
 
     loggedOutAnimationMedia?: LocalizedField<string>;
+    sigCons?: LocalizedField<string>;
     animationMedia?: LocalizedField<string>;
     loggedOutForegroundLogoMedia?: LocalizedField<StrictSanitizedBynder[]>;
     foregroundLogoMedia?: LocalizedField<StrictSanitizedBynder[]>;
@@ -107,6 +108,7 @@ export interface IncomingGamePayload {
     introductionContent?: LocalizedField<string>;
     infoDetails?: LocalizedField<string>;
     loggedOutAnimationMedia?: LocalizedField<string>;
+    sigCons?: LocalizedField<string>;
     animationMedia?: LocalizedField<string>;
     loggedOutForegroundLogoMedia?: LocalizedField<IBynderAsset[]>;
     foregroundLogoMedia?: LocalizedField<IBynderAsset[]>;
@@ -393,6 +395,7 @@ export const modifyEventGamePayload = (
         ...(isNotNullUndefinedOrEmptyString(game.loggedOutAnimationMedia)
             ? { loggedOutAnimationMedia: game.loggedOutAnimationMedia }
             : {}),
+        ...(isNotNullUndefinedOrEmptyString(game.sigCons) ? { sigCons: game.sigCons } : {}),
         ...(isNotNullUndefinedOrEmptyString(game.animationMedia) ? { animationMedia: game.animationMedia } : {}),
         ...(isNotNullUndefinedOrEmptyString(loggedOutForegroundLogoMedia) ? { loggedOutForegroundLogoMedia } : {}),
         ...(isNotNullUndefinedOrEmptyString(foregroundLogoMedia) ? { foregroundLogoMedia } : {}),

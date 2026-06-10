@@ -342,6 +342,36 @@ describe('constructGameSearchResponse', () => {
             },
         ]);
     });
+
+    it('forwards sigCons from the requested locale and omits it when missing', () => {
+        const withSigCons = mockGameHits.map((hit) => ({
+            ...hit,
+            innerHit: {
+                ...hit.innerHit,
+                game: { ...hit.innerHit.game, sigCons: { 'en-GB': 'sig-cons-en' } },
+            },
+        }));
+
+        const withResult = constructGameSearchResponse(
+            withSigCons,
+            spaceLocale,
+            localeOverride,
+            mockGameIdToNavName,
+            platform,
+            true,
+        );
+        const withoutResult = constructGameSearchResponse(
+            mockGameHits,
+            spaceLocale,
+            localeOverride,
+            mockGameIdToNavName,
+            platform,
+            true,
+        );
+
+        expect(withResult[0]?.sigCons).toBe('sig-cons-en');
+        expect(withoutResult[0]).not.toHaveProperty('sigCons');
+    });
 });
 
 describe('Integration Test for Lambda Handler', () => {

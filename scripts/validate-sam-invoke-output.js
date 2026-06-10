@@ -3,7 +3,12 @@
 const fs = require('fs');
 const path = require('path');
 
-// List of strings indicating a definite SAM/runtime failure
+// List of strings indicating a definite SAM/runtime failure.
+// Note: '"errorType"' is intentionally absent. Application structured logs
+// legitimately include errorType as a *nested* key when serialising error
+// objects (e.g. {"level":"ERROR","err":{"errorType":"BreakerOpenError",...}}).
+// Lambda runtime crashes are instead detected by checking for a top-level
+// errorType key in the final parsed JSON payload (see step 3 below).
 const ERROR_INDICATORS = [
     '[ERROR]', // General error marker from SAM/runtime
     'Traceback', // Python stack trace indicator
@@ -13,7 +18,6 @@ const ERROR_INDICATORS = [
     'Error: Cannot find module', // Specific Node.js import error
     'Invoke Error', // General SAM invoke error
     'panic:', // Go panic indicator
-    '"errorType"', // Often present in Lambda error JSON payloads
     'Sandbox.Failure', // SAM sandbox failure
 ];
 
@@ -35,7 +39,7 @@ function containsSamErrors(logContent) {
 /**
  * Attempts to find and parse the JSON payload at the end of the log output.
  * @param {string} logContent - The full log output.
- * @returns {boolean} True if a valid JSON payload is found and parsed, false otherwise.
+ * @returns {object|null} The parsed JSON payload object, or null if not found/parseable.
  */
 function findAndParseJsonPayload(logContent) {
     const lines = logContent.trim().split('\n');
@@ -62,16 +66,16 @@ function findAndParseJsonPayload(logContent) {
         // Attempt to parse if it looks like the start of a JSON object/array
         if (trimmedLine.startsWith('{') || trimmedLine.startsWith('[')) {
             try {
-                JSON.parse(potentialJson);
+                const parsed = JSON.parse(potentialJson);
                 console.log('Successfully parsed JSON payload.');
-                return true; // Success
+                return parsed;
             } catch (e) {
                 if (e instanceof SyntaxError) {
                     // Continue building the potential JSON string upwards
                     continue;
                 } else {
                     console.error('Error: Unexpected parsing error:', e);
-                    return false; // Unexpected error during parsing
+                    return null;
                 }
             }
         }
@@ -85,7 +89,7 @@ function findAndParseJsonPayload(logContent) {
             potentialJson.substring(0, 500) + (potentialJson.length > 500 ? '...' : ''),
         );
     }
-    return false;
+    return null;
 }
 
 // --- Main Execution ---
@@ -111,14 +115,29 @@ try {
         process.exit(1); // Failure due to error indicators
     }
 
-    // 2. If no errors found, check for a valid JSON payload
-    if (findAndParseJsonPayload(logContent)) {
-        console.log(`Validation successful for: ${fileName}`);
-        process.exit(0); // Success
-    } else {
+    // 2. Parse the final JSON payload
+    const payload = findAndParseJsonPayload(logContent);
+    if (payload === null) {
         console.error(`Validation failed for: ${fileName} (Could not parse valid JSON payload)`);
         process.exit(1); // Failure due to missing/invalid JSON
     }
+
+    // 3. Detect Lambda runtime crashes via a top-level errorType key in the response.
+    //    When the Lambda runtime catches an unhandled exception it serialises it as:
+    //      {"errorType":"Runtime.UnhandledPromiseRejection","errorMessage":"...","trace":[...]}
+    //    A proper HTTP response (even a 5xx) uses statusCode at the top level:
+    //      {"statusCode":500,"headers":{...},"body":"..."}
+    //    Application structured logs may include errorType as a nested key — those are
+    //    excluded because only the final parsed payload is checked here.
+    if (typeof payload === 'object' && !Array.isArray(payload) && 'errorType' in payload) {
+        const errorType = JSON.stringify(payload.errorType);
+        console.error(`Error: Lambda runtime returned an error payload (errorType: ${errorType})`);
+        console.error(`Validation failed for: ${fileName} (Lambda runtime error detected)`);
+        process.exit(1);
+    }
+
+    console.log(`Validation successful for: ${fileName}`);
+    process.exit(0); // Success
 } catch (error) {
     console.error(`An unexpected error occurred while processing ${fileName}:`, error);
     process.exit(1); // General failure

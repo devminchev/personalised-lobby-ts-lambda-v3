@@ -35,7 +35,7 @@ export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGat
     const memberId = event.queryStringParameters?.memberid as string;
 
     try {
-        const client = getClient();
+        const client = getClient({ tier: 'C', enabled: false });
 
         checkRequestParams([siteName, validators.siteName], [memberId, validators.memberId]); //400
 

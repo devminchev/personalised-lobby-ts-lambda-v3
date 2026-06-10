@@ -2,6 +2,116 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.23.5](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-minigames-0.23.4...get-minigames-0.23.5) (2026-06-09)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.61.0`
+## [0.23.4](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-minigames-0.23.3...get-minigames-0.23.4) (2026-06-09)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.60.2`
+## [0.23.3](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-minigames-0.23.2...get-minigames-0.23.3) (2026-06-05)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.60.1`
+
+### Bug Fixes
+
+* **gtech-1320927:** disable breaker logic for tier b and c ([8d1a3b9](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/8d1a3b9b748e83526e691cb74ad4c51d3afb6766))
+
+## [0.23.2](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-minigames-0.23.1...get-minigames-0.23.2) (2026-06-05)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.60.1`
+## [0.23.1](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-minigames-0.23.0...get-minigames-0.23.1) (2026-06-05)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.60.0`
+## [0.23.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-minigames-0.22.0...get-minigames-0.23.0) (2026-06-03)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.59.0`
+
+### Features
+
+* **gtech-1319757:** upgrade lambda node version to lts ([af44b88](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/af44b886b04e87327753f172dd91c67fba5764ab))
+
+## [0.22.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-minigames-0.21.2...get-minigames-0.22.0) (2026-06-02)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.58.0`
+
+### Features
+
+* **gtech-1320927:** lobby api lambdas to be able to get global breaker state ([a645e28](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/a645e284292ba9076283c26b1c49e133aa1840aa))
+
+## [0.21.2](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-minigames-0.21.1...get-minigames-0.21.2) (2026-05-20)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.57.1`
+## [0.21.1](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-minigames-0.21.0...get-minigames-0.21.1) (2026-05-20)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.57.0`
+## [0.21.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-minigames-0.20.4...get-minigames-0.21.0) (2026-05-20)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.56.1`
+
+### Features
+
+* **gtech-1322384:** add controller lambda component to nightwatch jira automation ([3f30a54](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/3f30a544d01ca2ba3d55851b1e9bd192e4bc5c3f))
+
+## [0.20.4](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-minigames-0.20.3...get-minigames-0.20.4) (2026-05-14)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.56.1`
+## [0.20.3](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-minigames-0.20.2...get-minigames-0.20.3) (2026-05-08)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.56.0`
+## [0.20.2](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-minigames-0.20.1...get-minigames-0.20.2) (2026-05-08)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.55.0`
+## [0.20.1](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-minigames-0.20.0...get-minigames-0.20.1) (2026-05-01)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.54.1`
+## [0.20.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-minigames-0.19.5...get-minigames-0.20.0) (2026-05-01)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.54.0`
+
+### Features
+
+* **gtech-1319733:** add sigcons lines to game model and lambda responses ([ac3ef91](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/commit/ac3ef9140a89291c720a5475b95914f582c1a89f))
+
+## [0.19.5](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-minigames-0.19.4...get-minigames-0.19.5) (2026-04-29)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.53.4`
+## [0.19.4](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-minigames-0.19.3...get-minigames-0.19.4) (2026-04-28)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.53.3`
 ## [0.19.3](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-minigames-0.19.2...get-minigames-0.19.3) (2026-04-24)
 
 ### Dependency Updates

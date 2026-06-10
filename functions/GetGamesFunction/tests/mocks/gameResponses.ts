@@ -201,6 +201,9 @@ export const GAMES_SUCCESS_RESP: any = {
                                                 'en-GB': '#3F1D83',
                                                 es: '#3F1D83',
                                             },
+                                            sigCons: {
+                                                'en-GB': 'Significant conditions apply. 18+. Please play responsibly.',
+                                            },
                                             infoImgUrlPattern: {
                                                 'en-GB':
                                                     '/api/content/gametiles/fluffy-arcade-ring-toss-luckytap-logged-out/scale-s%s/fluffy-arcade-ring-toss-luckytap-tile-r%s-w%s.jpg',

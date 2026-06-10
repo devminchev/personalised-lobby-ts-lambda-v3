@@ -1,0 +1,42 @@
+---
+parameters:
+  - name: sitename
+    description: Venture name
+    schema:
+      type: string
+    in: path
+    required: true
+  - name: memberid
+    in: path
+    description: Member ID
+    schema:
+      type: string
+    required: true
+get:
+  summary: Variant Lambda
+  x-controller: Variant Lambda
+  tags:
+    - Variant Lambda
+  responses:
+    "200":
+      description: Gets the variant for based on member
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/variant-lambda.yml'
+    '400':
+      $ref: '../schemas/error-responses.yml#/400'
+    '401':
+      $ref: '../schemas/error-responses.yml#/401'
+    '403':
+      $ref: '../schemas/error-responses.yml#/403'
+    '429':
+      $ref: '../schemas/error-responses.yml#/429'
+    '500':
+      $ref: '../schemas/error-responses.yml#/500'
+    '502':
+      $ref: '../schemas/error-responses.yml#/502'
+    '503':
+      $ref: '../schemas/error-responses.yml#/503'
+    '504':
+      $ref: '../schemas/error-responses.yml#/504'

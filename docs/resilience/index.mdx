@@ -1,18 +1,46 @@
 ---
 title: Resilience
-description: Ongoing architectural work to keep the Personalised Lobby APIs serving traffic under high or critical load
+description: How the Personalised Lobby keeps serving traffic under high or critical load — service tiers, the global circuit breaker, and the architectural decisions behind both
 ---
 
 # Resilience
 
-This section documents the architectural work in progress to make the Personalised Lobby service more resilient to high and critical load conditions. The guiding principle is simple:
+This section documents the architectural work to keep the Personalised Lobby service serving traffic under high or critical load. The guiding principle:
 
 > Under load, **preserve the core user journey** — even if that means turning off everything else.
 
-The first piece of this work is a tiering model that classifies every endpoint by how essential it is to the core user journey, so non-critical paths can be shed first when the system is under pressure.
+Two complementary pieces are documented here:
 
-## In this section
+- A **service-tier classification** that defines which endpoints are essential to the core user journey, so non-critical paths can be shed first when the system is under pressure.
+- A **global circuit breaker** (`PostCloudWatchController`) that observes pressure on the lobby stack via CloudWatch alarms, decides when to shed, and persists that decision to DynamoDB for downstream Lambdas to read.
 
-- [Service tiers](./service-tiers) — how endpoints are grouped into tiers (A / B / C and non-live traffic), the OpenSearch queries each tier depends on, and the order in which they would be shed during a load event.
+## Reading order
 
-More resilience topics (load-shedding controls, circuit breakers, cache fallbacks, etc.) will be added here as that work lands.
+If you're new to this section, start with [Service tiers](./service-tiers.mdx) for the *what gets shed* policy, then [Circuit-breaker overview](./circuit-breaker-overview.mdx) for the *when to shed* mechanism. From there each subtopic page goes deep on one piece.
+
+## Service tiers
+
+- [Service tiers](./service-tiers.mdx) — Tier A / B / C and non-live traffic; OpenSearch queries each tier depends on; shedding order.
+
+## Circuit breaker
+
+- [Circuit-breaker overview](./circuit-breaker-overview.mdx) — system context, what each piece does, system-context diagram, reading order for the rest.
+- [Circuit-breaker state machine](./circuit-breaker-state-machine.mdx) — the formal CLOSED / OPEN / HALF_OPEN spec; persisted fields; transition tables; tunable knobs.
+- [Circuit-breaker alarms](./circuit-breaker-alarms.mdx) — what each alarm measures, why it's tuned the way it is, detection timing, missing-data semantics.
+- [Circuit-breaker behaviour](./circuit-breaker-behaviour.mdx) — scenario walk-throughs (slow ramp, short critical peak, low traffic, warning-only) traced through the state machine.
+- [Circuit-breaker data model](./circuit-breaker-data-model.mdx) — the DynamoDB single-table schema, entity families, TTL, version semantics, access patterns.
+- [Consumer integration](./circuit-breaker-consumer-integration.mdx) — contract for future Lambdas that read the breaker state to shed traffic.
+- [Consistency and concurrency](./consistency-and-concurrency.mdx) — how the controller stays correct under racing alarm events.
+- [Circuit-breaker runbook](./circuit-breaker-runbook.mdx) — operator triage when something is on fire.
+- [Glossary](./glossary.mdx) — every project-specific term defined in one place.
+
+## Architecture decisions
+
+- [ADR index](./adr/index.mdx) — irreversible-or-load-bearing decisions for the resilience work, written down once so future readers can skip the archaeology.
+  - [001 — Configuration store decision](./configuration-store-decision.mdx)
+  - [002 — Single GLOBAL partition](./adr/002-global-only-partition.mdx)
+  - [003 — Optimistic concurrency with one-shot retry](./adr/003-optimistic-concurrency.mdx)
+  - [004 — Self-observability alarms must not be `breaker:`-prefixed](./adr/004-no-breaker-prefix-on-self-obs.mdx)
+  - [005 — Edge-triggered alarms + scheduled tick](./adr/005-edge-triggered-with-tick.mdx)
+
+More resilience topics (load-shedding controls, cache fallbacks, etc.) will be added here as that work lands.

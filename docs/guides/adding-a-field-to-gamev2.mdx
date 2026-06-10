@@ -1,0 +1,250 @@
+---
+title: Adding a new field to the gameV2 model
+description: End-to-end guide for propagating a new gameV2 field from Contentful to the API response. Worked example uses sigCons (Significant Conditions) — a localised, non-searchable text field.
+---
+
+# Adding a new field to the gameV2 model
+
+## How the data flows
+
+All data from Contentful to OpenSearch for the gameV2 model is handled by a Contentful webhook.
+The webhook publishes to a lambda, that handles and sanitizes the response, before sending it to OpenSearch.
+
+The lambda ensures that the payload received from the Webhook is correct and the datatypes sent to OpenSearch are correct.
+It also strips the media fields (Bynder) and removes the default locale from the non-localized properties.
+
+The sanitized response is sent to the `games-v3` OpenSearch index, which now has a strict schema regarding the properties of the `gameV2` model.
+
+This guide walks through every layer the field has to pass through, and explains the *why* alongside the *what* — particularly for the two layers that are deliberately restrictive (the webhook payload and the OpenSearch schema), because the reason for that restrictiveness is the thing that determines what your migration has to do.
+
+The worked example throughout is **`sigCons`** ("Significant Conditions") — a localised, optional, non-searchable localised text field.
+**Non-searchable** means OpenSearch stores the field but does not index or analyse it, so you cannot filter or full-text search on it; it is only ever returned as part of the payload if requested in the `_source`. This covers the common case for fields that are purely display data (regulatory text, badges, descriptions). If you need a field that the lobby will *search on or filter by*, the OpenSearch step is different — see [Choosing the mapping for your field](#choosing-the-mapping-for-your-field) in Step 4 for the rules;
+
+## TL;DR
+
+When adding a new field to the `gameV2` model, your change needs to propagate through the repos below:
+
+1. [**`contentful-migrations`** ](https://gitlab.ballys.tech/excite/applications/contentful-migrations/-/tree/main/model-migration?ref_type=heads) — define the field on the `gameV2` content model. Then apply the migration against a **test environment** on Contentful to make sure it's correct!
+**It's generally advised when adding new fields to the gameV2 model to have a Contentful test environment setup on which you can test and from which you can sync the data to the dev OpenSearch instance - so you can test the flow end-to-end while working.**
+2. [**`contentful-hooks`** ](https://gitlab.ballys.tech/excite/native/tools/contentful-hooks/-/blob/main/src/hookPayloads/V3HookPayloads/gamesHookPayloads_Lambda.js?ref_type=heads) — add the field to the webhook custom payload so Contentful actually sends it; For testing you can update the already existing STG webhook `yarn hook:update:v3`.
+**Only update PROD once your changes across all the other repos are merged in and ready for release!**
+3. [**`PostGamesPayloadFunction`** ](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/tree/main/functions/PostGamesPayloadFunction?ref_type=heads) — declare the field on the ingestion lambda's typed interfaces and add it to the conditional spread. **Without this, the field will not reach OpenSearch.**
+4. [**`osty-migrations`** ](https://gitlab.ballys.tech/excite/native/applications/osty-migrations) — add an explicit OpenSearch mapping for the field on `games-v3`. The mapping you choose depends on **whether the field is supposed to be searchable** and **whether it is a simple scalar or a nested / localised object**: non-searchable nested or localised data → `"type": "object", "enabled": false`; searchable scalar → typed mapping (`keyword`, `text`, `boolean`, `float`, `date`). Without an explicit mapping, the field is still stored in `_source` (so reads will return it) but it is **not indexed** — you cannot search, filter, or sort on it. The mapping is required for searchable fields, and strongly recommended for everything else (governance + a safety net against `dynamic` ever being flipped to `true`).
+Follow the README.md on the [`osty-rs` project ](https://gitlab.ballys.tech/excite/native/applications/osty-rs) to be able to create the migration file in the `osty-migrations` repo.
+You can apply and test the migration to the OpenSearch [dev instance ](https://search-lobby-opensearch-nsv4wbtlhyi5rtkzy62lf6s7su.eu-west-1.es.amazonaws.com/_dashboards/app/home#/) from your local following the `README.md on the `osty-rs` project` so you can test it. DO NOT apply the migrations on any of the other environments. There is a pipeline that will auto-apply any outstanding migrations on merge to main to OpenSearch STG instance, and prepare manual trigger pipeline for application to PROD.
+**The changes to the migrations for OpenSearch need to be reviewed and approved by the Nightwatch team before being merged in!**
+5. [**Client-facing lambdas** ](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3) — wire the field through any endpoint that should return it (OS query `_source`, locale extraction, response shape).
+6. Declare any changes to the Client-facing lambda responses it in the OpenAPI contract in the [`**lobby-contracts**` repo ](https://gitlab.ballys.tech/excite/native/applications/lobby-contracts).
+
+Test end-to-end on DEV first; Promotion to staging is via pipelines for the lambda and migration repos on merge to `main`. Promotion to PROD for the migrations are live immediately and have no rollback. The strategy is roll forward.
+
+ Promotions to PROD for the lambdas requires a REL ticket and at the time of writing the resulting pipeline is manually triggered by NOC!
+
+ Additionally for the openSearch migration - additive changes are non-destructive and will not require index re-creation. **For any destructive changes that require either - changing the schema of an already existing field, deprecating or removing a field  - those changes CANNOT be applied to an already existing index. Adding such changes needs a new index being created, updated and populated and then alias-swapping. For anything like this, please first consult the Nightwatch team.**
+
+## The long explanation: or Where the work lives
+
+From the Contentful entry to the API response, a `gameV2` field passes through a few stages — each configured in a different repo:
+
+```text
+┌────────────────────────────┐
+│  Contentful  gameV2 entry  │  ◀── content model defined in:  contentful-migrations
+└─────────────┬──────────────┘
+              │  fires on publish [PROD, STG] / save [STG] / autosave [STG]
+              ▼
+┌────────────────────────────┐
+│  Contentful webhook        │  ◀── selective custom payload defined in:  contentful-hooks
+└─────────────┬──────────────┘
+              │  POST request
+              ▼
+┌────────────────────────────┐
+│  PostGamesPayloadFunction  │  ◀── lambdas-v3 repo (ingestion lambda)
+│   sanitise + drop empties  │
+└─────────────┬──────────────┘
+              │  write
+              ▼
+┌────────────────────────────┐
+│  OpenSearch  games-v3      │  ◀── index mapping defined in:  osty-migrations
+│   strict schema            │
+└─────────────┬──────────────┘
+              │  read
+              ▼
+┌────────────────────────────┐
+│  Read-side lambdas         │  ◀── this repo
+└─────────────┬──────────────┘
+              │  API response
+              ▼
+        ┌──────────┐
+        │  Client  │  ◀── response shape defined in:  lobby-contracts
+        └──────────┘
+```
+
+The repositories at a glance:
+
+| Repo                                                                                                | What it owns                                                                                                                       |
+| --------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| [`contentful-migrations`](https://gitlab.ballys.tech/excite/applications/contentful-migrations/-/tree/main/model-migration?ref_type=heads)                                           | The shape of the `gameV2` content model in Contentful.                                                                             |
+| [`contentful-hooks`](https://gitlab.ballys.tech/excite/native/tools/contentful-hooks/-/blob/main/src/hookPayloads/V3HookPayloads/gamesHookPayloads_Lambda.js?ref_type=heads)                                                     | The webhook payload mapping that decides which fields Contentful actually sends.                                                   |
+| [`personalised-lobby-ts-lambda-v3`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/tree/main/functions/PostGamesPayloadFunction?ref_type=heads)                                                  | `PostGamesPayloadFunction` (the ingestion lambda) and the read-side lambdas, plus the shared `OSClient` library.                   |
+| [`osty-migrations`](https://gitlab.ballys.tech/excite/native/applications/osty-migrations)                                                       | OpenSearch index mappings — what OS expects, indexes, and stores.                                                                  |
+| [`lobby-contracts`](https://gitlab.ballys.tech/excite/native/applications/lobby-contracts)                                                       | The OpenAPI contract that defines what the API returns. Everything under `personalised-lobby/v3/` is the contract for these APIs. |
+
+
+## Adding a new property to the gameV2 model
+
+To add a new property to the gameV2 model:
+
+### 1. Make a model migration in the contentful-migrations repo
+
+Make a model migration in the [`contentful-migrations`](https://gitlab.ballys.tech/excite/applications/contentful-migrations/-/tree/main/model-migration?ref_type=heads) repo under `model-migration/scripts/`. Scripts are numbered — bump the highest existing number and add the next one.
+
+For `sigCons` see [`model-migration/scripts/358-ig-game-add-sigcon.ts`](https://gitlab.ballys.tech/excite/applications/contentful-migrations/-/blob/main/model-migration/scripts/358-ig-game-add-sigcon.ts?ref_type=heads)
+
+How to test and apply the migration: see the contentful-migrations repo [README](https://gitlab.ballys.tech/excite/applications/contentful-migrations/-/blob/main/README.md?ref_type=heads)
+
+### 2. Add the field to the Contentful gameV2 [Lambda][ENV] webhook
+
+After the property has been added in Contentful, add it to the `GAME_V2_HOOK_CUSTOM_PAYLOAD` map in [`contentful-hooks`](https://gitlab.ballys.tech/excite/native/tools/contentful-hooks/-/blob/main/src/hookPayloads/V3HookPayloads/gamesHookPayloads_Lambda.js?ref_type=heads) → `src/hookPayloads/V3HookPayloads/gamesHookPayloads_Lambda.js`. Each entry in the map is a `<key>: "{/payload/fields/<name>}"` pair; the right-hand side is a JSONPath into the Contentful event, and the value reaches the lambda exactly as Contentful structured it — for a localised field that means the whole locale-keyed object. The webhook config has to be re-applied in both **STG** and **PROD** Contentful environments after merging so the change takes effect.
+
+For [`sigCons`](https://gitlab.ballys.tech/excite/native/tools/contentful-hooks/-/blob/main/src/hookPayloads/V3HookPayloads/gamesHookPayloads_Lambda.js?ref_type=heads#L46) the change is a single new entry — `sigCons: "{/payload/fields/sigCons}"`
+
+#### Why the webhook payload is selective
+
+It is generally good practice to have a webhook send only what the consumer actually needs rather than blanket-forwarding the full entry. In this codebase that approach is reinforced by two small conventions:
+
+- **New fields are opt-in.** Adding a field to the `gameV2` model in Contentful does not pull it into the lobby pipeline automatically — it has to be added to the webhook payload too. Shape changes go through code review rather than appearing on the wire unannounced.
+- **One readable handshake between CMS and lambda.** The lambda's `IncomingGamePayload` interface mirrors the webhook config field-for-field, so the contract between Contentful and the lambda lives in one place that anyone can read.
+
+To apply the change to STG and PROD, the existing webhooks need to be re-pushed with the updated payload. The `contentful-hooks` repo has a CLI for this — set `NODE_ENV` and `JURISDICTION` in `.env` to target the right environment, look up the webhook IDs in Contentful, and run:
+
+```bash
+yarn hook:update:v3 --ids <comma-separated-webhook-ids>
+```
+
+This rebuilds each webhook from the latest payload definitions in `src/hookPayloads/V3HookPayloads/` and re-publishes it via the Contentful Management API with optimistic locking. STG and PROD are separate runs (one per environment, with the matching `.env` values). See the [contentful-hooks Readme](https://gitlab.ballys.tech/excite/native/tools/contentful-hooks).
+
+### 3. Add the fields to the `PostGamesPayloadFunction` lambda
+
+`PostGamesPayloadFunction` is the deliberate gate between Contentful and OpenSearch. Its typed interfaces mirror what the index accepts, and every incoming payload is validated and sanitised against them — so every field that lands in the database has been a conscious, code-reviewed decision, and malformed or unexpected entries are rejected before they pollute the data. **If a field is not declared here, it will not reach OpenSearch!**
+
+Two things are wired in [`functions/PostGamesPayloadFunction/lib/gamesPayload.ts`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostGamesPayloadFunction/lib/gamesPayload.ts):
+
+1. **Type definitions.** Declare the field on both payload interfaces — `IncomingGamePayload` (the inbound shape from the webhook) and `GamePayloadFields` (the outbound shape written to OpenSearch). The two interfaces are kept in sync deliberately, so renaming or removing a field on either side breaks the build.
+2. **Conditional spread inside `modifyEventGamePayload`.** This is what makes the field optional in the document written to OpenSearch: when the value is `null`, `undefined`, or an empty string, the key is omitted entirely rather than being stored as `null`. Almost every game field follows this pattern.
+
+The rules from the existing README still apply when shaping the value:
+
+- If the field is **non-localized**, remove the default locale here before forwarding to OpenSearch.
+- If the field is **localized**, pass the whole locale-keyed object through. Per-locale extraction happens at read time, not here.
+- Any additional sanitization or rules for the field can be applied at this point.
+
+For `sigCons` see the change on [`GTECH-1319733`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/merge_requests/233/diffs#34c51d0076c3d9c79b9563120e23cef6b326ec4b) The conditional spread looks like:
+
+```diff
++...(isNotNullUndefinedOrEmptyString(game.sigCons) ? { sigCons: game.sigCons } : {}),
+```
+
+#### Tests
+
+Tests live in [`functions/PostGamesPayloadFunction/tests/gamesPayload.test.ts`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostGamesPayloadFunction/tests/gamesPayload.test.ts). For pass-through localised string fields there is a list-driven test (`PASS_THROUGH_LOCALIZED_STRING_FIELDS`) that exercises populated / undefined / empty-string / null cases for every field in the list. If your field is the same shape (localised string, optional, dropped-when-empty), adding the field name to that array is the entire test change you need.
+
+If your field is a different shape (Bynder asset array, object, etc.), follow the existing per-shape tests in the same file as a pattern.
+
+You can use `sam-cli` in the repo to deploy any lambda changes to the AWS dev instance.
+
+Once the PR is approved, it will be automatically deployed to `STG` on merge to `main`. `PROD` deployment is manual pipeline trigger.
+
+### 4. Make a new migration in the osty-migrations repo
+
+Add a mapping for the field to the `games-v3` index by writing a new migration in [`osty-migrations`](https://gitlab.ballys.tech/excite/native/applications/osty-migrations) under `migrations/`. Migration files are JSON named `<unix-timestamp>_<description>.json` and are applied via the [osty-rs CLI](https://gitlab.ballys.tech/excite/native/applications/osty-rs)
+
+#### Why this step exists
+
+The `games-v3` index has its top-level `game` object set to [`dynamic: false`](https://docs.opensearch.org/latest/mappings/mapping-parameters/dynamic/) (see the baseline migration `1770064516_game_v3.json`). With this setting, when OpenSearch receives a field under `game.*` that has no explicit mapping, it **stores the value verbatim in `_source` but does not add it to the mapping or the inverted index**. The write succeeds, and the value is still returned by reads (because read-side lambdas pull from `_source`), but the field is not searchable — `query`, `filter`, `sort`, and aggregations against it return nothing.
+
+What this means in practice for **scalar fields and arrays of scalars** (booleans, strings, numbers, and arrays of those — [OpenSearch has no dedicated array type](https://docs.opensearch.org/latest/mappings/supported-field-types/index/), so an array of strings or booleans is mapped exactly like a single value of that type, just multi-valued):
+
+- **Searchable scalars need an explicit mapping.** Without one, the field is in `_source` but not indexed, so any query against it silently returns nothing — there is no inverted index for it to match against.
+- **Display-only scalars will flow through without a mapping**, but it is still our convention to declare one. Two reasons: **governance** — every field that lives in the index is documented in the schema, with no implicit/undocumented surface area; and a **safety net** — if `dynamic` is ever flipped to `true`, every currently-unmapped field would suddenly get auto-mapped, with the locale and Bynder multiplication problem described below.
+
+For **object fields and arrays of objects**, an explicit mapping is not optional — and the right shape is almost always [`"type": "object", "enabled": false`](https://docs.opensearch.org/latest/mappings/mapping-parameters/enabled/). Two reasons:
+
+- **`enabled: false` is the explicit "skip this subtree" contract.** Per the [enabled docs](https://docs.opensearch.org/latest/mappings/mapping-parameters/enabled/), it tells OpenSearch to preserve the JSON in `_source` without parsing or indexing any of the contents — the whole subtree counts as **one** mapping entry regardless of how many locales or nested keys it contains. Relying on `dynamic: false` to keep nested children unmapped is weaker by comparison; `enabled: false` gives an unambiguous, documented guarantee.
+- **[Arrays of objects are flattened](https://docs.opensearch.org/latest/mappings/supported-field-types/object/)** into multi-valued sub-fields at the parent level: an array like `[{ name, age }, { name, age }]` becomes `<field>.name: [...]` and `<field>.age: [...]`, so each child key still contributes to the field count exactly as if dynamic mapping had created them. `enabled: false` is what stops that flattening from ever taking place.
+
+That is why every nested object in the baseline schema (`title`, `animationMedia`, the Bynder media, `gamePlatformConfig`, etc.) uses `enabled: false`.
+
+The strict schema is also a deliberate guard against [mapping explosion](https://docs.opensearch.org/latest/mappings/mapping-explosion/). OpenSearch enforces a default limit of **1,000 fields per index** (`index.mapping.total_fields.limit`) and a default depth of **20 levels** (`index.mapping.depth.limit`); past those, writes start failing and the cluster state balloons (every leaf mapping costs memory on every node). Two things in the current gameV2 model data shape make this a real risk if dynamic mapping is left on:
+
+- **Localised fields multiply.** A single localised CMS field arrives as `{ "en-GB": "...", "gr-GR": "...", "es-ES": "..." }`. With dynamic mapping, OS would create a separate sub-field per locale per parent. Fifteen localised text fields across six locales is ninety leaf mappings just for that one shape.
+- **Bynder media is deeply nested.** Each Bynder asset is an object with many sub-properties (URLs, dimensions, derivatives, metadata). Letting OS auto-map them adds dozens of leaves per asset field.
+
+This is why the `enabled: false` convention above is used for — collapsing the entire subtree to one mapping entry keeps the index small, the writes fast, and the cluster stable.
+
+#### Choosing the mapping for your field
+
+The mapping you choose depends on whether you want to be able to search on the field:
+
+- **Stored but not searchable (the common case for display-only fields).** Use `"type": "object", "enabled": false`. OpenSearch stores the value verbatim and returns it on reads, but does not analyse, index, or let you query it. This should be used for any field that is purely returned to the client and never used in `query`/`filter`/`sort` — including all localised strings (because of the locale-keyed object shape) and any deeply nested object data. See the baseline schema for `title`, `animationMedia`, `infoDetails`, etc., which use the same pattern.
+- **Searchable / filterable.** Use a typed mapping like `"type": "keyword"` (exact match, filtering, aggregations), `"type": "text"` (full-text search with analysis), `"type": "boolean"`, `"type": "float"`, `"type": "date"`, etc. See the baseline migration for examples (`gameName: keyword`, `rtp: float`, `progressiveJackpot: boolean`). A worked example for an indexed/searchable field will follow in a separate guide.
+- **Stored, but specifically not indexed at all.** A few fields in the baseline use `"index": false` on a `keyword`/`boolean` (e.g. `funPanelEnabled`, `operatorBarDisabled`). This is similar to `enabled: false` but operates per-field rather than turning off the whole sub-tree. Prefer `enabled: false` for objects/nested data, `index: false` for scalar leaves you want to keep typed but not index.
+
+This decision matters most for localised fields and deeply nested objects — those are the shapes that drive the field count up the fastest if mismapped.
+
+For `sigCons` (non-searchable, localised) the migration is [`migrations/1777285712_game_field_mapping.json`](https://gitlab.ballys.tech/excite/native/applications/osty-migrations/-/merge_requests/18/diffs)
+
+#### Apply / promote
+
+Apply the migration on **DEV** first using the osty-rs CLI. Follow the README.md on the `osty-rs` project (https://gitlab.ballys.tech/excite/native/applications/osty-rs) on how to apply and test the migration to the OpenSearch dev instance (https://search-lobby-opensearch-nsv4wbtlhyi5rtkzy62lf6s7su.eu-west-1.es.amazonaws.com/_dashboards/app/home#/) from your local. DO NOT apply the migrations on any of the other environments. There is a pipeline that will auto-apply any outstanding migrations on merge to main to the `OpenSearch STG` instance, and prepare manual trigger pipeline for application to `PROD`.
+**The changes to the migrations for OpenSearch need to be reviewed and approved by the Nightwatch team before being merged in!**
+
+### 5. Surface the field where it needs to be consumed
+
+At this point the field exists in OpenSearch and is available to read. Any user-facing lambda that should expose it needs three things wired locally:
+
+1. The field listed in the lambda's OS query `_source`. OpenSearch only returns the fields you ask for, even when they are stored.
+2. Locale extraction if the field is localised — use `tryGetValueFromLocalised(...)` from the `OSClient` lib.
+3. The field added to the lambda's response shape, with a conditional spread so it is omitted when empty.
+
+Whether this is one lambda, a few of them, or all of the read-side lambdas depends entirely on which endpoints are supposed to return it. The `sigCons` branch propagated through all eight; most fields will be narrower.
+
+A note on the shared library: several lambdas defer payload construction to a centralised `payloadBuilder` in `libs/OSClient/lib/gamesPayloads.ts` (and to `createDefaultMapperPicking([...])` lists in `libs/OSClient/lib/personalisation/`). If you are wiring the field through one of those lambdas, add it once at the shared layer — `Game` / `ISectionGame` interfaces in `sharedInterfaces/interfaces.ts`, the `DerivedPayload` type, the locale extraction in `computeDerivedPayload`, and the conditional spread in `payloadBuilder` — and every consumer picks it up. The other lambdas build their payloads inline and follow the per-lambda pattern above.
+
+Tests: follow the existing per-lambda test layout. For shared changes, `libs/OSClient/tests/gamesPayloads.test.ts` is the place to cover the `payloadBuilder` propagation directly.
+
+### 6. Update the API contract in lobby-contracts
+
+The OpenAPI contract under `personalised-lobby/v3/` in [`lobby-contracts`](https://gitlab.ballys.tech/excite/native/applications/lobby-contracts) is the source of truth for what the lobby APIs return. Any field surfaced in Step 5 has to be declared here, otherwise contract validation will fail and the contract changes won't be published.
+
+Two things to update:
+
+- **Schemas** (`personalised-lobby/v3/schemas/`) — add the field definition to every schema that describes a game record returned by an affected endpoint. Optional fields stay out of `required:`. Match the description style of the surrounding fields; for an optional, omit-when-empty field the convention is a one-sentence purpose followed by *"Optional — omitted from the response when the game has no `<field>`."* The phrasing matches what the lambda actually does (conditional spread = field absent on empty) and signals omit-semantics consistently across the contract.
+- **Examples** (`personalised-lobby/v3/examples/`) — add the field to one or more example payloads per affected endpoint so the examples reflect the new shape.
+
+
+### 7. Testing the base functionality on DEV and STG
+
+Once the OpenSearch migration has been successfully tested on DEV → merge the PR. Once it's merged, it is automatically applied on STG. the same applies to the ingestion lambda.
+
+The order **on DEV** is:
+
+1. Contentful model migration (Step 1) applied to a test Contentful environment (can be the current `dev` one).
+2. OpenSearch index mapping (Step 4) applied — so the field has a mapping in place before any data flows.
+3. Ingestion lambda (Step 3) deployed — so the lambda accepts and forwards the field.
+4. Webhook payload (Step 2) updated — so Contentful starts sending the field. By default we only have webhooks publishing to STG and PROD.
+To be able to sync a change to DEV OpenSearch either replicate the STG webhook just for testing or run a manual sync on Dev form the Contentful Admin Dashboard app. **If you are unsure how to do any of the above reach out to the Nightwatch team.**
+5. Read-side lambdas + lobby-contracts (Steps 5–6) deployed.
+
+End-to-end test on STG: This can be done after all dev changes are approved and merged/applied -  publish a game with the field set, watch it land in OpenSearch, then call each affected API endpoint and confirm the field appears (and is absent when the value is empty).
+
+## Quick checklist
+
+For a localised, optional, non-searchable string field (the `sigCons` shape):
+
+- [ ] Step 1 — `contentful-migrations`: new migration script under `model-migration/scripts/`.
+- [ ] Step 2 — `contentful-hooks`: one line in `gamesHookPayloads_Lambda.js`; webhook config re-applied to STG and PROD Contentful environments.
+- [ ] Step 3 — `PostGamesPayloadFunction`: field in both interfaces, conditional spread, name added to the test array.
+- [ ] Step 4 — `osty-migrations`: new migration adding `{ type: object, enabled: false }` under `game.*`.
+- [ ] Step 5 — Each consuming lambda: field in OS query `_source`, locale extraction (if localised), field in response shape with conditional spread. Add to the shared `OSClient` `payloadBuilder` if the lambda uses it.
+- [ ] Step 6 — `lobby-contracts`: schemas and examples updated under `personalised-lobby/v3/` for every endpoint that returns the field.
+- [ ] Step 7 — DEV → STG → PROD, in the order above.

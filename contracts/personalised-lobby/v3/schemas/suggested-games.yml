@@ -1,0 +1,10 @@
+---
+title: SuggestedGamesResponse
+description: Response for suggested-for-you games as per memberId.
+type: array
+items:
+  type: object
+  $ref:  "./section-games-auth-ml.yml"
+
+example:
+  $ref: '../examples/suggested-games.yml'

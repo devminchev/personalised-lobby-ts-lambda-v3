@@ -57,6 +57,7 @@ interface IGameObject {
     mobileGameSkin?: string;
     imgUrlPattern?: string;
     animationMedia?: string;
+    sigCons?: string;
     representativeColor?: string;
     foregroundLogoMedia?: SanitizedBynder;
     backgroundMedia?: SanitizedBynder;
@@ -197,6 +198,7 @@ export const getMinigames = async (
                                             'game.imgUrlPattern',
                                             'game.representativeColor',
                                             'game.animationMedia',
+                                            'game.sigCons',
                                             'game.foregroundLogoMedia',
                                             'game.backgroundMedia',
                                             'game.tags',
@@ -251,6 +253,7 @@ export const createMinigamesLobby = (
             null,
         );
         const animationMedia = tryGetValueFromLocalised(userLocale, spaceLocale, gameData?.animationMedia, null);
+        const sigCons = tryGetValueFromLocalised(userLocale, spaceLocale, gameData?.sigCons, null);
         const foregroundLogoMedia = tryGetValueFromLocalised(
             userLocale,
             spaceLocale,
@@ -273,6 +276,7 @@ export const createMinigamesLobby = (
             ...(gameData?.gameSkin && { gameSkin: gameData.gameSkin }), // game
             ...(imgUrlPattern && { imgUrlPattern }), // game
             ...(animationMedia && { animationMedia }), // game
+            ...(sigCons && { sigCons }), // game
             ...(representativeColor && { representativeColor }), // game
             ...(siteGameData?.sash?.[spaceLocale] && { sash: siteGameData?.sash?.[spaceLocale] }), // siteGame
             ...(foregroundLogoMediaObj && { foregroundLogoMedia: foregroundLogoMediaObj }), // game
@@ -366,7 +370,7 @@ export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGat
     const userLocale: string = validateLocaleQuery(event.queryStringParameters?.locale);
 
     try {
-        const client = getClient();
+        const client = getClient({ tier: 'C', enabled: false });
 
         const spaceLocale = handleSpaceLocalization();
 

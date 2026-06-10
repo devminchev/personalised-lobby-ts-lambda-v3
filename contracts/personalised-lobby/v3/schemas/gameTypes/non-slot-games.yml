@@ -1,0 +1,72 @@
+title: Non Slot Games
+description: Non slot game types
+properties:
+  winLineType:
+    type: string
+    nullable: true
+  brandedSkin:
+    type: boolean
+  languages:
+    type: array
+    items:
+      type: string
+      nullable: true
+  type:
+    type: string
+  bonusRounds:
+    type: boolean
+  volatility:
+    type: string
+    nullable: true
+  winLines:
+    type: string
+    nullable: true
+  maxMultiplierRange:
+    type: string
+    nullable: true
+  sideBets:
+    type: string
+    nullable: true
+  symbolType:
+    type: array
+    items:
+      type: string
+    nullable: true
+  reel:
+    type: string
+    nullable: true
+  isPersistence:
+    type: boolean
+  themes:
+    type: array
+    items:
+      type: string
+    nullable: true
+  features:
+    type: array
+    items:
+      type: string
+    nullable: true
+  traditional:
+    type: boolean
+  liveDealer:
+    type: boolean
+  isJackpotFixedPrize:
+    type: boolean
+  isJackpotInGameProgressive:
+    type: boolean
+  averageGameRoundLength:
+    type: string
+    nullable: true
+  waysToWin:
+    type: string
+    nullable: true
+  brand:
+    type: string
+    nullable: true
+  isJackpot:
+    type: boolean
+  isMultiLanguage:
+    type: boolean
+  isJackpotPlatformProgressive:
+    type: boolean

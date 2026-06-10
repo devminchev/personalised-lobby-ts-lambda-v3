@@ -51,6 +51,7 @@ const becauseYouPlayedMapper = createDefaultMapperPicking([
     'representativeColor',
     'videoUrlPattern',
     'animationMedia',
+    'sigCons',
     'foregroundLogoMedia',
     'backgroundMedia',
     'tags',

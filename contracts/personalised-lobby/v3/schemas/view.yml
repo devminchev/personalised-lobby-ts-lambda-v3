@@ -1,0 +1,93 @@
+
+title: View
+description: Response of view defined for a particular venture and navigation
+type: array
+items:
+  type: object
+  required:
+    - name
+    - viewSlug
+    - topContent
+    - primaryContent
+  properties:
+    name:
+      description: Name of the IG View
+      type: string
+    viewSlug:
+      description: The slug for the IG View
+      type: string
+    classification:
+      description: Classification of the View. Can be `general` for any normal game views and `search` for the search page.
+      type: string
+
+    topContent:
+      description: >
+        Array of sections.
+        - sectionClassification can be one of [`GameSection`, `PersonalisedSection`, `PromotionSection`, `BannerSection`, `MarketingSection`, `QuickLinksSection`, `BrazePromosSection`, `JackpotSectionsBlock`, `PlaceholderSection`]
+        - layoutType can be one of [carousel-a, carousel-b, grid-a, grid-b, grid-c, grid-d, grid-e, grid-f, grid-g, carousel-pill]
+      type: array
+      items:
+        type: object
+        required:
+          - entryId
+        oneOf:
+          - $ref: './sections/section-quickLinks.yml'
+          - $ref: './sections/section-collab-personalised.yml'
+          - $ref: './sections/section-similarity-personalised.yml'
+          - $ref: './sections/banner.yml'
+          - $ref: './sections/section-carousel-a.yml'
+          - $ref: './sections/marketing-section.yml'
+          - $ref: './sections/braze-placeholder-section.yml'
+          - $ref: './sections/section-promotions-grid.yml'
+          - $ref: './sections/placeholder-section.yml'
+
+    primaryContent:
+      description: >
+        Array of sections.
+        - sectionClassification can be one of [`GameSection`, `PersonalisedSection`, `JackpotSection`, `DFGSection`, `BannerSection`, `MarketingSection`, `QuickLinksSection`, `BrazePromosSection`, `JackpotSectionsBlock`, `SearchResultsSection`, `PlaceholderSection`]
+        - layoutType can be one of [`carousel-a`, `carousel-b`, `grid-a`, `grid-b`, `grid-c`, `grid-d`, `grid-e`, `grid-f`, `grid-g`, `carousel-pill`]
+      type: array
+      items:
+        type: object
+        required:
+          - entryId
+          - viewAllType
+        oneOf:
+          - $ref: './sections/section-quickLinks.yml'
+          - $ref: './sections/section-grid-a.yml'
+          - $ref: './sections/section-grid-b.yml'
+          - $ref: './sections/section-grid-c.yml'
+          - $ref: './sections/section-grid-d.yml'
+          - $ref: './sections/section-grid-e.yml'
+          - $ref: './sections/section-grid-f.yml'
+          - $ref: './sections/section-grid-g.yml'
+          - $ref: './sections/section-jackpot.yml'
+          - $ref: './sections/section-dfg.yml'
+          - $ref: './sections/section-carousel-a.yml'
+          - $ref: './sections/section-carousel-b.yml'
+          - $ref: './sections/section-collab-personalised.yml'
+          - $ref: './sections/section-similarity-personalised.yml'
+          - $ref: './sections/banner.yml'
+          - $ref: './sections/marketing-section.yml'
+          - $ref: './sections/jackpots-block-section.yml'
+          - $ref: './sections/braze-placeholder-section.yml'
+          - $ref: './sections/section-search-results.yml'
+          - $ref: './sections/section-promotions-grid.yml'
+          - $ref: './sections/gameShuffle.yml'
+          - $ref: './sections/placeholder-section.yml'
+
+    liveHidden:
+      description: If the link will be visible on live
+      type: boolean
+    theme:
+      description: The theme for the page
+      type: object
+      required:
+        - primaryColor
+      properties:
+        primaryColor:
+          type: string
+        secondaryColor:
+          type: string
+        image:
+          type: object

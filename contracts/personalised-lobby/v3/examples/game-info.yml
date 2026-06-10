@@ -1,0 +1,61 @@
+entryId: 1SC6Pyl5XFF1w8S4Y2uMzZ
+demoUrl: /service/game/demo/play-double-bubble-triple
+gameSkin: play-double-bubble-triple
+gameType: Slots
+title: Double Bubble Triple Jackpot
+howToPlayContent: <p>Choose your stake. Spin.</p>
+infoDetails: <p>Coin Size 1p - £10</p>
+infoImgUrlPattern: /api/content/gametiles/double-bubble-triple-jackpot/scale-s%s/dbtj-tile-r%s-w%s.jpg
+introductionContent: <p>Wilds, Multipliers, and 3 jackpots</p>
+maxBet: £10
+minBet: 1p
+name: play-double-bubble-triple
+realUrl: /service/game/play/play-double-bubble-triple
+representativeColor: "#40c37f"
+sigCons: "Significant conditions apply. 18+. Please play responsibly."
+animationMedia: "animated"
+foregroundLogoMedia:
+  name: "flash-match-on-feb26-25-Marquee-New-3X"
+  type: "image"
+  width: 750
+  height: 372
+  orientation: "landscape"
+  original: null
+  tags: []
+  thumbnails:
+    transformBaseUrl: "https://assets.ballys.com/transform/4c901602-85e2-41b4-99b6-ad7a928a5e6e/flash-match-on-feb26-25-Marquee-New-3X"
+backgroundMedia:
+  name: "flash-match-on-feb26-25-Marquee-New-3X"
+  type: "image"
+  width: 750
+  height: 372
+  orientation: "landscape"
+  original: null
+  tags: []
+  thumbnails:
+    transformBaseUrl: "https://assets.ballys.com/transform/4c901602-85e2-41b4-99b6-ad7a928a5e6e/flash-match-on-feb26-25-Marquee-New-3X"
+loggedOutAnimationMedia: "default"
+loggedOutForegroundLogoMedia:
+  name: "flash-match-on-feb26-25-Marquee-New-3X"
+  type: "image"
+  width: 750
+  height: 372
+  orientation: "landscape"
+  original: null
+  tags: []
+  thumbnails:
+    transformBaseUrl: "https://assets.ballys.com/transform/4c901602-85e2-41b4-99b6-ad7a928a5e6e/flash-match-on-feb26-25-Marquee-New-3X"
+loggedOutBackgroundMedia:
+  name: "flash-match-on-feb26-25-Marquee-New-3X"
+  type: "image"
+  width: 750
+  height: 372
+  orientation: "landscape"
+  original: null
+  tags: []
+  thumbnails:
+    transformBaseUrl: "https://assets.ballys.com/transform/4c901602-85e2-41b4-99b6-ad7a928a5e6e/flash-match-on-feb26-25-Marquee-New-3X"
+funPanelGame:
+  defaultCategory: contract-test
+showNetPosition: true
+liveHidden: true

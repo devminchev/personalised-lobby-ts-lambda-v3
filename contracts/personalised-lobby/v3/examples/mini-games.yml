@@ -1,0 +1,90 @@
+- entryId: 3V7Hsob7cx3ON0B73omXQH
+  title: Play'n Go
+  name: play-and-go
+  games:
+  - entryId: 5RFJtBgfmSqep534sH16EL
+    name: play-png-book-of-dead
+    title: PNG_BOOK_OF_DEAD
+    demoUrl: /service/game/demo/play-png-book-of-dead
+    realUrl: /service/game/play/play-png-book-of-dead
+    gameSkin: PNG_BOOK_OF_DEAD
+    representativeColor: "#DDC679"
+    imgUrlPattern: "/api/content/gametiles/double-bubble-triple-jackpot/scale-s%s/dbtj-tile-r%s-w%s.jpg"
+    animationMedia: default
+    sigCons: "Significant conditions apply. 18+. Please play responsibly."
+    foregroundLogoMedia:
+      name: "jackpotjoy-big-bass-bonanza-bynder-1914x1263"
+      type: "image"
+      width: 1914
+      height: 1263
+      orientation: "landscape"
+      original: null
+      tags: []
+      thumbnails:
+        transformBaseUrl: "https://assets.ballys.com/transform/2a1e8a76-409f-4ac4-89d0-946829b57c42/jackpotjoy-big-bass-bonanza-bynder-1914x1263"
+    backgroundMedia:
+      name: "jackpotjoy-big-bass-bonanza-bynder-1914x1263"
+      type: "image"
+      width: 1914
+      height: 1263
+      orientation: "landscape"
+      original: null
+      tags: []
+      thumbnails:
+        transformBaseUrl: "https://assets.ballys.com/transform/2a1e8a76-409f-4ac4-89d0-946829b57c42/jackpotjoy-big-bass-bonanza-bynder-1914x1263"
+    tags: ['new', 'exclusive']
+    vendor: "infinity"
+  - entryId: 6vA4OS1fnjYcj4fc8DjY5P
+    name: play-png-gargantoonz
+    title: PNG_GARGANTOONZ\
+    demoUrl: /service/game/demo/play-png-gargantoonz
+    realUrl: /service/game/play/play-png-gargantoonz
+    gameSkin: PNG_GARGANTOONZ
+    representativeColor: "#04140D"
+    vendor: "roxor-rgp"
+  layoutType: carousel-a
+- entryId: 41w6yQ89FWW5y00ccGperJ
+  title: Spotlight
+  name: spotlight
+  games:
+  - entryId: 5NKtO51RjyJOW7CVhLcSem
+    name: play-push-big-bite
+    title: PUSH_BIG_BITE
+    demoUrl: /service/game/demo/play-push-big-bite
+    realUrl: /service/game/play/play-push-big-bite
+    gameSkin: PUSH_BIG_BITE
+    representativeColor: "#69ADBC"
+    imgUrlPattern: "/api/content/gametiles/double-bubble-megaways-logged-out/scale-s%s/double-bubble-megaways-tile-r%s-w%s.jpg"
+    animationMedia: default
+    sigCons: "Significant conditions apply. 18+. Please play responsibly."
+    foregroundLogoMedia:
+      name: "jackpotjoy-big-bass-bonanza-bynder-1914x1263"
+      type: "image"
+      width: 1914
+      height: 1263
+      orientation: "landscape"
+      original: null
+      tags: []
+      thumbnails:
+        transformBaseUrl: "https://assets.ballys.com/transform/2a1e8a76-409f-4ac4-89d0-946829b57c42/jackpotjoy-big-bass-bonanza-bynder-1914x1263"
+    backgroundMedia:
+      name: "jackpotjoy-big-bass-bonanza-bynder-1914x1263"
+      type: "image"
+      width: 1914
+      height: 1263
+      orientation: "landscape"
+      original: null
+      tags: []
+      thumbnails:
+        transformBaseUrl: "https://assets.ballys.com/transform/2a1e8a76-409f-4ac4-89d0-946829b57c42/jackpotjoy-big-bass-bonanza-bynder-1914x1263"
+    tags: ['new', 'exclusive']
+    vendor: "roxor-rgp"
+  - entryId: 7ATwrxVWELVidna9ugbxs5
+    name: play-bp-king-kong-cash-even-bigger-bananas-2-rapid-fire
+    title: BP_KING_KONG_CASH_EVEN_BIGGER_BANANAS_2_RAPID_FIRE
+    demoUrl: /service/game/demo/play-bp-king-kong-cash-even-bigger-bananas-2-rapid-fire
+    realUrl: /service/game/play/play-bp-king-kong-cash-even-bigger-bananas-2-rapid-fire
+    gameSkin: BP_KING_KONG_CASH_EVEN_BIGGER_BANANAS_2_RAPID_FIRE
+    representativeColor: "#102E22"
+    vendor: "infinity"
+  layoutType: carousel-a

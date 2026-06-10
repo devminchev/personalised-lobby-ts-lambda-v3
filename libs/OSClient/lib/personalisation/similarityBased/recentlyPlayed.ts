@@ -57,6 +57,7 @@ const recentlyPlayedMapper = createDefaultMapperPicking([
     'representativeColor',
     'videoUrlPattern',
     'animationMedia',
+    'sigCons',
     'foregroundLogoMedia',
     'backgroundMedia',
     'tags',

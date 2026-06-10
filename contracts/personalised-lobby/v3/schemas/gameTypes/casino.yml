@@ -1,0 +1,7 @@
+title: Casino
+description: Game type
+properties:
+  type:
+    type: string
+  casinoType:
+    type: string

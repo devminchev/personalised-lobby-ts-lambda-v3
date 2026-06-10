@@ -1,0 +1,118 @@
+---
+title: "ADR-004: Self-observability alarms must not be `breaker:`-prefixed"
+description: Why `ControllerErrorsAlarm` and `ControllerDlqDepthAlarm` deliberately do not start with `breaker:` — naming them otherwise would feed them into the controller via the EventBridge rule and create a self-amplifying loop on a controller failure
+---
+
+# ADR-004: Self-observability alarms must not be `breaker:`-prefixed
+
+- **Status:** Accepted (2026-04-25)
+- **Affected resources:** `ControllerErrorsAlarm`, `ControllerDlqDepthAlarm` ([template.yaml](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/template.yaml))
+- **Why this is an ADR:** The decision is a *naming rule*. Naming rules are unusually fragile to refactors — a "let's standardise alarm names with the `breaker:` prefix" PR would break the system without altering any behaviour visibly until something else broke first.
+
+## Context
+
+The controller's EventBridge rule routes events to the Lambda based on **alarm name prefix**. From [template.yaml](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/template.yaml):
+
+```yaml
+Pattern:
+    source:
+        - aws.cloudwatch
+    detail-type:
+        - CloudWatch Alarm State Change
+    detail:
+        alarmName:
+            - prefix: "breaker:"
+        state:
+            value:
+                - ALARM
+                - OK
+                - INSUFFICIENT_DATA
+```
+
+Any alarm whose name starts with `breaker:` is consumed by the controller. The prefix is the *only* routing filter — there is no second-level allowlist or content check. The controller trusts that a `breaker:`-prefixed alarm is a signal it's expected to react to.
+
+Two new alarms watch the controller itself:
+
+- `ControllerErrorsAlarm` — fires when the controller's `AWS/Lambda Errors` count is non-zero.
+- `ControllerDlqDepthAlarm` — fires when the DLQ has any messages, indicating an event was permanently lost.
+
+These alarms exist so operators notice when the controller has failed — which is a different concern from the breaker signals themselves. They do not participate in the breaker's state machine, do not write to DynamoDB, and are not consumed by the controller in any way.
+
+## Decision
+
+Self-observability alarms **must not** be named with the `breaker:` prefix.
+
+The two alarms are explicitly named:
+
+- `lobby-controller-errors-${StageName}`
+- `lobby-controller-dlq-depth-${StageName}`
+
+And the comment block above their declarations in [template.yaml](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/template.yaml) explains why.
+
+The naming rule is the *only* mechanism preventing a feedback loop. Neither the EventBridge rule, the state machine, nor any other component can distinguish "an alarm describing my own health" from "an alarm describing backend health."
+
+## Consequences
+
+### What happens if the rule is violated
+
+If either alarm gets renamed with the `breaker:` prefix (a future "standardise alarm names" PR, a copy-paste during a new alarm's creation, an over-eager linter), the failure pattern is:
+
+1. The controller throws an exception on some real cause (DDB throttling, code regression, IAM drift).
+2. `ControllerErrorsAlarm` fires.
+3. The EventBridge rule sees `alarmName: breaker:...` and invokes the controller with the alarm's state-change payload.
+4. The controller is still broken; the invocation also throws.
+5. **Lambda's async retry budget burns** trying to deliver the alarm event back to a Lambda that cannot succeed.
+6. The original failure events also pile into the DLQ.
+7. `ControllerDlqDepthAlarm` fires (also `breaker:`-prefixed under the hypothetical violation), invokes the controller, which fails again.
+8. Lambda's reserved-concurrency cap (5) saturates, and ordinary breaker signal alarms also get throttled.
+
+The original failure may be small (a single SSM parameter that became unreadable for 30 s); the feedback loop turns it into a sustained controller outage that may persist long after the underlying cause clears. There is no obvious mitigation in code — by the time you can SSH in, the breaker is hopelessly out of sync with reality.
+
+### Positive (when the rule holds)
+
+- **Failure containment.** A controller error fires `ControllerErrorsAlarm`, which goes to operators (a future SNS pipeline) and stops there. The error does not propagate into more controller invocations.
+- **Clear separation of concerns.** Breaker signals describe backend health; self-observability alarms describe controller health. The naming reflects the distinction.
+- **Auditable in CloudWatch.** A search for `breaker:*` in the CloudWatch console returns only signal alarms, never the self-observability ones.
+
+### Negative
+
+- **Naming is non-uniform.** `breaker:GLOBAL:os-search-rejections` and `lobby-controller-errors-v2` share no schema. A reader skimming alarm names might briefly miss that they're related. The trade-off is documented in [the alarms doc](./../circuit-breaker-alarms.mdx#why-they-are-not-breaker-prefixed) and in the inline comment above the alarms in `template.yaml`.
+
+### How we keep the rule in place
+
+- **Inline comment block** above the two alarm definitions in [`template.yaml`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/template.yaml) explaining the loop.
+- **Cross-references** in [the alarms doc](./../circuit-breaker-alarms.mdx#why-they-are-not-breaker-prefixed), [the behaviour doc](./../circuit-breaker-behaviour.mdx) (which scopes its scenarios to signal alarms only), and [this ADR](./index.mdx).
+- **Invariant in the alarms doc**: "Only `breaker:*`-prefixed alarms are consumed... `ControllerErrorsAlarm` and `ControllerDlqDepthAlarm` MUST NOT be renamed with the `breaker:` prefix." See [Invariants the controller relies on](./../circuit-breaker-alarms.mdx#invariants-the-controller-relies-on).
+
+## Considered alternatives
+
+### A. Use a different EventBridge rule filter
+
+Filter on `detail.metricName` (e.g. only route alarms whose metric is in `AWS/ES` or `AWS/ApiGateway`) instead of on alarm name prefix. The controller would naturally ignore alarms on `AWS/Lambda Errors`.
+
+**Why we rejected it.** Brittler than name-based routing — a future signal alarm whose metric is `AWS/Lambda` (e.g. concurrency saturation as an indicator of stack pressure) would fail to route. Also harder to reason about in a CloudWatch console search than the literal name prefix.
+
+### B. Allowlist signal names explicitly in the EventBridge rule
+
+Replace `prefix: "breaker:"` with `anything-but` or an explicit list of the six recognised signal names.
+
+**Why we rejected it.** Adds template churn whenever a new signal is added. The controller already has a code-side allowlist in [`src/config.ts`](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/config.ts) (`CRITICAL_SIGNALS` ∪ `WARNING_SIGNALS`); duplicating it in the EventBridge rule means two places to update. A name-prefix routing keeps the EventBridge layer dumb and the controller smart.
+
+### C. Tag-based filtering on the alarm
+
+EventBridge rules can pattern-match on tags. Tag the signal alarms with `BreakerSignal: true`; route only those.
+
+**Why we rejected it.** EventBridge doesn't see tags on the source alarm directly — the rule pattern only matches on the event payload, which doesn't include tags. We'd need a tag-replication mechanism (e.g. EventBridge Pipes or a tag-driven routing layer). Strictly more infrastructure for the same outcome.
+
+### D. Two EventBridge rules — one for signals, one ignoring self-obs
+
+Keep `prefix: "breaker:"` and add an explicit `anything-but` clause for the controller's own alarm names.
+
+**Why we rejected it.** Couples the EventBridge rule to specific resource names; every new self-obs alarm would require both the new alarm and a corresponding `anything-but` entry. The naming rule is the simpler invariant.
+
+## References
+
+- [EventBridge — content-based filtering rules](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-event-patterns-content-based-filtering.html) — including `prefix:` and `anything-but:` operators
+- [Source: alarm declarations and the inline rationale](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/template.yaml)
+- [Source: EventBridge rule pattern](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/template.yaml)
+- [Alarms doc — controller self-observability section](./../circuit-breaker-alarms.mdx#controller-self-observability-alarms)

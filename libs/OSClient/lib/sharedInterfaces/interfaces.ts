@@ -232,6 +232,7 @@ export interface Game {
     videoUrlPattern?: LocalizedField<string>;
     animationMedia?: LocalizedField<string>;
     loggedOutAnimationMedia?: LocalizedField<string>;
+    sigCons?: LocalizedField<string>;
     foregroundLogoMedia?: LocalizedField<IBynderAsset[]>;
     loggedOutForegroundLogoMedia?: LocalizedField<IBynderAsset[]>;
     backgroundMedia?: LocalizedField<IBynderAsset[]>;
@@ -360,6 +361,7 @@ export type IGameInfo = Pick<
     | 'funPanelBackgroundImage'
     | 'funPanelDefaultCategory'
     | 'showNetPosition'
+    | 'sigCons'
     | 'animationMedia'
     | 'loggedOutAnimationMedia'
     | 'foregroundLogoMedia'
@@ -577,12 +579,34 @@ export interface ISectionGame {
     headlessJackpot?: object;
     animationMedia?: string;
     loggedOutAnimationMedia?: string;
+    sigCons?: string;
+    launchCode?: string;
     foregroundLogoMedia?: object;
     loggedOutForegroundLogoMedia?: object;
     backgroundMedia?: object;
     loggedOutBackgroundMedia?: object;
     liveHidden?: boolean;
 }
+
+// Compile-time drift guard for the localised string fields that `payloadBuilder` forwards
+// from `Game` (Contentful input, `LocalizedField<string>`) to `ISectionGame` (API output,
+// plain `string`). The output-side spread in `payloadBuilder` doesn't trigger excess-property
+// checks, so without this list a silent rename on either interface would leave the builder
+// emitting a phantom field that no consumer reads. Mirrors `PASS_THROUGH_LOCALIZED_STRING_FIELDS`
+// on the writer side (PostGamesPayloadFunction/tests/gamesPayload.test.ts).
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const PAYLOAD_PASS_THROUGH_LOCALIZED_STRING_FIELDS = [
+    'title',
+    'dfgWeeklyImgUrlPattern',
+    'imgUrlPattern',
+    'loggedOutImgUrlPattern',
+    'representativeColor',
+    'videoUrlPattern',
+    'animationMedia',
+    'loggedOutAnimationMedia',
+    'sigCons',
+    'launchCode',
+] as const satisfies ReadonlyArray<keyof Game & keyof ISectionGame>;
 
 export interface IGameConfigResponse {
     chat?: object;
@@ -614,6 +638,7 @@ export interface IGameConfigResponse {
 export interface IGameSkinConfigResponse {
     gameName: string;
     gameType: string;
+    gameAggregator: string | null;
 }
 
 export interface IGameInfoResponse {
@@ -630,6 +655,7 @@ export interface IGameInfoResponse {
     introductionContent: string;
     maxBet: string;
     minBet: string;
+    sigCons?: string | null;
     representativeColor: string;
     animationMedia?: string;
     backgroundImage?: string;

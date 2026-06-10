@@ -1,0 +1,10 @@
+{
+  "title": "Architecture Decision Records",
+  "pages": [
+    "index",
+    "002-global-only-partition",
+    "003-optimistic-concurrency",
+    "004-no-breaker-prefix-on-self-obs",
+    "005-edge-triggered-with-tick"
+  ]
+}

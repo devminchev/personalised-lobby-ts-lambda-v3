@@ -1,0 +1,12 @@
+summary: "SearchView Example"
+value:
+  name: "Search"
+  viewSlug: "search"
+  classification: "search"
+  topContent: []
+
+  primaryContent:
+    - entryId: "123"
+      classification: "SearchResultsSection"
+      title: "Search our games"
+      layoutType: "grid-a"

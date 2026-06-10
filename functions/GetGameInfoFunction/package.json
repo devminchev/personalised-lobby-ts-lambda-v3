@@ -1,9 +1,9 @@
 {
   "name": "get-game-info",
-  "version": "0.24.3",
+  "version": "0.28.5",
   "description": "Returns game info for a specific game",
   "main": "app.js",
-  "repository": "https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda",
+  "repository": "https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3",
   "relComponent": "igaming_lobby_game_info_v3",
   "scripts": {
     "unit": "jest",

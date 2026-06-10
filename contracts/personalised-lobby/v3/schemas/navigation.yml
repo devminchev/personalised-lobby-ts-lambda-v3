@@ -1,0 +1,21 @@
+---
+title: Navigation
+description: Response of Navigation defined for a particular venture
+type: object
+required:
+  - links
+properties:
+  links:
+    description: Primary navigation links.
+    type: array
+    items:
+      $ref: "./link.yml"
+
+  bottomNavLinks:
+    description: Navigation links for the bottom navigation area.
+    type: array
+    items:
+      $ref: "./link.yml"
+
+example:
+  $ref: '../examples/navigation.yml'

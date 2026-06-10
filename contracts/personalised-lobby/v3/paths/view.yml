@@ -1,0 +1,73 @@
+---
+get:
+  summary: Page view
+  x-controller: getView
+  tags:
+    - View
+  parameters:
+    - name: X-LOBBY-VARIANT
+      description: Custom header for AB testing. Accepted (treatment, control, unaffected) defaults to unaffected.
+      schema:
+        type: string
+      in: header
+      required: false
+    - name: sitename
+      description: venture name
+      schema:
+        type: string
+      in: path
+      required: true
+    - name: viewslug
+      in: path
+      description: Id of the view
+      schema:
+        type: string
+      required: true
+    - name: platform
+      in: path
+      description: Platform device type. Accepted values 'web', 'ios' and 'android'.
+      schema:
+        type: string
+      required: true
+    - name: auth
+      description: Indicator if the user is loggedin or not. If true - user is considered loggedin. If it's missing or any value different from true, backend considers the user to be logged out.
+      schema:
+        type: string
+      in: query
+      required: false
+    - name: locale
+      in: query
+      description: Used for localization. Values are set in Contentful. Accepted values "en-GB", "en-CA", "en-US", "es-ES"
+      schema:
+        type: string
+      required: false
+  responses:
+    "200":
+      description: The response from the proxied URL.
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/view.yml'
+          examples:
+            view:
+              $ref: "../examples/sections/view.yml"
+            searchView:
+              $ref: "../examples/sections/search-view.yml"
+    '400':
+      $ref: '../schemas/error-responses.yml'
+    '401':
+      $ref: '../schemas/error-responses.yml'
+    '403':
+      $ref: '../schemas/error-responses.yml'
+    '404':
+      $ref: '../schemas/error-responses.yml'
+    '429':
+      $ref: '../schemas/error-responses.yml'
+    '500':
+      $ref: '../schemas/error-responses.yml'
+    '502':
+      $ref: '../schemas/error-responses.yml'
+    '503':
+      $ref: '../schemas/error-responses.yml'
+    '504':
+      $ref: '../schemas/error-responses.yml'

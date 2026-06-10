@@ -2,6 +2,126 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.16.5](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-recommended-games-on-exit-0.16.4...get-recommended-games-on-exit-0.16.5) (2026-06-09)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.61.0`
+## [0.16.4](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-recommended-games-on-exit-0.16.3...get-recommended-games-on-exit-0.16.4) (2026-06-09)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.60.2`
+## [0.16.3](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-recommended-games-on-exit-0.16.2...get-recommended-games-on-exit-0.16.3) (2026-06-05)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.60.1`
+
+### Bug Fixes
+
+* **gtech-1320927:** disable breaker logic for tier b and c ([8d1a3b9](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/8d1a3b9b748e83526e691cb74ad4c51d3afb6766))
+
+## [0.16.2](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-recommended-games-on-exit-0.16.1...get-recommended-games-on-exit-0.16.2) (2026-06-05)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.60.1`
+## [0.16.1](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-recommended-games-on-exit-0.16.0...get-recommended-games-on-exit-0.16.1) (2026-06-05)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.60.0`
+## [0.16.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-recommended-games-on-exit-0.15.0...get-recommended-games-on-exit-0.16.0) (2026-06-03)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.59.0`
+
+### Features
+
+* **gtech-1319757:** upgrade lambda node version to lts ([af44b88](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/af44b886b04e87327753f172dd91c67fba5764ab))
+
+## [0.15.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-recommended-games-on-exit-0.14.2...get-recommended-games-on-exit-0.15.0) (2026-06-02)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.58.0`
+
+### Features
+
+* **gtech-1320927:** lobby api lambdas to be able to get global breaker state ([a645e28](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/a645e284292ba9076283c26b1c49e133aa1840aa))
+
+## [0.14.2](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-recommended-games-on-exit-0.14.1...get-recommended-games-on-exit-0.14.2) (2026-05-20)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.57.1`
+## [0.14.1](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-recommended-games-on-exit-0.14.0...get-recommended-games-on-exit-0.14.1) (2026-05-20)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.57.0`
+## [0.14.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-recommended-games-on-exit-0.13.5...get-recommended-games-on-exit-0.14.0) (2026-05-20)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.56.1`
+
+### Features
+
+* **gtech-1322384:** add controller lambda component to nightwatch jira automation ([3f30a54](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/3f30a544d01ca2ba3d55851b1e9bd192e4bc5c3f))
+
+## [0.13.5](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-recommended-games-on-exit-0.13.4...get-recommended-games-on-exit-0.13.5) (2026-05-14)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.56.1`
+## [0.13.4](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-recommended-games-on-exit-0.13.3...get-recommended-games-on-exit-0.13.4) (2026-05-08)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.56.0`
+## [0.13.3](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-recommended-games-on-exit-0.13.2...get-recommended-games-on-exit-0.13.3) (2026-05-08)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.55.0`
+## [0.13.2](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-recommended-games-on-exit-0.13.1...get-recommended-games-on-exit-0.13.2) (2026-05-01)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.54.1`
+## [0.13.1](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-recommended-games-on-exit-0.13.0...get-recommended-games-on-exit-0.13.1) (2026-05-01)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.54.0`
+
+### Bug Fixes
+
+* **gtech-1319733:** recommended games spain locale resolution ([5dce906](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/commit/5dce906269e879eebc3df5dc41e5d0cd9e62514c))
+
+## [0.13.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-recommended-games-on-exit-0.12.5...get-recommended-games-on-exit-0.13.0) (2026-05-01)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.54.0`
+
+### Features
+
+* **gtech-1319733:** add sigcons lines to game model and lambda responses ([ac3ef91](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/commit/ac3ef9140a89291c720a5475b95914f582c1a89f))
+
+## [0.12.5](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-recommended-games-on-exit-0.12.4...get-recommended-games-on-exit-0.12.5) (2026-04-29)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.53.4`
+## [0.12.4](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-recommended-games-on-exit-0.12.3...get-recommended-games-on-exit-0.12.4) (2026-04-28)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.53.3`
 ## [0.12.3](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-recommended-games-on-exit-0.12.2...get-recommended-games-on-exit-0.12.3) (2026-04-24)
 
 ### Dependency Updates

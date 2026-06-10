@@ -2,6 +2,108 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.33.4](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-sections-0.33.3...get-sections-0.33.4) (2026-06-09)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.61.0`
+## [0.33.3](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-sections-0.33.2...get-sections-0.33.3) (2026-06-09)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.60.2`
+## [0.33.2](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-sections-0.33.1...get-sections-0.33.2) (2026-06-05)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.60.1`
+## [0.33.1](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-sections-0.33.0...get-sections-0.33.1) (2026-06-05)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.60.0`
+## [0.33.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-sections-0.32.0...get-sections-0.33.0) (2026-06-03)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.59.0`
+
+### Features
+
+* **gtech-1319757:** upgrade lambda node version to lts ([af44b88](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/af44b886b04e87327753f172dd91c67fba5764ab))
+
+## [0.32.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-sections-0.31.2...get-sections-0.32.0) (2026-06-02)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.58.0`
+
+### Features
+
+* **gtech-1320927:** lobby api lambdas to be able to get global breaker state ([a645e28](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/a645e284292ba9076283c26b1c49e133aa1840aa))
+
+## [0.31.2](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-sections-0.31.1...get-sections-0.31.2) (2026-05-20)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.57.1`
+## [0.31.1](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-sections-0.31.0...get-sections-0.31.1) (2026-05-20)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.57.0`
+## [0.31.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/compare/get-sections-0.30.0...get-sections-0.31.0) (2026-05-20)
+
+
+### Features
+
+* **gtech-1322384:** add controller lambda component to nightwatch jira automation ([3f30a54](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/commit/3f30a544d01ca2ba3d55851b1e9bd192e4bc5c3f))
+
+## [0.30.0](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-sections-0.29.14...get-sections-0.30.0) (2026-05-14)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.56.1`
+
+### Features
+
+* **gtech-1320056:** add new component in cms for loyalty progress tracker ([08794fb](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/commit/08794fbd6d1892f6c15548aec77df795375de6e5))
+
+## [0.29.14](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-sections-0.29.13...get-sections-0.29.14) (2026-05-14)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.56.1`
+## [0.29.13](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-sections-0.29.12...get-sections-0.29.13) (2026-05-08)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.56.0`
+## [0.29.12](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-sections-0.29.11...get-sections-0.29.12) (2026-05-08)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.55.0`
+## [0.29.11](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-sections-0.29.10...get-sections-0.29.11) (2026-05-01)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.54.1`
+## [0.29.10](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-sections-0.29.9...get-sections-0.29.10) (2026-05-01)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.54.0`
+## [0.29.9](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-sections-0.29.8...get-sections-0.29.9) (2026-04-29)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.53.4`
+## [0.29.8](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-sections-0.29.7...get-sections-0.29.8) (2026-04-28)
+
+### Dependency Updates
+
+* `os-client` updated to version `0.53.3`
 ## [0.29.7](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda/compare/get-sections-0.29.6...get-sections-0.29.7) (2026-04-24)
 
 ### Dependency Updates

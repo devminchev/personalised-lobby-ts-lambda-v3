@@ -1,0 +1,24 @@
+title: Game Shuffle
+description: Response of Game Shuffle for a particular venture.
+type: array
+items:
+  type: object
+  properties:
+    tileOne:
+      description: List of games with rtp of 93% or less
+      type: array
+      items:
+        $ref: '../schemas/game-shuffle-games.yml'
+    tileTwo:
+      description: List of games with rtp less than 96%
+      type: array
+      items:
+        $ref: '../schemas/game-shuffle-games.yml'
+    tileThree:
+      description: List of games with rtp less than 96%
+      type: array
+      items:
+        $ref: '../schemas/game-shuffle-games.yml'
+
+example:
+  $ref: '../examples/game-shuffle.yml'

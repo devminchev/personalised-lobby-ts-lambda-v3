@@ -1,0 +1,122 @@
+---
+title: Consumer integration
+description: Contract for Lambdas that read the breaker state to shed traffic — what to read, how to cache, what guarantees the controller makes, and the bits of the contract that are still future work
+---
+
+# Consumer integration
+
+**This section is to be re-reviewed after consumer implementation!**
+
+The whole point of the controller is that lobby Lambdas read the persisted breaker state and shed non-critical traffic when the stack is under pressure. **No consumer exists in the codebase yet** — this page is the contract the controller commits to so the next Lambda that wants to integrate has a stable spec to write against.
+
+When the consumer reader helper lands (planned for `libs/OSClient`), this page becomes the canonical reference for it. Until then, treat it as the design contract.
+
+For background on which endpoints would be shed first when the breaker opens, see [Service tiers](./service-tiers.mdx).
+
+## What to read
+
+A consumer reads exactly one DynamoDB item: `(PK = "BREAKER#GLOBAL", SK = "STATE#CURRENT")` from `CircuitControl-${StageName}`.
+
+```ts
+const out = await ddb.send(new GetCommand({
+    TableName: `CircuitControl-${process.env.STAGE_NAME}`,
+    Key: { PK: 'BREAKER#GLOBAL', SK: 'STATE#CURRENT' },
+}));
+const breaker = out.Item; // BreakerStateItem | undefined
+```
+
+The `BreakerStateItem` shape is documented in [Data model — `STATE#CURRENT`](./circuit-breaker-data-model.mdx#statecurrent--live-breaker-posture). The fields a consumer should care about are:
+
+| Field | Use |
+|---|---|
+| `mode` | The decision input. `'normal'` → serve normally. `'protect'` → shed non-critical (per [Service tiers](./service-tiers.mdx)). |
+| `state` | If you want finer-grained logging — `'OPEN'` and `'HALF_OPEN'` both map to `'protect'` mode but `'HALF_OPEN'` indicates we are probing for recovery. |
+| `version` | Monotonic per partition. Useful for cache invalidation / "has the posture changed since I last read?" logic on the consumer side. |
+| `reason` | Human-readable label (e.g. `compound_open:compound_warning:api-p99,api-5xx`). Log it; don't branch on it. |
+| `updatedAt` | When this posture was written. Use it to detect a stuck/abandoned breaker (e.g. last update > 24 h ago is suspicious). |
+
+`tripCount`, `healthyProbeCount`, `holdUntil`, and `openedByAlarm` exist for forensics and the controller's own logic. Consumers should not branch on them.
+
+## What `mode` means
+
+Two values; the breaker only ever produces these:
+
+| `mode` | What the consumer should do |
+|---|---|
+| `'normal'` | Serve traffic normally. All endpoints, all OpenSearch queries, all personalisation. |
+| `'protect'` | Shed non-critical traffic. The exact shed list is per-endpoint and lives in [Service tiers](./service-tiers.mdx). At minimum: drop Tier C endpoints, then Tier B if the protect mode persists. Tier A always serves. |
+
+The mapping from `state` to `mode` ([statemachine.ts](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/statemachine.ts)):
+
+| `state` | `mode` |
+|---|---|
+| `CLOSED` | `'normal'` |
+| `OPEN` | `'protect'` |
+| `HALF_OPEN` | `'protect'` |
+
+`OPEN` and `HALF_OPEN` map to the same consumer mode. The breaker can oscillate between them while sustained pressure persists, but a consumer that watches `mode` sees one continuous "protect" window — not flap. See [Behaviour — Scenario 1](./circuit-breaker-behaviour.mdx#scenario-1--slow-ramp-ending-in-rejections) for an example.
+
+## Caching the read
+
+The controller is invoked at most a few times per minute under normal conditions, but a consumer can be invoked at the rate of incoming user traffic. Reading DynamoDB on every request is unnecessary and expensive. The recommended pattern is a per-container in-process cache, mirroring the [settings cache](./configuration-store-decision.mdx#what-this-means-in-practice) on the controller side.
+
+### Recommended cache shape
+
+- **TTL**: 5–10 seconds. Short enough that a state transition propagates in time to be useful (the breaker only flips `mode` on HALF_OPEN→CLOSED, and the consumer-visible `protect`-window is bounded below by `openHoldMs = 60 s`). Long enough that the read is amortised across hundreds of requests under load.
+- **Jitter**: ±10 %. Without jitter, every container in a fleet can synchronise its refresh and produce a thundering herd against DynamoDB. AWS [DynamoDB best practices](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/best-practices.html) call this out.
+- **Failure-mode**: keep serving the last cached value on a transient read error. A consumer that fails-loud on a DDB read error is *less* available than just continuing with slightly stale state. If the cached value has aged past a hard ceiling (say, 5 min), then fail-loud — but in normal operation, stale is better than down.
+- **Consistency**: eventually-consistent (the default). Strong reads are not necessary on the consumer side because the breaker state changes slowly relative to the cache TTL.
+
+### What the consumer should NOT do
+
+- **Don't `Query`.** A `GetItem` on the exact key is one RCU; a `Query` is at least one and may be more.
+- **Don't read `STATE#<isoTs>` history rows.** Those are TTL'd and are not the live posture.
+- **Don't read `EVENT#*` audit rows.** Same.
+- **Don't subscribe to DynamoDB Streams.** It would work, but the cache + polling pattern is simpler and the RPS doesn't justify the complexity.
+- **Don't modify `STATE#CURRENT` from a consumer.** Only the controller (and `setBreakerStateManually`) writes there.
+
+## Guarantees the controller commits to
+
+Restated from [the state machine spec](./circuit-breaker-state-machine.mdx#invariants):
+
+1. **`STATE#CURRENT` always exists once the controller has been invoked at least once.** Cold-start consumers may transiently see `Item: undefined` on a brand-new stack; treat that as `mode: 'normal'`. (Equivalent: assume CLOSED on absence.)
+2. **`version` is monotonically increasing.** A consumer that observes a decrease has read across an unsupported rollback (PITR restore, manual table edit) — log it, ignore the older value.
+3. **The controller never flips `mode` from `'protect'` back to `'normal'` while signals are still active.** A `'protect' → 'normal'` transition only happens via HALF_OPEN→CLOSED — either the probe path ([statemachine.ts](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/statemachine.ts)) or the tick path with empty pruned signals ([index.ts](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/index.ts)). (`mode === 'normal'` also appears on CLOSED→CLOSED steady-state writes and on a manual override that sets `state: 'CLOSED'` — those are not `'protect' → 'normal'` transitions.)
+4. **`mode` cannot whip-saw faster than once per minute.** `openHoldMs ≥ 60 s` plus the alarm-side smoothing (`3-of-5` for warnings, `2-of-3` for criticals) ensures this. See [Behaviour — Anti-flap](./circuit-breaker-behaviour.mdx#baseline-mechanics).
+5. **`updatedAt` is monotonic per partition.** The tick never advances time backward.
+
+## Failure modes the consumer should plan for
+
+| Failure | Consumer-visible symptom | Consumer should... |
+|---|---|---|
+| DynamoDB read throttled | `ProvisionedThroughputExceededException` (rare on PAY_PER_REQUEST but possible during burst) | Serve the cached value; let the next refresh retry |
+| DynamoDB read errors transiently | Connection error, 5xx | Same as above |
+| `STATE#CURRENT` is missing | First-ever read on a fresh stack | Treat as `mode: 'normal'` — the breaker is in CLOSED equivalent state |
+| `updatedAt` is older than e.g. 24 h | Controller has not been invoked recently | The controller may be broken; this is a `ControllerErrorsAlarm` / `ControllerDlqDepthAlarm` problem on the controller side. The consumer should still respect the last known `mode`. |
+| Cached value's TTL has long since elapsed AND the read is still failing | Sustained DDB outage | After a hard ceiling (say, 5 min stale), prefer to fail-open (`mode: 'normal'`) — the user-facing behaviour of a regression to default-on is better than serving stale `protect` with no possibility of recovery |
+
+These tradeoffs are a recommendation; the actual policy is the consumer's choice. The controller does not encode any expectation here.
+
+## Future tier-aware shedding
+
+The controller already computes a four-level severity score (`HIGH | MEDIUM_HIGH | LOW | NONE`) inside `computeSeverityScore` ([index.ts](https://gitlab.ballys.tech/excite/native/applications/personalised-lobby-ts-lambda-v3/-/blob/main/functions/PostCloudWatchController/src/index.ts)). Today only the binary `mode` is persisted on `BreakerStateItem`; the score is not.
+
+Once a consumer lands and we know which shedding granularity is useful, persisting the score onto `STATE#CURRENT` is a small change and would let consumers do tier-aware decisions:
+
+| Score | Suggested consumer behaviour |
+|---|---|
+| `HIGH` (any critical signal) | Shed Tier B + Tier C; serve only Tier A |
+| `MEDIUM_HIGH` (compound warning) | Shed Tier C; keep Tier B + Tier A |
+| `LOW` (single warning, breaker stays CLOSED) | Serve normally; log for visibility |
+| `NONE` | Serve normally |
+
+This is a deliberate v2: shipping the binary version first lets us validate the overall pipeline (alarms → controller → DynamoDB → consumer) before adding granularity. See [the open-items list in the controller's review notes](./circuit-breaker-overview.mdx).
+
+Real consumers will want jitter on `TTL_MS`, structured logging, metrics on cache hit-rate, and tests against DynamoDB Local — that's all conventional and out of scope for this page.
+
+## Where this connects to existing docs
+
+- [Service tiers](./service-tiers.mdx) — what each tier covers and the order in which they should be shed.
+- [State machine](./circuit-breaker-state-machine.mdx) — what each `state` value means and what guarantees the transition logic provides.
+- [Data model](./circuit-breaker-data-model.mdx) — the persisted shapes a consumer reads.
+- [Runbook](./circuit-breaker-runbook.mdx) — operator workflow when something is wrong on the controller side; consumers should respect the breaker even during operator overrides.

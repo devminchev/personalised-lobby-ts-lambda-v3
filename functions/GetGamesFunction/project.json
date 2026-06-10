@@ -11,7 +11,7 @@
         "main": "functions/GetGamesFunction/app.ts",
         "tsConfig": "functions/GetGamesFunction/tsconfig.json",
         "platform": "node",
-        "target": "node20",
+        "target": "node24",
         "bundle": true,
         "sourcemap": true,
         "minify": true,
@@ -57,7 +57,7 @@
   },
   "tags": [],
   "implicitDependencies": [],
-  "version": "0.24.7",
+  "version": "0.29.4",
   "dependencies": [
     "os-client"
   ]

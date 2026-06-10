@@ -1,0 +1,203 @@
+# - chat: {}
+#   funPanelEnabled: true
+#   vendor: test-data
+#   gameName: true
+#   minBet: '2'
+#   maxBet: '10'
+#   entryId: 1SC6Pyl5XFF1w8S4Y2uMzZ
+#   mobileOverride: false
+#   gameSkin: play-double-bubble-mini
+#   name: play-double-bubble-mini
+#   demoUrl: /service/game/demo/play-double-bubble-mini
+#   realUrl: /service/game/play/play-double-bubble-mini
+#   gameLoaderFileName: play-double-bubble-mini
+#   mobileName: ""
+#   mobileGameSkin: ""
+#   mobileRealUrl: ""
+#   mobileDemoUrl: ""
+#   mobileGameLoaderFileName: ""
+#   gameStudio: Gamevy
+#   gameProvider: Engage Rgc
+#   gameType:
+#     type: Casino
+#     casinoType: Blackjack
+
+entryId: 1SC6Pyl5XFF1w8S4Y2uMzZ
+chat: {}
+funPanelEnabled: true
+showNetPosition: true
+vendor: test-data
+minBet: '2'
+maxBet: '10'
+headlessJackpot: {
+  id: 1234,
+  name: 'Jackpot 1'
+}
+mobileOverride: false
+gameSkin: play-double-bubble-mini
+gameName: play-double-bubble-mini
+demoUrl: /service/game/demo/play-double-bubble-mini
+realUrl: /service/game/play/play-double-bubble-mini
+gameLoaderFileName: play-double-bubble-mini
+mobileName: ""
+mobileGameSkin: ""
+mobileRealUrl: ""
+mobileDemoUrl: ""
+mobileGameLoaderFileName: ""
+gameStudio: Gaming Arts
+gameProvider: Evolution Gaming
+gameType:
+  type: Slots
+  brand: Monopoly
+  features:
+    - Expanding Wilds
+  themes:
+    - Nature
+  symbolType:
+    - Royals
+    - Suits
+  maxMultiplier: "2"
+  reel: "5-5"
+  symbolCount: "1"
+  waysToWin: "1024"
+  winLineType: Megaways
+  winLines: "10"
+  isJackpotFixedPrize: false
+  isJackpotInGameProgressive: false
+  isJackpotPlatformProgressive: false
+  isPersistence: false
+  liveHidden: true
+
+
+# - chat: {}
+#   funPanelEnabled: true
+#   vendor: test-data
+#   gameName: true
+#   minBet: '2'
+#   maxBet: '10'
+#   entryId: 1SC6Pyl5XFF1w8S4Y2uMzZ
+#   mobileOverride: false
+#   gameSkin: play-double-bubble-mini
+#   name: play-double-bubble-mini
+#   demoUrl: /service/game/demo/play-double-bubble-mini
+#   realUrl: /service/game/play/play-double-bubble-mini
+#   gameLoaderFileName: play-double-bubble-mini
+#   mobileName: ""
+#   mobileGameSkin: ""
+#   mobileRealUrl: ""
+#   mobileDemoUrl: ""
+#   mobileGameLoaderFileName: ""
+#   gameStudio: Gaming Arts
+#   gameProvider: Evolution Gaming
+#   gameType:
+#     type: Live dealer
+
+# - chat: {}
+#   funPanelEnabled: true
+#   vendor: test-data
+#   gameName: true
+#   minBet: '2'
+#   maxBet: '10'
+#   entryId: 1SC6Pyl5XFF1w8S4Y2uMzZ
+#   mobileOverride: false
+#   gameSkin: play-double-bubble-mini
+#   name: play-double-bubble-mini
+#   demoUrl: /service/game/demo/play-double-bubble-mini
+#   realUrl: /service/game/play/play-double-bubble-mini
+#   gameLoaderFileName: play-double-bubble-mini
+#   mobileName: ""
+#   mobileGameSkin: ""
+#   mobileRealUrl: ""
+#   mobileDemoUrl: ""
+#   mobileGameLoaderFileName: ""
+#   gameStudio: Gaming Arts
+#   gameProvider: Evolution Gaming
+#   gameType:
+#     type: Slingo
+#     themes:
+#       - Magic
+#       - Fruit
+#     features:
+#       - Expanding Wilds
+#       - Stacked Wilds
+#     brand: Deal or no deal
+
+# - chat: {}
+#   funPanelEnabled: true
+#   vendor: test-data
+#   gameName: true
+#   minBet: '2'
+#   maxBet: '10'
+#   entryId: 1SC6Pyl5XFF1w8S4Y2uMzZ
+#   mobileOverride: false
+#   gameSkin: play-double-bubble-mini
+#   name: play-double-bubble-mini
+#   demoUrl: /service/game/demo/play-double-bubble-mini
+#   realUrl: /service/game/play/play-double-bubble-mini
+#   gameLoaderFileName: play-double-bubble-mini
+#   mobileName: ""
+#   mobileGameSkin: ""
+#   mobileRealUrl: ""
+#   mobileDemoUrl: ""
+#   mobileGameLoaderFileName: ""
+#   gameStudio: Gaming Arts
+#   gameProvider: Evolution Gaming
+#   gameType:
+#     type: Bingo
+
+# - chat: {}
+#   funPanelEnabled: true
+#   vendor: test-data
+#   gameName: true
+#   minBet: '2'
+#   maxBet: '10'
+#   entryId: 1SC6Pyl5XFF1w8S4Y2uMzZ
+#   mobileOverride: false
+#   gameSkin: play-double-bubble-mini
+#   name: play-double-bubble-mini
+#   demoUrl: /service/game/demo/play-double-bubble-mini
+#   realUrl: /service/game/play/play-double-bubble-mini
+#   gameLoaderFileName: play-double-bubble-mini
+#   mobileName: ""
+#   mobileGameSkin: ""
+#   mobileRealUrl: ""
+#   mobileDemoUrl: ""
+#   mobileGameLoaderFileName: ""
+#   gameStudio: Hungry Bear
+#   gameProvider: Eyecon
+#   gameType:
+#     type: Poker
+
+# - chat: {}
+#   funPanelEnabled: true
+#   vendor: test-data
+#   gameName: true
+#   minBet: '2'
+#   maxBet: '10'
+#   entryId: 1SC6Pyl5XFF1w8S4Y2uMzZ
+#   mobileOverride: false
+#   gameSkin: play-double-bubble-mini
+#   name: play-double-bubble-mini
+#   demoUrl: /service/game/demo/play-double-bubble-mini
+#   realUrl: /service/game/play/play-double-bubble-mini
+#   gameLoaderFileName: play-double-bubble-mini
+#   mobileName: ""
+#   mobileGameSkin: ""
+#   mobileRealUrl: ""
+#   mobileDemoUrl: ""
+#   mobileGameLoaderFileName: ""
+#   gameStudio: Lightning Box
+#   gameProvider: Pragmatic
+#   gameType:
+#     type: Instant Win
+#     themes:
+#       - Branded
+#       - Fruit
+#       - Egypt
+#       - Magic
+#     features:
+#       - Sticky Wilds
+#       - Other Wilds
+#       - Expanding Wilds
+#       - Free Spins
+#     brand: Deal or no deal

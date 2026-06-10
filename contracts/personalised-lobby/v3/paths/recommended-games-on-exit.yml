@@ -1,0 +1,56 @@
+---
+parameters:
+  - name: sitename
+    description: Venture name
+    schema:
+      type: string
+    in: path
+    required: true
+  - name: platform
+    description: Platform device type. Accepted values 'web', 'ios' and 'android'.
+    schema:
+      type: string
+    in: path
+    required: true
+  - name: gameskin
+    in: path
+    description: Game skin to filter the recommendations.
+    schema:
+      type: string
+    required: true
+  - name: locale
+    in: query
+    description: Used for localization. Values are set in Contentful. Accepted values "en-GB", "en-CA", "en-US", "es-ES"
+    schema:
+      type: string
+    required: false
+get:
+  summary: Games for the ML Personalised Recommended Games on Exit Section
+  x-controller: RecommendedGamesOnExit
+  tags:
+    - RecommendedGamesOnExit
+  responses:
+    "200":
+      description: A list of recommended games tailored for the user. Suggestions are generated either by machine learning models, if no ML-based recommendations are available for the user, an empty list is returned.
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/recommended-games-on-exit.yml'
+    '400':
+      $ref: '../schemas/error-responses.yml'
+    '401':
+      $ref: '../schemas/error-responses.yml'
+    '403':
+      $ref: '../schemas/error-responses.yml'
+    '404':
+      $ref: '../schemas/error-responses.yml'
+    '429':
+      $ref: '../schemas/error-responses.yml'
+    '500':
+      $ref: '../schemas/error-responses.yml'
+    '502':
+      $ref: '../schemas/error-responses.yml'
+    '503':
+      $ref: '../schemas/error-responses.yml'
+    '504':
+      $ref: '../schemas/error-responses.yml'

@@ -1,0 +1,37 @@
+title: Mini Games
+description: Response containing an array of minigame sections, each with a list of games
+required:
+  - entryId
+  - games
+oneOf:
+  - type: array
+    items:
+      type: object
+      required:
+        - entryId
+        - games
+        - title
+        - name
+        - layoutType
+      properties:
+        entryId:
+          type: string
+          description: The unique entry ID for the Mini Game Section
+        title:
+          type: string
+          description: Entry title of the Mini Games
+        name:
+          type: string
+          description: Property is used by mobile-web
+        games:
+          type: array
+          description: Array of games, each being a game object
+          $ref:  "./loggedIn-minimal-game-resp.yml"
+        layoutType:
+          description: Layout type for mini games section
+          type: string
+        vendor:
+          description: Which vendor will load the game
+          type: string
+example:
+  $ref: '../examples/mini-games.yml'

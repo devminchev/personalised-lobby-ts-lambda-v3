@@ -1,0 +1,14 @@
+---
+title: PersonalisedSectionGamesResponse
+description: >-
+  Response for the personalised section games endpoint. Returns an ordered list of games for
+  an ML personalised section (e.g. `personal-suggested-games`, `because-you-played`,
+  `recently-played`). Games are ordered by the section's configured sort criteria (defaults
+  to `margin_rank`).
+type: array
+items:
+  type: object
+  $ref: "./section-games.yml"
+
+example:
+  $ref: '../examples/personalised-section-games.yml'
